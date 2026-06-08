@@ -105,7 +105,7 @@ function PaymentOutflowPage() {
   const total = items.reduce((s, i) => s + i.amount, 0);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-page-in">
       <PageHeader
         title="Payment Outflow"
         subtitle="Miscellaneous cash payments — these appear in the Cashbook paid side"

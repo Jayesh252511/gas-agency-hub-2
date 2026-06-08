@@ -190,7 +190,7 @@ function OutstandingPage() {
   const total = items.reduce((s, i) => s + i.amount, 0);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-page-in">
       <PageHeader
         title="Outstanding"
         subtitle="Record money / udhari given to individuals — these appear in the Cashbook paid side"

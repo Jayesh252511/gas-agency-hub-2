@@ -5,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PageHeader } from "@/components/page-header";
@@ -13,22 +12,77 @@ import { useTranslation } from "react-i18next";
 import { fmtCurrency, fmtDate, todayISO } from "@/lib/format";
 import { exportToExcel, exportToPDF } from "@/lib/exports";
 import { getStockBalances, getStockLedger } from "@/lib/stock-store";
-import { Download, FileText, Play } from "lucide-react";
+import { Download, FileText, Play, Bookmark, BookmarkCheck, Trash2, History } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import { DateRangePicker } from "@/components/date-range-picker";
 
 export const Route = createFileRoute("/app/reports")({ component: () => <RequireAgencyUser><Page/></RequireAgencyUser> });
 
 type Kind = "daily_summary" | "product_sales" | "payments" | "udhari" | "cashbook" | "delivery" | "stock" | "customer_ledger";
 
+const SAVED_FILTERS_KEY = "gh_saved_report_filters";
+
+interface SavedFilter {
+  id: string;
+  name: string;
+  kind: Kind;
+  from: string;
+  to: string;
+  customerId?: string;
+  savedAt: string;
+}
+
+function getSavedFilters(): SavedFilter[] {
+  try { return JSON.parse(localStorage.getItem(SAVED_FILTERS_KEY) ?? "[]"); } catch { return []; }
+}
+function setSavedFilters(filters: SavedFilter[]) {
+  try { localStorage.setItem(SAVED_FILTERS_KEY, JSON.stringify(filters)); } catch {}
+}
+
 function Page() {
   const { t } = useTranslation();
   const { agency, session } = useAuth();
   const [kind, setKind] = useState<Kind>("daily_summary");
-  const [from, setFrom] = useState(todayISO()); const [to, setTo] = useState(todayISO());
+  const [from, setFrom] = useState(todayISO());
+  const [to, setTo] = useState(todayISO());
   const [cols, setCols] = useState<string[]>([]); const [data, setData] = useState<(string|number)[][]>([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
-  const [customers, setCustomers] = useState<Array<{ id: string; name: string }>>([]);
+  const [customers, setCustomers] = useState<Array<{ id: string; name: string }>>([])
+  const [savedFilters, setSavedFiltersState] = useState<SavedFilter[]>(getSavedFilters);
+  const [showSaved, setShowSaved] = useState(false);
+
+  const saveCurrentFilter = () => {
+    const name = `${kind.replace("_", " ")} · ${from} to ${to}`;
+    const newFilter: SavedFilter = {
+      id: Date.now().toString(),
+      name,
+      kind,
+      from,
+      to,
+      customerId: selectedCustomerId || undefined,
+      savedAt: new Date().toISOString(),
+    };
+    const next = [newFilter, ...getSavedFilters()].slice(0, 8);
+    setSavedFilters(next);
+    setSavedFiltersState(next);
+    toast.success("Filter saved!");
+  };
+
+  const loadSavedFilter = (f: SavedFilter) => {
+    setKind(f.kind);
+    setFrom(f.from);
+    setTo(f.to);
+    if (f.customerId) setSelectedCustomerId(f.customerId);
+    setShowSaved(false);
+    toast.success("Filter loaded!");
+  };
+
+  const deleteSavedFilter = (id: string) => {
+    const next = getSavedFilters().filter(f => f.id !== id);
+    setSavedFilters(next);
+    setSavedFiltersState(next);
+  };;
 
   useEffect(() => {
     if (!agency) return;
@@ -441,43 +495,112 @@ function Page() {
     ? "Cylinder Sales Report"
     : t(`reports.${kind}` as never, kind)) as string;
   return (
-    <div className="space-y-6 pb-8">
+    <div className="space-y-6 pb-8 animate-page-in">
       <PageHeader title={t("reports.title")} />
-      <Card className="shadow-soft"><CardContent className="p-4 grid grid-cols-2 md:grid-cols-5 gap-3">
-        <div className="col-span-2 md:col-span-2">
-          <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Select Roster Report Sheet</Label>
-          <Select value={kind} onValueChange={(v) => setKind(v as Kind)}>
-            <SelectTrigger className="h-11 mt-1"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="daily_summary">📋 Daily Sales Register</SelectItem>
-              <SelectItem value="product_sales">📈 Cylinder Sales Report</SelectItem>
-              <SelectItem value="payments">💰 Collection Report</SelectItem>
-              <SelectItem value="udhari">⚠️ Credit Book</SelectItem>
-              <SelectItem value="cashbook">📓 Cashbook</SelectItem>
-              <SelectItem value="delivery">🚚 Delivery Boy Settlement Report</SelectItem>
-              <SelectItem value="stock">📦 Cylinder Stock Register</SelectItem>
-              <SelectItem value="customer_ledger">👤 Customer Ledger</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
 
-        {kind === "customer_ledger" && (
-          <div className="col-span-2 md:col-span-2">
-            <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Select Customer</Label>
-            <Select value={selectedCustomerId} onValueChange={setSelectedCustomerId}>
-              <SelectTrigger className="h-11 mt-1"><SelectValue placeholder="Select Customer..." /></SelectTrigger>
-              <SelectContent>
-                {customers.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+      {/* Filter Card */}
+      <Card className="shadow-soft">
+        <CardContent className="p-4 space-y-4">
+          <div className={`grid grid-cols-1 sm:grid-cols-2 gap-3 ${kind === "customer_ledger" ? "lg:grid-cols-4" : "lg:grid-cols-3"}`}>
+            {/* Report Type */}
+            <div className="sm:col-span-2 lg:col-span-1">
+              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Report Type</Label>
+              <Select value={kind} onValueChange={(v) => setKind(v as Kind)}>
+                <SelectTrigger className="h-11 mt-1"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="daily_summary">📋 Daily Sales Register</SelectItem>
+                  <SelectItem value="product_sales">📈 Cylinder Sales Report</SelectItem>
+                  <SelectItem value="payments">💰 Collection Report</SelectItem>
+                  <SelectItem value="udhari">⚠️ Credit Book</SelectItem>
+                  <SelectItem value="cashbook">📓 Cashbook</SelectItem>
+                  <SelectItem value="delivery">🚚 Delivery Boy Settlement Report</SelectItem>
+                  <SelectItem value="stock">📦 Cylinder Stock Register</SelectItem>
+                  <SelectItem value="customer_ledger">👤 Customer Ledger</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Customer Selector (conditional) */}
+            {kind === "customer_ledger" && (
+              <div>
+                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Customer</Label>
+                <Select value={selectedCustomerId} onValueChange={setSelectedCustomerId}>
+                  <SelectTrigger className="h-11 mt-1"><SelectValue placeholder="Select Customer..." /></SelectTrigger>
+                  <SelectContent>
+                    {customers.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* Date Range Picker */}
+            <div className="sm:col-span-2 lg:col-span-1">
+              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Date Range</Label>
+              <div className="mt-1">
+                <DateRangePicker
+                  value={{ from, to }}
+                  onChange={(v) => { if (v.from) setFrom(v.from); if (v.to) setTo(v.to); }}
+                />
+              </div>
+            </div>
+
+            {/* Run + Save buttons */}
+            <div className="flex items-end gap-2">
+              <Button onClick={run} className="flex-1 h-11 shadow-soft font-semibold">
+                <Play className="h-4 w-4 mr-1.5" />{t("reports.run")}
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-11 w-11 shrink-0"
+                onClick={saveCurrentFilter}
+                title="Save this filter"
+              >
+                <Bookmark className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-11 w-11 shrink-0"
+                onClick={() => setShowSaved(v => !v)}
+                title="Saved filters"
+              >
+                <History className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-        )}
-        <div><Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t("reports.from")}</Label><Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="h-11 mt-1 text-sm" /></div>
-        <div><Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t("reports.to")}</Label><Input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="h-11 mt-1 text-sm" /></div>
-        <div className="flex items-end"><Button onClick={run} className="w-full h-11 shadow-soft font-semibold"><Play className="h-4 w-4 mr-1.5" />{t("reports.run")}</Button></div>
-      </CardContent></Card>
+
+          {/* Saved Filters Panel */}
+          {showSaved && (
+            <div className="border border-border rounded-xl p-3 bg-muted/30 space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                  <BookmarkCheck className="w-3.5 h-3.5" /> Saved Filters ({savedFilters.length})
+                </p>
+              </div>
+              {savedFilters.length === 0 ? (
+                <p className="text-xs text-muted-foreground py-2">No saved filters yet. Run a report and click 🔖 to save.</p>
+              ) : (
+                <div className="space-y-1.5">
+                  {savedFilters.map(f => (
+                    <div key={f.id} className="flex items-center justify-between gap-2 p-2 rounded-lg bg-background border border-border/60 hover:border-primary/30 transition-colors">
+                      <button className="flex-1 text-left" onClick={() => loadSavedFilter(f)}>
+                        <p className="text-xs font-semibold text-foreground capitalize">{f.kind.replace(/_/g, " ")}</p>
+                        <p className="text-[10px] text-muted-foreground">{f.from} → {f.to}</p>
+                      </button>
+                      <button onClick={() => deleteSavedFilter(f.id)} className="p-1 text-muted-foreground hover:text-destructive transition-colors">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
       {data.length > 0 && (
         <Card><CardContent className="p-0">
           <div className="px-4 py-3 border-b flex items-center justify-between">
@@ -501,7 +624,7 @@ function Page() {
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-surface-muted"><tr>{cols.map((c) => <th key={c} className="text-left px-3 py-2 font-semibold">{c}</th>)}</tr></thead>
+              <thead className="bg-muted/50"><tr>{cols.map((c) => <th key={c} className="text-left px-3 py-2 font-semibold">{c}</th>)}</tr></thead>
               <tbody>{data.map((row, i) => (
                 <tr key={i} className="border-t">{row.map((v, j) => <td key={j} className="px-3 py-2 whitespace-nowrap">{typeof v === "number" ? v.toLocaleString("en-IN") : v}</td>)}</tr>
               ))}</tbody>

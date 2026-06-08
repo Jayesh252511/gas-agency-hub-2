@@ -12,7 +12,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Search, IndianRupee, Eye, PlusCircle, AlertCircle, Loader2, Calendar, TrendingDown, FileText } from "lucide-react";
+import { Search, IndianRupee, Eye, PlusCircle, AlertCircle, Loader2, Calendar, TrendingDown, FileText, MessageCircle } from "lucide-react";
 import { fmtCurrency, fmtDate } from "@/lib/format";
 import { getFriendlyError } from "@/lib/friendly-error";
 
@@ -314,7 +314,7 @@ function UdhariPage() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in select-none">
+    <div className="space-y-6 animate-page-in">
       <PageHeader title={t("nav.udhari")} subtitle="Outstanding dues, aging analysis & collection priority" />
 
 
@@ -464,6 +464,17 @@ function UdhariPage() {
                         <Button size="sm" variant="outline" onClick={() => openStatement(c)} className="h-9 flex-1 font-bold">
                           <Eye className="h-4 w-4 mr-1" /> Statement
                         </Button>
+                        {c.mobile && (
+                          <a
+                            href={`https://wa.me/91${c.mobile.replace(/\D/g, "")}?text=${encodeURIComponent(`Hello ${c.name}, you have an outstanding balance of ₹${c.outstanding.toLocaleString("en-IN")} with our agency. Kindly clear your dues at the earliest. Thank you!`)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="h-9 w-9 shrink-0 flex items-center justify-center rounded-md border border-emerald-500 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
+                            title="Send WhatsApp reminder"
+                          >
+                            <MessageCircle className="h-4 w-4" />
+                          </a>
+                        )}
                       </div>
                     </div>
                   );
@@ -535,6 +546,17 @@ function UdhariPage() {
                               <Button size="sm" variant="outline" onClick={() => openStatement(c)} className="h-9">
                                 <Eye className="h-4 w-4 mr-1.5" /> View Statement
                               </Button>
+                              {c.mobile && (
+                                <a
+                                  href={`https://wa.me/91${c.mobile.replace(/\D/g, "")}?text=${encodeURIComponent(`Hello ${c.name}, you have an outstanding balance of ₹${c.outstanding.toLocaleString("en-IN")} with our agency. Kindly clear your dues at the earliest. Thank you!`)}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="h-9 w-9 flex items-center justify-center rounded-md border border-emerald-500 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
+                                  title="Send WhatsApp reminder"
+                                >
+                                  <MessageCircle className="h-4 w-4" />
+                                </a>
+                              )}
                             </div>
                           </td>
                         </tr>

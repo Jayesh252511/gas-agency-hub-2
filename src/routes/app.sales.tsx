@@ -317,7 +317,7 @@ function Page() {
   };
 
   return (
-    <div className="space-y-6 pb-8">
+    <div className="space-y-6 pb-8 animate-page-in">
       <PageHeader title={t("sales.title")} actions={
         <div className="flex items-center gap-2">
           <DropdownMenu>

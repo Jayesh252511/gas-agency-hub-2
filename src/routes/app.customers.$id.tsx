@@ -395,7 +395,7 @@ function Page() {
   }, [sales, pays]);
 
   return (
-    <div className="space-y-6 pb-8">
+    <div className="space-y-6 pb-8 animate-page-in">
       
       {/* Page Navigation & Actions */}
       <div className="flex items-center justify-between">
@@ -531,7 +531,7 @@ function Page() {
 
         {/* Ledger Statement view */}
         {tab === "ledger" && (
-          <div className="space-y-3 select-none">
+          <div className="space-y-3">
             {loading ? (
               <div className="p-12 text-center text-xs text-muted-foreground animate-pulse">Loading transaction statements...</div>
             ) : ledger.length === 0 ? (

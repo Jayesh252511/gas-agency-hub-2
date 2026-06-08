@@ -173,7 +173,7 @@ function PaymentInflowPage() {
   const total = items.reduce((s, i) => s + i.amount, 0);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-page-in">
       <PageHeader
         title="Payment Inflow"
         subtitle="Miscellaneous cash receipts — these appear in the Cashbook received side"

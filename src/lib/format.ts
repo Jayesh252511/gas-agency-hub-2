@@ -1,6 +1,10 @@
 export const fmtCurrency = (n: number | null | undefined) => {
   const v = Number(n ?? 0);
-  return "₹" + v.toLocaleString("en-IN", { maximumFractionDigits: 2 });
+  const hasFraction = v % 1 !== 0;
+  return "₹" + v.toLocaleString("en-IN", {
+    minimumFractionDigits: hasFraction ? 2 : 0,
+    maximumFractionDigits: 2,
+  });
 };
 export const fmtDate = (d: string | Date | null | undefined) => {
   if (!d) return "—";

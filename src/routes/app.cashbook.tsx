@@ -228,6 +228,7 @@ function Page() {
     const onlineByDriver: Record<string, { name: string; qty: number; amount: number }> = {};
     let onlineQtyTotal = 0;
     const prepByDriver: Record<string, { name: string; qty: number; amount: number }> = {};
+    const prepByProduct: Record<string, { qty: number; amount: number }> = {};
     let prepQtyTotal = 0;
 
     // Per-customer cheque
@@ -287,6 +288,11 @@ function Page() {
         if (!prepByDriver[dbKey]) prepByDriver[dbKey] = { name: dbKey, qty: 0, amount: 0 };
         prepByDriver[dbKey].qty += prepQty;
         prepByDriver[dbKey].amount += prepAmt;
+        
+        if (!prepByProduct[s.product_name]) prepByProduct[s.product_name] = { qty: 0, amount: 0 };
+        prepByProduct[s.product_name].qty += prepQty;
+        prepByProduct[s.product_name].amount += prepAmt;
+
         prepQtyTotal += prepQty;
       }
 
@@ -406,7 +412,7 @@ function Page() {
       pendingBillsTotal, paymentInflowsTotal,
       leftGrandTotal, expensesTotal, commissionsTotal,
       commissionByDriver, onlineByDriver, onlineQtyTotal,
-      prepOutflow, prepByDriver, prepQtyTotal,
+      prepOutflow, prepByDriver, prepByProduct, prepQtyTotal,
       chequeByCustomer,
       udhariByCustomer, udhariOutflow, upiOutflow,
       chequeOutflow, magilBillsTotal, paymentOutflowsTotal,
@@ -679,7 +685,9 @@ function Page() {
 
     if (agg.prepQtyTotal > 0) {
       right.push({ label: "Website Prepaid", qty: agg.prepQtyTotal, amt: agg.prepOutflow });
-      Object.values(agg.prepByDriver).forEach(d => right.push({ label: `  - ${d.name}`, qty: d.qty, amt: d.amount, sub: true }));
+      Object.entries(agg.prepByProduct).forEach(([prodName, d]) => {
+        right.push({ label: `  - ${prodName}`, qty: d.qty, amt: d.amount, sub: true });
+      });
     }
 
     if (agg.commissionsTotal > 0) {
@@ -1065,7 +1073,7 @@ function Page() {
 
   /* ──────────────────────────────────────────────────────────── JSX ─── */
   return (
-    <div className="space-y-6 pb-10">
+    <div className="space-y-6 pb-10 animate-page-in">
       <PageHeader title="Daily Cash Book" actions={
         <div className="flex items-center gap-2">
           <DropdownMenu>

@@ -214,7 +214,7 @@ function Page() {
   );
 
   return (
-    <div className="space-y-6 pb-8">
+    <div className="space-y-6 pb-8 animate-page-in">
       <PageHeader title={t("products.title")} actions={
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>

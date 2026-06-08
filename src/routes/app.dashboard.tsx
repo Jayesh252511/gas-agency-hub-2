@@ -13,7 +13,8 @@ import {
   BookOpen, Users, Clock, Flame, ChevronRight, Activity, Trash2, Calendar, Info,
   ArrowDownToLine, ArrowUpFromLine
 } from "lucide-react";
-
+import { useQuery } from "@tanstack/react-query";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/app/dashboard")({ component: () => <RequireAgencyUser><Dash/></RequireAgencyUser> });
 
@@ -35,40 +36,14 @@ interface TopCustomer {
 function Dash() {
   const { t } = useTranslation();
   const { agency } = useAuth();
-  const [busy, setBusy] = useState(true);
-  
-  const [metrics, setMetrics] = useState({
-    grossSales: 0,
-    cashCollections: 0,
-    outstanding: 0,
-    commissionPaid: 0,
-    expenses: 0,
-    openingCash: 0,
-    cashInHand: 0,
-    pendingCommission: 0,
-    monthlyRevenue: 0,
-    totalCustomers: 0,
-    totalDeliveryBoys: 0
-  });
 
-  const [auditMetrics, setAuditMetrics] = useState({
-    totalSales: 0,
-    totalPayments: 0,
-    totalOutstanding: 0,
-    ledgerOutstanding: 0
-  });
+  const { data: dashData, isLoading: queryLoading } = useQuery({
+    queryKey: ["dashboard-data", agency?.id],
+    queryFn: async () => {
+      if (!agency) return null;
+      const today = todayISO();
+      const monthStart = `${today.substring(0, 8)}01`;
 
-  const [topCustomers, setTopCustomers] = useState<TopCustomer[]>([]);
-  const [activities, setActivities] = useState<ActivityItem[]>([]);
-  const [topProducts, setTopProducts] = useState<Array<{ name: string; qty: number }>>([]);
-
-  const loadData = async () => {
-    if (!agency) return;
-    setBusy(true);
-    const today = todayISO();
-    const monthStart = `${today.substring(0, 8)}01`;
-
-    try {
       const [
         salesQ, 
         paysQ, 
@@ -181,32 +156,10 @@ function Dash() {
       const totalSystemPayments = ((allPaymentsQ.data ?? []) as any[]).reduce((a, r) => a + Number(r.amount || 0), 0);
       const totalSystemOutstanding = ((custQ.data ?? []) as any[]).reduce((a, r) => a + Number(r.outstanding || 0), 0);
 
-      setMetrics({
-        grossSales,
-        cashCollections,
-        outstanding,
-        commissionPaid,
-        expenses,
-        openingCash,
-        cashInHand,
-        pendingCommission,
-        monthlyRevenue,
-        totalCustomers,
-        totalDeliveryBoys
-      });
-
-      setAuditMetrics({
-        totalSales: totalSystemSales,
-        totalPayments: totalSystemPayments,
-        totalOutstanding: totalSystemOutstanding,
-        ledgerOutstanding: outstanding
-      });
-
       // Format Top Customers by Outstanding
       const sortedCustomers = ((custQ.data ?? []) as any[])
         .sort((a: any, b: any) => b.outstanding - a.outstanding)
         .slice(0, 4) as TopCustomer[];
-      setTopCustomers(sortedCustomers);
 
       // Format Top Products sold today
       const { data: todayProductsSales } = await (supabase.from("sales") as any)
@@ -225,7 +178,6 @@ function Dash() {
         .map(([name, qty]) => ({ name, qty }))
         .sort((a, b) => b.qty - a.qty)
         .slice(0, 4);
-      setTopProducts(sortedProducts);
 
       // Compile Recent Audit Activities
       const items: ActivityItem[] = [];
@@ -267,20 +219,62 @@ function Dash() {
         .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
         .slice(0, 4);
 
-      setActivities(sortedActivities);
-    } catch (err: any) {
-      console.error("Dashboard error:", err);
-    } finally {
-      setBusy(false);
-    }
+      return {
+        metrics: {
+          grossSales,
+          cashCollections,
+          outstanding,
+          commissionPaid,
+          expenses,
+          openingCash,
+          cashInHand,
+          pendingCommission,
+          monthlyRevenue,
+          totalCustomers,
+          totalDeliveryBoys
+        },
+        auditMetrics: {
+          totalSales: totalSystemSales,
+          totalPayments: totalSystemPayments,
+          totalOutstanding: totalSystemOutstanding,
+          ledgerOutstanding: outstanding
+        },
+        topCustomers: sortedCustomers,
+        topProducts: sortedProducts,
+        activities: sortedActivities
+      };
+    },
+    enabled: !!agency?.id,
+  });
+
+  const metrics = dashData?.metrics ?? {
+    grossSales: 0,
+    cashCollections: 0,
+    outstanding: 0,
+    commissionPaid: 0,
+    expenses: 0,
+    openingCash: 0,
+    cashInHand: 0,
+    pendingCommission: 0,
+    monthlyRevenue: 0,
+    totalCustomers: 0,
+    totalDeliveryBoys: 0
   };
 
-  useEffect(() => {
-    void loadData();
-  }, [agency]);
+  const auditMetrics = dashData?.auditMetrics ?? {
+    totalSales: 0,
+    totalPayments: 0,
+    totalOutstanding: 0,
+    ledgerOutstanding: 0
+  };
+
+  const topCustomers = dashData?.topCustomers ?? [];
+  const activities = dashData?.activities ?? [];
+  const topProducts = dashData?.topProducts ?? [];
+  const busy = queryLoading;
 
   return (
-    <div className="space-y-6 pb-8">
+    <div className="space-y-6 pb-8 animate-page-in">
       
       {/* Compact Welcome & Agency Header Banner */}
       <Card className="border-muted-foreground/10 bg-card/60 backdrop-blur-md shadow-md overflow-hidden">
@@ -454,18 +448,20 @@ function Kpi({ label, value, icon, accent, description, tooltip }: { label: stri
     success: "bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-600 text-white shadow-emerald-500/10 hover:shadow-emerald-500/20",
     destructive: "bg-gradient-to-br from-rose-500 via-rose-600 to-red-600 text-white shadow-rose-500/10 hover:shadow-rose-500/20",
     warning: "bg-gradient-to-br from-amber-500 via-amber-600 to-orange-600 text-white shadow-amber-500/10 hover:shadow-amber-500/20",
-    muted: "bg-muted text-muted-foreground border-border",
+    muted: "bg-muted text-muted-foreground border-border border",
   };
+  const isGradient = accent !== "muted";
+  
   return (
-    <Card title={tooltip} className={`${cls[accent] ?? "bg-white"} shadow-soft border-none transition-all hover:scale-[1.02] cursor-help`}>
+    <Card title={tooltip} className={`${cls[accent] ?? "bg-card border-border border"} shadow-soft border-none transition-all hover:scale-[1.02] cursor-help`}>
       <CardContent className="p-5">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 space-y-1">
-            <div className="text-[10px] font-extrabold uppercase tracking-widest text-white/80">{label}</div>
-            <div className="text-xl md:text-2xl font-black tracking-tight text-white">{value}</div>
-            {description && <p className="text-[10px] text-white/70 font-medium truncate">{description}</p>}
+            <div className={cn("text-[10px] font-extrabold uppercase tracking-widest", isGradient ? "text-white/80" : "text-muted-foreground")}>{label}</div>
+            <div className={cn("text-xl md:text-2xl font-black tracking-tight", isGradient ? "text-white" : "text-foreground")}>{value}</div>
+            {description && <p className={cn("text-[10px] font-medium truncate", isGradient ? "text-white/70" : "text-muted-foreground/85")}>{description}</p>}
           </div>
-          <div className="h-10 w-10 rounded-xl bg-white/20 text-white flex items-center justify-center shrink-0 border border-white/10 shadow-inner">
+          <div className={cn("h-10 w-10 rounded-xl flex items-center justify-center shrink-0 border shadow-inner", isGradient ? "bg-white/20 text-white border-white/10" : "bg-muted text-muted-foreground border-border")}>
             {icon}
           </div>
         </div>

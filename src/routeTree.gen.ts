@@ -31,6 +31,7 @@ import { Route as AppDeliveryBoysRouteImport } from './routes/app.delivery-boys'
 import { Route as AppDashboardRouteImport } from './routes/app.dashboard'
 import { Route as AppCustomersRouteImport } from './routes/app.customers'
 import { Route as AppCashbookRouteImport } from './routes/app.cashbook'
+import { Route as AppAnalyticsRouteImport } from './routes/app.analytics'
 import { Route as ApiDiagnoseRouteImport } from './routes/api.diagnose'
 import { Route as AppCustomersIdRouteImport } from './routes/app.customers.$id'
 
@@ -144,6 +145,11 @@ const AppCashbookRoute = AppCashbookRouteImport.update({
   path: '/cashbook',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AppRoute,
+} as any)
 const ApiDiagnoseRoute = ApiDiagnoseRouteImport.update({
   id: '/api/diagnose',
   path: '/api/diagnose',
@@ -161,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/platform-admin': typeof PlatformAdminRouteWithChildren
   '/api/diagnose': typeof ApiDiagnoseRoute
+  '/app/analytics': typeof AppAnalyticsRoute
   '/app/cashbook': typeof AppCashbookRoute
   '/app/customers': typeof AppCustomersRouteWithChildren
   '/app/dashboard': typeof AppDashboardRoute
@@ -185,6 +192,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/api/diagnose': typeof ApiDiagnoseRoute
+  '/app/analytics': typeof AppAnalyticsRoute
   '/app/cashbook': typeof AppCashbookRoute
   '/app/customers': typeof AppCustomersRouteWithChildren
   '/app/dashboard': typeof AppDashboardRoute
@@ -212,6 +220,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/platform-admin': typeof PlatformAdminRouteWithChildren
   '/api/diagnose': typeof ApiDiagnoseRoute
+  '/app/analytics': typeof AppAnalyticsRoute
   '/app/cashbook': typeof AppCashbookRoute
   '/app/customers': typeof AppCustomersRouteWithChildren
   '/app/dashboard': typeof AppDashboardRoute
@@ -240,6 +249,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/platform-admin'
     | '/api/diagnose'
+    | '/app/analytics'
     | '/app/cashbook'
     | '/app/customers'
     | '/app/dashboard'
@@ -264,6 +274,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/api/diagnose'
+    | '/app/analytics'
     | '/app/cashbook'
     | '/app/customers'
     | '/app/dashboard'
@@ -290,6 +301,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/platform-admin'
     | '/api/diagnose'
+    | '/app/analytics'
     | '/app/cashbook'
     | '/app/customers'
     | '/app/dashboard'
@@ -475,6 +487,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCashbookRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/analytics': {
+      id: '/app/analytics'
+      path: '/analytics'
+      fullPath: '/app/analytics'
+      preLoaderRoute: typeof AppAnalyticsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/api/diagnose': {
       id: '/api/diagnose'
       path: '/api/diagnose'
@@ -505,6 +524,7 @@ const AppCustomersRouteWithChildren = AppCustomersRoute._addFileChildren(
 )
 
 interface AppRouteChildren {
+  AppAnalyticsRoute: typeof AppAnalyticsRoute
   AppCashbookRoute: typeof AppCashbookRoute
   AppCustomersRoute: typeof AppCustomersRouteWithChildren
   AppDashboardRoute: typeof AppDashboardRoute
@@ -524,6 +544,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAnalyticsRoute: AppAnalyticsRoute,
   AppCashbookRoute: AppCashbookRoute,
   AppCustomersRoute: AppCustomersRouteWithChildren,
   AppDashboardRoute: AppDashboardRoute,

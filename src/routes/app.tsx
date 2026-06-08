@@ -5,10 +5,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { getMe } from "@/lib/auth.functions";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
+import { NotificationCenter } from "@/components/notification-center";
+import { GlobalSearch } from "@/components/global-search";
+import { PwaInstallPrompt } from "@/components/pwa-install-prompt";
 import {
   LayoutDashboard, ShoppingCart, Users, Package, IndianRupee,
   Receipt, Wallet, Truck, BookOpen, LogOut, Flame, Menu, UserCog,
-  ArrowDownToLine, ArrowUpFromLine, Coins, Moon, Sun,
+  ArrowDownToLine, ArrowUpFromLine, Coins, Moon, Sun, BarChart2,
 } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -35,6 +38,8 @@ const NAV = [
   { to: "/app/payment-inflow", label: "Payment Inflow", icon: ArrowDownToLine },
   { to: "/app/payment-outflow", label: "Payment Outflow", icon: ArrowUpFromLine },
   { to: "/app/outstanding", label: "Outstanding", icon: Coins },
+  { to: "/app/analytics", label: "Analytics", icon: BarChart2 },
+  { to: "/app/reports", label: "Reports", icon: Receipt },
   { to: "/app/profile", label: "Profile", icon: UserCog },
 ] as const;
 
@@ -52,7 +57,7 @@ function AppLayout() {
 
   useEffect(() => {
     // Initial theme setup
-    const isDark = localStorage.getItem("theme") === "dark" || 
+    const isDark = localStorage.getItem("theme") === "dark" ||
       (!localStorage.getItem("theme") && window.matchMedia("(prefers-color-scheme: dark)").matches);
     if (isDark) {
       document.documentElement.classList.add("dark");
@@ -60,6 +65,13 @@ function AppLayout() {
     } else {
       document.documentElement.classList.remove("dark");
       setTheme("light");
+    }
+  }, []);
+
+  // Register service worker for PWA
+  useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js").catch(() => { });
     }
   }, []);
 
@@ -107,44 +119,30 @@ function AppLayout() {
   return (
     <div className="min-h-screen flex bg-muted/30 text-foreground transition-colors duration-200">
       {/* Sidebar (desktop) */}
-      <aside className="hidden lg:flex w-64 flex-col bg-sidebar border-r border-sidebar-border">
-        <div className="h-16 px-5 flex items-center gap-2 border-b border-sidebar-border">
-          {me?.agency?.logo_url ? (
-            <img 
-              src={me.agency.logo_url} 
-              className="w-9 h-9 rounded-lg object-cover border border-sidebar-border shadow-sm" 
-              alt="Agency Logo" 
-            />
-          ) : (
-            <div className="w-9 h-9 rounded-lg bg-primary text-primary-foreground grid place-items-center shadow-sm">
-              <Flame className="w-5 h-5" />
+      <aside className="hidden lg:flex w-64 shrink-0 flex-col bg-sidebar border-r border-sidebar-border">
+        <div className="h-16 px-5 flex items-center justify-between border-b border-sidebar-border">
+          <div className="flex items-center gap-2.5 min-w-0">
+            {me?.agency?.logo_url ? (
+              <img
+                src={me.agency.logo_url}
+                className="w-9 h-9 rounded-lg object-cover border border-sidebar-border shadow-sm"
+                alt="Agency Logo"
+              />
+            ) : (
+              <div className="w-9 h-9 rounded-lg bg-primary text-primary-foreground grid place-items-center shadow-sm">
+                <Flame className="w-5 h-5" />
+              </div>
+            )}
+            <div className="leading-tight min-w-0">
+              <div className="font-bold text-sm truncate max-w-[100px]">{me?.agency?.name ?? "LPG Agency"}</div>
+              <div className="text-xs text-muted-foreground">{me?.agency?.code}</div>
             </div>
-          )}
-          <div className="leading-tight">
-            <div className="font-bold text-sm">{me?.agency?.name ?? "LPG Agency"}</div>
-            <div className="text-xs text-muted-foreground">{me?.agency?.code}</div>
           </div>
-        </div>
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {navItems.map((n) => (
-            <Link
-              key={n.to} to={n.to}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent transition-all duration-200 active:scale-[0.98] hover:translate-x-[2px]"
-              activeProps={{ className: "bg-sidebar-accent text-sidebar-primary" }}
-              activeOptions={{ exact: (n as any).exact }}
-            >
-              <n.icon className="w-5 h-5" />
-              {n.label}
-            </Link>
-          ))}
-        </nav>
-        <div className="p-3 border-t border-sidebar-border">
-          <div className="flex items-center justify-between mb-2 px-3">
-            <div className="text-xs text-muted-foreground truncate max-w-[150px]">
-              {me?.user?.full_name ?? me?.user?.username}
-            </div>
-            <button 
-              onClick={toggleTheme} 
+
+          <div className="flex items-center gap-1 shrink-0">
+            <NotificationCenter align="left" />
+            <button
+              onClick={toggleTheme}
               className="text-muted-foreground hover:text-foreground p-1.5 rounded-lg hover:bg-sidebar-accent transition-all duration-300 active:scale-90"
               title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
@@ -152,6 +150,32 @@ function AppLayout() {
                 {theme === "dark" ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4" />}
               </div>
             </button>
+          </div>
+        </div>
+
+        {/* Search bar in sidebar */}
+        <div className="px-3 pt-3 pb-1">
+          <GlobalSearch />
+        </div>
+
+        <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
+          {navItems.map((n) => (
+            <Link
+              key={n.to} to={n.to}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent transition-all duration-200 active:scale-[0.98] hover:translate-x-[2px]"
+              activeProps={{ className: "bg-sidebar-accent text-sidebar-primary" }}
+              activeOptions={{ exact: (n as any).exact }}
+            >
+              <n.icon className="w-5 h-5 shrink-0" />
+              <span className="truncate">{n.label}</span>
+            </Link>
+          ))}
+        </nav>
+        <div className="p-3 border-t border-sidebar-border space-y-2">
+          <div className="flex items-center justify-between px-3">
+            <div className="text-xs text-muted-foreground truncate">
+              Signed in as: <span className="font-semibold text-sidebar-foreground">{me?.user?.full_name ?? me?.user?.username}</span>
+            </div>
           </div>
           <Button variant="ghost" className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover-spring" onClick={signOut}>
             <LogOut className="w-4 h-4 mr-2" /> Sign Out
@@ -166,21 +190,22 @@ function AppLayout() {
           <button onClick={() => setOpen(!open)} className="p-2 -ml-2 text-foreground"><Menu className="w-6 h-6" /></button>
           <div className="flex items-center gap-2 font-semibold">
             {me?.agency?.logo_url ? (
-              <img 
-                src={me.agency.logo_url} 
-                className="w-7 h-7 rounded-md object-cover border border-sidebar-border shadow-sm" 
-                alt="Agency Logo" 
+              <img
+                src={me.agency.logo_url}
+                className="w-7 h-7 rounded-md object-cover border border-sidebar-border shadow-sm"
+                alt="Agency Logo"
               />
             ) : (
               <div className="w-7 h-7 rounded-md bg-primary text-primary-foreground grid place-items-center shadow-sm">
                 <Flame className="w-4 h-4" />
               </div>
             )}
-            <span className="truncate max-w-[150px]">{me?.agency?.name ?? "LPG Agency"}</span>
+            <span className="truncate max-w-[120px] text-sm">{me?.agency?.name ?? "LPG Agency"}</span>
           </div>
           <div className="flex items-center gap-1">
-            <button 
-              onClick={toggleTheme} 
+            <NotificationCenter />
+            <button
+              onClick={toggleTheme}
               className="p-2 text-muted-foreground hover:text-foreground transition-all duration-300 active:scale-90"
               title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
@@ -196,12 +221,12 @@ function AppLayout() {
         <div className={cn("lg:hidden fixed inset-0 z-40 transition-opacity duration-300", open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none")} onClick={() => setOpen(false)}>
           <div className="absolute inset-0 bg-black/40" />
           <aside className={cn("absolute left-0 top-0 bottom-0 w-72 bg-sidebar shadow-xl p-3 overflow-y-auto transition-transform duration-300 ease-out", open ? "translate-x-0" : "-translate-x-full")} onClick={(e) => e.stopPropagation()}>
-            <div className="mb-4 px-2 py-3 border-b border-sidebar-border flex items-center gap-2.5">
+            <div className="mb-3 px-2 py-3 border-b border-sidebar-border flex items-center gap-2.5">
               {me?.agency?.logo_url ? (
-                <img 
-                  src={me.agency.logo_url} 
-                  className="w-9 h-9 rounded-lg object-cover border border-sidebar-border shadow-sm" 
-                  alt="Agency Logo" 
+                <img
+                  src={me.agency.logo_url}
+                  className="w-9 h-9 rounded-lg object-cover border border-sidebar-border shadow-sm"
+                  alt="Agency Logo"
                 />
               ) : (
                 <div className="w-9 h-9 rounded-lg bg-primary text-primary-foreground grid place-items-center shadow-sm">
@@ -213,57 +238,67 @@ function AppLayout() {
                 <div className="text-xs text-muted-foreground">{me?.agency?.code}</div>
               </div>
             </div>
-            <div className="space-y-1">
+            {/* Mobile search */}
+            <div className="mb-3">
+              <GlobalSearch />
+            </div>
+            <div className="space-y-0.5">
               {navItems.map((n) => (
                 <Link key={n.to} to={n.to} onClick={() => setOpen(false)}
                   className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
                   activeProps={{ className: "bg-sidebar-accent text-sidebar-primary" }}
                   activeOptions={{ exact: (n as any).exact }}
                 >
-                  <n.icon className="w-5 h-5" />{n.label}
+                  <n.icon className="w-5 h-5 shrink-0" />{n.label}
                 </Link>
               ))}
             </div>
           </aside>
         </div>
 
-        {/* Main Content Pane with Key-based Page-In Transition */}
+        {/* Main Content Pane */}
         <main className="flex-1 p-4 pb-24 lg:p-8 max-w-7xl w-full mx-auto">
-          <div key={pathname} className="animate-page-in">
-            <Outlet />
-          </div>
+          <Outlet />
         </main>
 
         {/* Mobile Bottom Navigation Bar (Sticky) */}
         <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-background border-t border-border flex items-center justify-around z-30 pb-safe shadow-lg">
-          <Link 
-            to="/app" 
-            activeOptions={{ exact: true }} 
-            className="flex flex-col items-center justify-center flex-1 h-full text-muted-foreground transition-colors hover:text-foreground" 
+          <Link
+            to="/app"
+            activeOptions={{ exact: true }}
+            className="flex flex-col items-center justify-center flex-1 h-full text-muted-foreground transition-colors hover:text-foreground"
             activeProps={{ className: "text-primary font-semibold dark:text-primary" }}
           >
             <LayoutDashboard className="w-5 h-5 mb-0.5" />
             <span className="text-[10px]">Home</span>
           </Link>
-          <Link 
-            to="/app/sales" 
-            className="flex flex-col items-center justify-center flex-1 h-full text-muted-foreground transition-colors hover:text-foreground" 
+          <Link
+            to="/app/sales"
+            className="flex flex-col items-center justify-center flex-1 h-full text-muted-foreground transition-colors hover:text-foreground"
             activeProps={{ className: "text-primary font-semibold dark:text-primary" }}
           >
             <ShoppingCart className="w-5 h-5 mb-0.5" />
             <span className="text-[10px]">Sales</span>
           </Link>
-          <Link 
-            to="/app/udhari" 
-            className="flex flex-col items-center justify-center flex-1 h-full text-muted-foreground transition-colors hover:text-foreground" 
+          <Link
+            to="/app/cashbook"
+            className="flex flex-col items-center justify-center flex-1 h-full text-muted-foreground transition-colors hover:text-foreground"
             activeProps={{ className: "text-primary font-semibold dark:text-primary" }}
           >
-            <IndianRupee className="w-5 h-5 mb-0.5" />
-            <span className="text-[10px]">Credit</span>
+            <BookOpen className="w-5 h-5 mb-0.5" />
+            <span className="text-[10px]">Cashbook</span>
           </Link>
-          <Link 
-            to="/app/profile" 
-            className="flex flex-col items-center justify-center flex-1 h-full text-muted-foreground transition-colors hover:text-foreground" 
+          <Link
+            to="/app/expenses"
+            className="flex flex-col items-center justify-center flex-1 h-full text-muted-foreground transition-colors hover:text-foreground"
+            activeProps={{ className: "text-primary font-semibold dark:text-primary" }}
+          >
+            <Receipt className="w-5 h-5 mb-0.5" />
+            <span className="text-[10px]">Expenses</span>
+          </Link>
+          <Link
+            to="/app/profile"
+            className="flex flex-col items-center justify-center flex-1 h-full text-muted-foreground transition-colors hover:text-foreground"
             activeProps={{ className: "text-primary font-semibold dark:text-primary" }}
           >
             <UserCog className="w-5 h-5 mb-0.5" />
@@ -271,6 +306,9 @@ function AppLayout() {
           </Link>
         </nav>
       </div>
+
+      {/* PWA Install Prompt */}
+      <PwaInstallPrompt />
     </div>
   );
 }

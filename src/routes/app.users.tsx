@@ -236,7 +236,7 @@ function UsersManager() {
   }, [users, q]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-page-in">
       <PageHeader 
         title="Agency Staff & Users" 
         subtitle="Manage operators, managers, cashiers, and login access"

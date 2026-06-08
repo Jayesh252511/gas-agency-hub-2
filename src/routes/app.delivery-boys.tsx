@@ -219,7 +219,7 @@ function Page() {
   }, [deliveries]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-page-in">
       <PageHeader title={t("delivery.title")} actions={
         <div className="flex items-center gap-2">
           <DropdownMenu>
