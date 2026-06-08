@@ -1092,7 +1092,7 @@ function Page() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => doPdfExport()}><FileText className="h-4 w-4 mr-2 text-primary" />PDF Ledger</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => doExcelExport()}><FileText className="h-4 w-4 mr-2 text-emerald-600" />Excel (Side-by-Side)</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => doExcelExport()}><FileText className="h-4 w-4 mr-2 text-emerald-600" />Excel</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           <Button variant="outline" className="h-11 gap-1.5" onClick={() => window.print()}>
