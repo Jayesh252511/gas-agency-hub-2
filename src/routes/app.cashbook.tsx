@@ -939,7 +939,9 @@ function Page() {
     // 8. Website Prepaid (group)
     if (agg.prepQtyTotal > 0) {
       rRows.push({ label: "Website Prepaid", qty: cleanQty(agg.prepQtyTotal), amt: fmt(agg.prepOutflow) });
-      Object.values(agg.prepByDriver).forEach(d => rRows.push({ label: `  - ${d.name}`, qty: cleanQty(d.qty), amt: fmt(d.amount), sub: true }));
+      Object.entries(agg.prepByProduct).forEach(([prodName, d]) => {
+        rRows.push({ label: `  - ${prodName}`, qty: cleanQty(d.qty), amt: "", sub: true });
+      });
     }
 
     // 9. Route Commission Paid (group)
@@ -1400,10 +1402,9 @@ function Page() {
                   <span className="font-bold tabular-nums text-red-600 text-sm">{fmtCurrency(agg.prepOutflow)}</span>
                 </div>
                 <div className="mt-1 pl-3 border-l-2 border-border space-y-0.5 text-[10px] text-slate-500 dark:text-slate-400 font-medium">
-                  {Object.values(agg.prepByDriver).map((d) => (
-                    <div key={d.name} className="flex justify-between py-0.5">
-                      <span>{d.name} {d.qty > 0 && <span className="text-slate-400">({d.qty} units)</span>}</span>
-                      <span className="tabular-nums">{fmtCurrency(d.amount)}</span>
+                  {Object.entries(agg.prepByProduct).map(([prodName, d]) => (
+                    <div key={prodName} className="flex py-0.5">
+                      <span>{prodName} <span className="text-slate-400">({d.qty} units)</span></span>
                     </div>
                   ))}
                 </div>
