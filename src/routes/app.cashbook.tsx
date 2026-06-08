@@ -289,9 +289,10 @@ function Page() {
         prepByDriver[dbKey].qty += prepQty;
         prepByDriver[dbKey].amount += prepAmt;
         
-        if (!prepByProduct[s.product_name]) prepByProduct[s.product_name] = { qty: 0, amount: 0 };
-        prepByProduct[s.product_name].qty += prepQty;
-        prepByProduct[s.product_name].amount += prepAmt;
+        const prodKey = `${s.product_name} - ${dbKey}`;
+        if (!prepByProduct[prodKey]) prepByProduct[prodKey] = { qty: 0, amount: 0 };
+        prepByProduct[prodKey].qty += prepQty;
+        prepByProduct[prodKey].amount += prepAmt;
 
         prepQtyTotal += prepQty;
       }
