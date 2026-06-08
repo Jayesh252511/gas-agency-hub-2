@@ -686,7 +686,7 @@ function Page() {
     if (agg.prepQtyTotal > 0) {
       right.push({ label: "Website Prepaid", qty: agg.prepQtyTotal, amt: agg.prepOutflow });
       Object.entries(agg.prepByProduct).forEach(([prodName, d]) => {
-        right.push({ label: `  - ${prodName}`, qty: d.qty, amt: d.amount, sub: true });
+        right.push({ label: `  - ${prodName}`, qty: d.qty, amt: null, sub: true });
       });
     }
 
@@ -729,7 +729,12 @@ function Page() {
         const qtyVal = cleanQtyExcel(r2.qty);
         if (qtyVal !== "") W(row, 5, qtyVal, { align: "center", bg: subBg });
         else BLANK(row, 5, subBg);
-        W(row, 6, r2.amt || 0, { bg: subBg });
+        // Only write amount if it exists (Website Prepaid product rows have null amount)
+        if (r2.amt != null) {
+          W(row, 6, r2.amt || 0, { bg: subBg });
+        } else {
+          BLANK(row, 6, subBg);
+        }
       } else {
         BLANK(row, 4, rowBg); BLANK(row, 5, rowBg); BLANK(row, 6, rowBg);
       }
