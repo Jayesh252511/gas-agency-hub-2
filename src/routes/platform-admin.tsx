@@ -16,8 +16,9 @@ import { toast } from "sonner";
 import { formatDate } from "@/lib/format";
 
 export const Route = createFileRoute("/platform-admin")({
-  beforeLoad: async () => {
+  beforeLoad: async ({ location }) => {
     if (typeof window === "undefined") return;
+    if (location.pathname === "/platform-admin/login") return;
     const { data } = await supabase.auth.getSession();
     if (!data.session) throw redirect({ to: "/platform-admin/login" });
     if (data.session.user.user_metadata?.kind !== "platform_admin") {

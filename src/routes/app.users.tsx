@@ -176,6 +176,9 @@ function UsersManager() {
       return;
     }
     const targetStatus = !currentActive;
+    const userName = user.full_name ?? user.username;
+    const action = targetStatus ? "activate" : "deactivate";
+    if (!window.confirm(`Are you sure you want to ${action} the account for "${userName}"?`)) return;
     try {
       await toggleStatusFn({
         data: {

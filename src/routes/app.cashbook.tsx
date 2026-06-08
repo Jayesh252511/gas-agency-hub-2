@@ -465,6 +465,7 @@ function Page() {
   };
 
   const deletePendingBill = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this pending bill?")) return;
     const updated = pendingBills.filter(b => b.id !== id);
     setPendingBills(updated);
     await persist({ pending_bills: updated });
@@ -485,12 +486,14 @@ function Page() {
   };
 
   const deleteMagilBill = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this magil bill?")) return;
     const updated = magilBills.filter(b => b.id !== id);
     setMagilBills(updated);
     await persist({ magil_bills: updated });
   };
 
   const deleteOtherReceipt = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this receipt?")) return;
     const updated = otherReceiptsList.filter(r => r.id !== id);
     setOtherReceiptsList(updated);
     await persist({ other_receipts: updated, other_cash_receipts: updated.reduce((s, r) => s + r.amount, 0) });
@@ -687,7 +690,7 @@ function Page() {
     if (agg.prepQtyTotal > 0) {
       right.push({ label: "Website Prepaid", qty: agg.prepQtyTotal, amt: agg.prepOutflow });
       Object.entries(agg.prepByProduct).forEach(([prodName, d]) => {
-        right.push({ label: `  - ${prodName}`, qty: d.qty, amt: null, sub: true });
+        right.push({ label: `  - ${prodName}`, qty: d.qty, amt: d.amount, sub: true });
       });
     }
 
@@ -941,7 +944,7 @@ function Page() {
     if (agg.prepQtyTotal > 0) {
       rRows.push({ label: "Website Prepaid", qty: cleanQty(agg.prepQtyTotal), amt: fmt(agg.prepOutflow) });
       Object.entries(agg.prepByProduct).forEach(([prodName, d]) => {
-        rRows.push({ label: `  - ${prodName}`, qty: cleanQty(d.qty), amt: "", sub: true });
+        rRows.push({ label: `  - ${prodName}`, qty: cleanQty(d.qty), amt: fmt(d.amount), sub: true });
       });
     }
 
@@ -1404,8 +1407,9 @@ function Page() {
                 </div>
                 <div className="mt-1 pl-3 border-l-2 border-border space-y-0.5 text-[10px] text-slate-500 dark:text-slate-400 font-medium">
                   {Object.entries(agg.prepByProduct).map(([prodName, d]) => (
-                    <div key={prodName} className="flex py-0.5">
+                    <div key={prodName} className="flex justify-between py-0.5">
                       <span>{prodName} <span className="text-slate-400">({d.qty} units)</span></span>
+                      <span className="tabular-nums">{fmtCurrency(d.amount)}</span>
                     </div>
                   ))}
                 </div>
