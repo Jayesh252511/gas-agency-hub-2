@@ -117,10 +117,16 @@ export function NotificationCenter({ align = "right" }: NotificationCenterProps)
   const updatePanelPosition = useCallback(() => {
     if (!bellRef.current) return;
     const rect = bellRef.current.getBoundingClientRect();
-    const panelWidth = 320;
     const margin = 8;
+    const isMobile = window.innerWidth < 640;
 
-    if (align === "left") {
+    if (isMobile) {
+      // On mobile: pin to left edge with full usable width
+      setPanelPos({
+        top: rect.bottom + margin,
+        left: margin,
+      });
+    } else if (align === "left") {
       setPanelPos({
         top: rect.bottom + margin,
         left: Math.max(margin, rect.left),
@@ -192,7 +198,8 @@ export function NotificationCenter({ align = "right" }: NotificationCenterProps)
     top: panelPos.top,
     ...(panelPos.left !== undefined ? { left: panelPos.left } : {}),
     ...(panelPos.right !== undefined ? { right: panelPos.right } : {}),
-    width: "min(320px, calc(100vw - 16px))",
+    width: window.innerWidth < 640 ? `calc(100vw - 16px)` : "min(340px, calc(100vw - 16px))",
+    maxWidth: "calc(100vw - 16px)",
   };
 
   return (

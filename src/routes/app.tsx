@@ -281,20 +281,20 @@ function AppLayout() {
             <span className="text-[10px]">Sales</span>
           </Link>
           <Link
-            to="/app/analytics"
+            to="/app/cashbook"
             className="flex flex-col items-center justify-center flex-1 h-full text-muted-foreground transition-colors hover:text-foreground"
             activeProps={{ className: "text-primary font-semibold dark:text-primary" }}
           >
-            <BarChart2 className="w-5 h-5 mb-0.5" />
-            <span className="text-[10px]">Analytics</span>
+            <BookOpen className="w-5 h-5 mb-0.5" />
+            <span className="text-[10px]">Cashbook</span>
           </Link>
           <Link
-            to="/app/udhari"
+            to="/app/expenses"
             className="flex flex-col items-center justify-center flex-1 h-full text-muted-foreground transition-colors hover:text-foreground"
             activeProps={{ className: "text-primary font-semibold dark:text-primary" }}
           >
-            <IndianRupee className="w-5 h-5 mb-0.5" />
-            <span className="text-[10px]">Credit</span>
+            <Receipt className="w-5 h-5 mb-0.5" />
+            <span className="text-[10px]">Expenses</span>
           </Link>
           <Link
             to="/app/profile"
