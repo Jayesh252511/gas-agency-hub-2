@@ -19,4 +19,4 @@ GRANT EXECUTE ON FUNCTION public.has_role(uuid, public.app_role) TO authenticate
 GRANT EXECUTE ON FUNCTION public.is_platform_admin(uuid) TO authenticated, service_role;
 GRANT EXECUTE ON FUNCTION public.current_agency_id() TO authenticated, service_role;
 GRANT EXECUTE ON FUNCTION public.platform_admin_exists() TO authenticated, service_role;
-GRANT EXECUTE ON FUNCTION public.next_txn_no(uuid, text) TO service_role;
+GRANT EXECUTE ON FUNCTION public.next_txn_no(uuid, text) TO authenticated, service_role;
