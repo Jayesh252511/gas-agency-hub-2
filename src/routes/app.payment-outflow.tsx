@@ -202,23 +202,23 @@ function PaymentOutflowPage() {
                         <div className="text-xs text-muted-foreground mt-0.5">{fmtDate(date)}</div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span className="font-black text-red-600 tabular-nums text-base">{fmtCurrency(item.amount)}</span>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <span className="font-black text-red-600 tabular-nums text-base mr-1">{fmtCurrency(item.amount)}</span>
                       {/* View */}
                       <button type="button" onClick={() => setViewTarget(item)}
-                        className="h-8 w-8 rounded-lg border border-blue-200 text-blue-500 hover:bg-blue-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="h-8 w-8 rounded-lg border border-blue-200 text-blue-500 hover:bg-blue-50 flex items-center justify-center transition-colors"
                         title="View details">
                         <Eye className="h-3.5 w-3.5" />
                       </button>
                       {/* Edit */}
                       <button type="button" onClick={() => openEdit(item)}
-                        className="h-8 w-8 rounded-lg border border-amber-200 text-amber-500 hover:bg-amber-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="h-8 w-8 rounded-lg border border-amber-200 text-amber-500 hover:bg-amber-50 flex items-center justify-center transition-colors"
                         title="Edit entry">
                         <Edit2 className="h-3.5 w-3.5" />
                       </button>
                       {/* Delete */}
                       <button type="button" onClick={() => deleteItem(item.id)}
-                        className="h-8 w-8 rounded-lg border border-red-200 dark:border-red-900/50 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="h-8 w-8 rounded-lg border border-red-200 dark:border-red-900/50 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 flex items-center justify-center transition-colors"
                         title="Delete entry">
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>

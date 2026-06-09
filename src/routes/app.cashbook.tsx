@@ -14,7 +14,7 @@ import { useTranslation } from "react-i18next";
 import { fmtCurrency, fmtDate, todayISO } from "@/lib/format";
 import {
   ArrowUpRight, ArrowDownRight, Printer, Download, FileText,
-  Sparkles, Plus, Loader2, Calendar, StickyNote,
+  Sparkles, Plus, Loader2, Calendar, StickyNote, Edit2, Trash2,
 } from "lucide-react";
 import * as XLSXStyle from "xlsx-js-style";
 import { jsPDF } from "jspdf";
@@ -94,6 +94,17 @@ function Page() {
   const [magilLabel, setMagilLabel] = useState("");
   const [magilQty, setMagilQty] = useState("");
   const [magilRate, setMagilRate] = useState("");
+
+  // Edit states for pending & magil bills
+  const [editPendingTarget, setEditPendingTarget] = useState<BillItem | null>(null);
+  const [editPendingLabel, setEditPendingLabel] = useState("");
+  const [editPendingQty, setEditPendingQty] = useState("");
+  const [editPendingRate, setEditPendingRate] = useState("");
+
+  const [editMagilTarget, setEditMagilTarget] = useState<BillItem | null>(null);
+  const [editMagilLabel, setEditMagilLabel] = useState("");
+  const [editMagilQty, setEditMagilQty] = useState("");
+  const [editMagilRate, setEditMagilRate] = useState("");
 
   /* ─── Helpers to build complete notes payload ─── */
   const buildNotes = (overrides: Record<string, any> = {}) => {
@@ -471,6 +482,27 @@ function Page() {
     await persist({ pending_bills: updated });
   };
 
+  const openEditPending = (b: BillItem) => {
+    setEditPendingTarget(b);
+    setEditPendingLabel(b.label);
+    setEditPendingQty(String(b.qty));
+    setEditPendingRate(String(b.rate));
+  };
+
+  const saveEditPending = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!editPendingTarget) return;
+    const qty = Number(editPendingQty), rate = Number(editPendingRate);
+    if (!qty || !rate) { toast.error("Enter valid qty and rate."); return; }
+    const updated = pendingBills.map(b => b.id === editPendingTarget.id
+      ? { ...b, label: editPendingLabel.trim() || "Pending Bill", qty, rate, amount: qty * rate }
+      : b);
+    setPendingBills(updated);
+    await persist({ pending_bills: updated });
+    toast.success("Pending bill updated.");
+    setEditPendingTarget(null);
+  };
+
   /* ─── Add Magil Bill ─── */
   const addMagilBill = async (e: FormEvent) => {
     e.preventDefault();
@@ -490,6 +522,27 @@ function Page() {
     const updated = magilBills.filter(b => b.id !== id);
     setMagilBills(updated);
     await persist({ magil_bills: updated });
+  };
+
+  const openEditMagil = (b: BillItem) => {
+    setEditMagilTarget(b);
+    setEditMagilLabel(b.label);
+    setEditMagilQty(String(b.qty));
+    setEditMagilRate(String(b.rate));
+  };
+
+  const saveEditMagil = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!editMagilTarget) return;
+    const qty = Number(editMagilQty), rate = Number(editMagilRate);
+    if (!qty || !rate) { toast.error("Enter valid qty and rate."); return; }
+    const updated = magilBills.map(b => b.id === editMagilTarget.id
+      ? { ...b, label: editMagilLabel.trim() || "Magil Bill", qty, rate, amount: qty * rate }
+      : b);
+    setMagilBills(updated);
+    await persist({ magil_bills: updated });
+    toast.success("Magil bill updated.");
+    setEditMagilTarget(null);
   };
 
   const deleteOtherReceipt = async (id: string) => {
@@ -1204,15 +1257,23 @@ function Page() {
 
             {/* Pending Bills */}
             {pendingBills.map((b) => (
-              <div key={b.id} className="px-5 py-3 flex justify-between items-center hover:bg-muted/10 group">
-                <span className="font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
-                  <span className="text-[9px] font-black uppercase bg-amber-100 text-amber-700 px-1 rounded">Pending</span>
-                  {b.label}
-                  <span className="text-slate-400 font-normal">({b.qty} × ₹{b.rate})</span>
-                  <button type="button" onClick={() => deletePendingBill(b.id)}
-                    className="text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 font-bold ml-1.5 text-[10px]" title="Delete">✕</button>
-                </span>
-                <span className="font-bold tabular-nums text-emerald-600 text-sm">{fmtCurrency(b.amount)}</span>
+              <div key={b.id} className="px-4 py-3 flex items-center gap-2 hover:bg-muted/10">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-[9px] font-black uppercase bg-amber-100 text-amber-700 px-1 rounded">Pending</span>
+                    <span className="font-semibold text-slate-600 dark:text-slate-300 text-sm">{b.label}</span>
+                    <span className="text-slate-400 font-normal text-xs">({b.qty} × ₹{b.rate})</span>
+                  </div>
+                </div>
+                <span className="font-bold tabular-nums text-emerald-600 text-sm shrink-0">{fmtCurrency(b.amount)}</span>
+                <button type="button" onClick={() => openEditPending(b)}
+                  className="h-7 w-7 rounded-md border border-amber-200 text-amber-500 hover:bg-amber-50 flex items-center justify-center shrink-0 transition-colors" title="Edit">
+                  <Edit2 className="h-3 w-3" />
+                </button>
+                <button type="button" onClick={() => deletePendingBill(b.id)}
+                  className="h-7 w-7 rounded-md border border-red-200 text-red-500 hover:bg-red-50 flex items-center justify-center shrink-0 transition-colors" title="Delete">
+                  <Trash2 className="h-3 w-3" />
+                </button>
               </div>
             ))}
 
@@ -1302,15 +1363,23 @@ function Page() {
 
             {/* Magil Bills */}
             {magilBills.map((b) => (
-              <div key={b.id} className="px-5 py-2 flex justify-between items-center hover:bg-muted/10 group">
-                <span className="font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
-                  <span className="text-[9px] font-black uppercase bg-purple-100 dark:bg-purple-950/20 text-purple-700 dark:text-purple-300 px-1 rounded">Magil</span>
-                  {b.label}
-                  <span className="text-slate-400 font-normal">({b.qty} × ₹{b.rate})</span>
-                  <button type="button" onClick={() => deleteMagilBill(b.id)}
-                    className="text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 font-bold ml-1.5 text-[10px]" title="Delete">✕</button>
-                </span>
-                <span className="font-bold tabular-nums text-red-600 text-sm">{fmtCurrency(b.amount)}</span>
+              <div key={b.id} className="px-4 py-3 flex items-center gap-2 hover:bg-muted/10">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-[9px] font-black uppercase bg-purple-100 dark:bg-purple-950/20 text-purple-700 dark:text-purple-300 px-1 rounded">Magil</span>
+                    <span className="font-semibold text-slate-600 dark:text-slate-300 text-sm">{b.label}</span>
+                    <span className="text-slate-400 font-normal text-xs">({b.qty} × ₹{b.rate})</span>
+                  </div>
+                </div>
+                <span className="font-bold tabular-nums text-red-600 text-sm shrink-0">{fmtCurrency(b.amount)}</span>
+                <button type="button" onClick={() => openEditMagil(b)}
+                  className="h-7 w-7 rounded-md border border-amber-200 text-amber-500 hover:bg-amber-50 flex items-center justify-center shrink-0 transition-colors" title="Edit">
+                  <Edit2 className="h-3 w-3" />
+                </button>
+                <button type="button" onClick={() => deleteMagilBill(b.id)}
+                  className="h-7 w-7 rounded-md border border-red-200 text-red-500 hover:bg-red-50 flex items-center justify-center shrink-0 transition-colors" title="Delete">
+                  <Trash2 className="h-3 w-3" />
+                </button>
               </div>
             ))}
 
@@ -1645,6 +1714,85 @@ function Page() {
         </DialogContent>
       </Dialog>
 
+      {/* ── Edit Pending Bill Dialog ── */}
+      <Dialog open={!!editPendingTarget} onOpenChange={(v) => { if (!v) setEditPendingTarget(null); }}>
+        <DialogContent className="max-w-sm bg-background border border-border rounded-2xl shadow-xl p-6">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-lg font-bold">
+              <Edit2 className="h-5 w-5 text-amber-500" /> Edit Pending Bill
+            </DialogTitle>
+          </DialogHeader>
+          {editPendingTarget && (
+            <form onSubmit={saveEditPending} className="space-y-4 mt-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-muted-foreground uppercase">Description / Label</Label>
+                <Input value={editPendingLabel} onChange={(e) => setEditPendingLabel(e.target.value)} placeholder="e.g. Pending cylinders" className="h-11" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-bold text-muted-foreground uppercase">Qty</Label>
+                  <Input required type="number" step="any" min="1" value={editPendingQty} onChange={(e) => setEditPendingQty(e.target.value)} placeholder="0" className="h-11 font-bold" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-bold text-muted-foreground uppercase">Rate (₹)</Label>
+                  <Input required type="number" step="any" min="0.01" value={editPendingRate} onChange={(e) => setEditPendingRate(e.target.value)} placeholder="0.00" className="h-11 font-bold" />
+                </div>
+              </div>
+              {editPendingQty && editPendingRate && (
+                <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 rounded-lg p-3 text-center">
+                  <div className="text-xs text-amber-700 dark:text-amber-400 font-bold uppercase">Total Amount</div>
+                  <div className="text-xl font-black text-amber-700 dark:text-amber-400 mt-0.5">{fmtCurrency(Number(editPendingQty) * Number(editPendingRate))}</div>
+                </div>
+              )}
+              <DialogFooter className="pt-2">
+                <Button type="button" variant="ghost" onClick={() => setEditPendingTarget(null)}>Cancel</Button>
+                <Button type="submit" className="bg-amber-600 hover:bg-amber-500 text-white font-bold h-11">Save Changes</Button>
+              </DialogFooter>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Edit Magil Bill Dialog ── */}
+      <Dialog open={!!editMagilTarget} onOpenChange={(v) => { if (!v) setEditMagilTarget(null); }}>
+        <DialogContent className="max-w-sm bg-background border border-border rounded-2xl shadow-xl p-6">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-lg font-bold">
+              <Edit2 className="h-5 w-5 text-purple-500" /> Edit Magil Bill
+            </DialogTitle>
+          </DialogHeader>
+          {editMagilTarget && (
+            <form onSubmit={saveEditMagil} className="space-y-4 mt-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-muted-foreground uppercase">Description / Label</Label>
+                <Input value={editMagilLabel} onChange={(e) => setEditMagilLabel(e.target.value)} placeholder="e.g. Magil cylinders" className="h-11" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-bold text-muted-foreground uppercase">Qty</Label>
+                  <Input required type="number" step="any" min="1" value={editMagilQty} onChange={(e) => setEditMagilQty(e.target.value)} placeholder="0" className="h-11 font-bold" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-bold text-muted-foreground uppercase">Rate (₹)</Label>
+                  <Input required type="number" step="any" min="0.01" value={editMagilRate} onChange={(e) => setEditMagilRate(e.target.value)} placeholder="0.00" className="h-11 font-bold" />
+                </div>
+              </div>
+              {editMagilQty && editMagilRate && (
+                <div className="bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-900/50 rounded-lg p-3 text-center">
+                  <div className="text-xs text-purple-700 dark:text-purple-400 font-bold uppercase">Total Amount</div>
+                  <div className="text-xl font-black text-purple-700 dark:text-purple-400 mt-0.5">{fmtCurrency(Number(editMagilQty) * Number(editMagilRate))}</div>
+                </div>
+              )}
+              <DialogFooter className="pt-2">
+                <Button type="button" variant="ghost" onClick={() => setEditMagilTarget(null)}>Cancel</Button>
+                <Button type="submit" className="bg-purple-600 hover:bg-purple-500 text-white font-bold h-11">Save Changes</Button>
+              </DialogFooter>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 }
+
