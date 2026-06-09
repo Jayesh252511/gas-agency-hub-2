@@ -1306,6 +1306,14 @@ function Page() {
               <Plus className="h-3.5 w-3.5" /> Pending Bill
             </Button>
           </div>
+
+          {/* Left Footer: Total Received Inflow */}
+          <div className="mt-auto border-t border-border/80 select-none">
+            <div className="bg-emerald-50 dark:bg-emerald-950/20 px-5 py-3 flex justify-between items-center">
+              <span className="text-xs font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">Total Received Inflow</span>
+              <span className="tabular-nums font-black text-sm text-emerald-700 dark:text-emerald-300">{fmtCurrency(agg.leftGrandTotal)}</span>
+            </div>
+          </div>
         </div>
 
         {/* RIGHT: Money Paid */}
