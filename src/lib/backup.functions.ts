@@ -66,7 +66,7 @@ export async function compileDailyCashBookWorkbook(admin: any, agencyId: string,
   const { data: sData } = await admin
     .from("sales")
     .select(`id, quantity, rate, gross_amount, commission_amount, payment_mode, notes,
-      customer:customers(name), product:products(name),
+      customer:customers(name), product:products(name, show_qty_in_cashbook),
       delivery_boy:delivery_boys(name), delivery_boy_id`)
     .eq("agency_id", agencyId).eq("sale_date", date).eq("is_deleted", false);
 
@@ -83,10 +83,15 @@ export async function compileDailyCashBookWorkbook(admin: any, agencyId: string,
     const quantity = Number(s.quantity);
     const rate = Number(s.rate || 0);
     const grossAmount = quantity * rate;
+    const isShowQty = !!(s.product?.show_qty_in_cashbook ?? (
+      s.product?.name?.toLowerCase().includes("14") &&
+      (s.product?.name?.toLowerCase().includes("home") || s.product?.name?.toLowerCase().includes("delivery"))
+    ));
     return {
       id: s.id,
       customer_name: s.customer?.name ?? "Walk-in",
       product_name: s.product?.name ?? "Cylinder",
+      show_qty_in_cashbook: isShowQty,
       quantity,
       rate,
       total: grossAmount,
@@ -166,7 +171,9 @@ export async function compileDailyCashBookWorkbook(admin: any, agencyId: string,
       const n = s.delivery_boy_name;
       if (!commissionByDriver[n]) commissionByDriver[n] = { name: n, amount: 0, qty: 0 };
       commissionByDriver[n].amount += s.commission_total;
-      commissionByDriver[n].qty += s.quantity;
+      if (s.show_qty_in_cashbook) {
+        commissionByDriver[n].qty += s.quantity;
+      }
     }
 
     if (prepQty > 0) {

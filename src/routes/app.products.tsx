@@ -28,6 +28,7 @@ interface P {
   id: string; 
   name: string; 
   rate: number; 
+  show_qty_in_cashbook?: boolean;
   is_deleted: boolean; 
   created_at: string;
   created_by: string | null; 
@@ -171,6 +172,21 @@ function Page() {
     }
   };
 
+  const toggleShowQty = async (id: string, currentVal: boolean) => {
+    try {
+      const { error } = await (supabase.from("products") as any).update({ 
+        show_qty_in_cashbook: !currentVal,
+        updated_by: session?.user?.id 
+      }).eq("id", id);
+      
+      if (error) throw error;
+      toast.success("Product quantity display settings updated.");
+      void load();
+    } catch (err: any) {
+      toast.error(getFriendlyError(err));
+    }
+  };
+
   const archiveRow = async () => {
     if (!confirmArchiveId || !session) return;
     setArchiving(true);
@@ -301,6 +317,18 @@ function Page() {
                             onBlur={(e) => { const v = Number(e.target.value); if (v !== p.rate) void saveRate(p.id, v); }} 
                           />
                           <span className="text-xs text-muted-foreground w-20 text-right font-semibold">{fmtCurrency(p.rate)}</span>
+                        </div>
+
+                        <div className="flex items-center gap-2 border-l pl-3 border-border/60" onClick={(e) => e.stopPropagation()}>
+                          <Switch
+                            id={`show-qty-${p.id}`}
+                            checked={!!p.show_qty_in_cashbook}
+                            disabled={p.is_deleted}
+                            onCheckedChange={() => toggleShowQty(p.id, !!p.show_qty_in_cashbook)}
+                          />
+                          <Label htmlFor={`show-qty-${p.id}`} className="text-xs text-muted-foreground font-semibold cursor-pointer select-none">
+                            Show Qty
+                          </Label>
                         </div>
 
                         <div className="flex gap-1.5">
@@ -609,6 +637,11 @@ function Page() {
 
                   <div className="text-muted-foreground">Current Catalog Rate</div>
                   <div className="font-bold text-foreground text-right">{fmtCurrency(selectedProduct.rate)}</div>
+
+                  <div className="text-muted-foreground">Show Qty in Cashbook</div>
+                  <div className="font-bold text-foreground text-right">
+                    {selectedProduct.show_qty_in_cashbook ? "Yes (Included in Commission Count)" : "No"}
+                  </div>
                 </div>
               </div>
 
@@ -709,6 +742,7 @@ function Page() {
 function NewForm({ agencyId, userId, onDone }: { agencyId?: string; userId?: string; onDone: () => void }) {
   const [name, setName] = useState(""); 
   const [rate, setRate] = useState("0"); 
+  const [showQty, setShowQty] = useState(false);
   const [busy, setBusy] = useState(false);
   
   const submit = async (e: FormEvent) => {
@@ -721,6 +755,7 @@ function NewForm({ agencyId, userId, onDone }: { agencyId?: string; userId?: str
         agency_id: agencyId, 
         name, 
         rate: Number(rate),
+        show_qty_in_cashbook: showQty,
         created_by: userId
       });
       
@@ -743,6 +778,16 @@ function NewForm({ agencyId, userId, onDone }: { agencyId?: string; userId?: str
       <div className="space-y-1.5">
         <Label>Product Rate (₹)</Label>
         <Input required type="number" value={rate} onChange={(e) => setRate(e.target.value)} className="h-11" />
+      </div>
+      <div className="flex items-center space-x-2 pt-2 pb-4">
+        <Switch 
+          id="new-show-qty" 
+          checked={showQty} 
+          onCheckedChange={setShowQty}
+        />
+        <Label htmlFor="new-show-qty" className="text-xs font-semibold text-muted-foreground cursor-pointer select-none">
+          Show Qty in Cashbook Route Commission
+        </Label>
       </div>
       <Button type="submit" disabled={busy} className="w-full h-12 font-semibold shadow-soft">
         {busy ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}

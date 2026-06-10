@@ -31,6 +31,7 @@ interface CashSaleItem {
   id: string;
   customer_name: string | null;
   product_name: string;
+  show_qty_in_cashbook?: boolean;
   quantity: number;
   rate: number;
   total: number;
@@ -172,10 +173,10 @@ function Page() {
     const { data: sData } = await supabase
       .from("sales")
       .select(`id, quantity, rate, gross_amount, commission_amount, payment_mode, notes,
-        customer:customers(name), product:products(name),
+        customer:customers(name), product:products(name, show_qty_in_cashbook),
         delivery_boy:delivery_boys(name), delivery_boy_id`)
       .eq("agency_id", agency.id).eq("sale_date", date).eq("is_deleted", false);
-
+ 
     setDailySales(((sData ?? []) as any[]).map((s) => {
       let pm = s.payment_mode?.toLowerCase() || "cash";
       let prepQty = 0;
@@ -189,10 +190,17 @@ function Page() {
       const quantity = Number(s.quantity);
       const rate = Number(s.rate || 0);
       const grossAmount = quantity * rate;
+      
+      const isShowQty = !!(s.product?.show_qty_in_cashbook ?? (
+        s.product?.name?.toLowerCase().includes("14") &&
+        (s.product?.name?.toLowerCase().includes("home") || s.product?.name?.toLowerCase().includes("delivery"))
+      ));
+
       return {
         id: s.id,
         customer_name: s.customer?.name ?? "Walk-in",
         product_name: s.product?.name ?? "Cylinder",
+        show_qty_in_cashbook: isShowQty,
         quantity,
         rate,
         total: grossAmount,
@@ -289,7 +297,9 @@ function Page() {
         const n = s.delivery_boy_name;
         if (!commissionByDriver[n]) commissionByDriver[n] = { name: n, amount: 0, qty: 0 };
         commissionByDriver[n].amount += s.commission_total;
-        commissionByDriver[n].qty += s.quantity;
+        if (s.show_qty_in_cashbook) {
+          commissionByDriver[n].qty += s.quantity;
+        }
       }
 
       // 1. Website Prepaid (govt website prepaid orders)

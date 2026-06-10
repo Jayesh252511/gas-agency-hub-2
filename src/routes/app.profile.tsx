@@ -282,7 +282,7 @@ function ProfilePage() {
         supabase
           .from("sales")
           .select(`quantity, rate, gross_amount, commission_amount, payment_mode, notes, sale_date,
-            customer:customers(name), product:products(name),
+            customer:customers(name), product:products(name, show_qty_in_cashbook),
             delivery_boy:delivery_boys(name), delivery_boy_id`)
           .eq("agency_id", me.agency.id)
           .eq("is_deleted", false)
@@ -421,9 +421,14 @@ function ProfilePage() {
           const quantity = Number(s.quantity);
           const rate = Number(s.rate || 0);
           const grossAmount = quantity * rate;
+          const isShowQty = !!(s.product?.show_qty_in_cashbook ?? (
+            s.product?.name?.toLowerCase().includes("14") &&
+            (s.product?.name?.toLowerCase().includes("home") || s.product?.name?.toLowerCase().includes("delivery"))
+          ));
           return {
             customer_name: s.customer?.name ?? "Walk-in",
             product_name: s.product?.name ?? "Cylinder",
+            show_qty_in_cashbook: isShowQty,
             quantity,
             rate,
             total: grossAmount,
@@ -492,7 +497,9 @@ function ProfilePage() {
             const n = s.delivery_boy_name;
             if (!commissionByDriver[n]) commissionByDriver[n] = { name: n, amount: 0, qty: 0 };
             commissionByDriver[n].amount += s.commission_total;
-            commissionByDriver[n].qty += s.quantity;
+            if (s.show_qty_in_cashbook) {
+              commissionByDriver[n].qty += s.quantity;
+            }
           }
 
           if (prepQty > 0) {
