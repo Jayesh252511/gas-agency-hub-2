@@ -2,7 +2,7 @@ import { createFileRoute, Outlet, redirect, Link, useNavigate } from "@tanstack/
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { getMe, listAgencies, createAgency, setAgencyStatus, resetAgencyAdminPassword } from "@/lib/auth.functions";
+import { getMe, listAgencies, createAgency, setAgencyStatus, resetAgencyAdminPassword, deleteAgency } from "@/lib/auth.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Shield, Building2, LogOut, Plus, Loader2, KeyRound, Power, PowerOff } from "lucide-react";
+import { Shield, Building2, LogOut, Plus, Loader2, KeyRound, Power, PowerOff, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { formatDate } from "@/lib/format";
@@ -60,6 +60,7 @@ export function AgenciesPage() {
   const listFn = useServerFn(listAgencies);
   const setStatusFn = useServerFn(setAgencyStatus);
   const resetPwFn = useServerFn(resetAgencyAdminPassword);
+  const deleteFn = useServerFn(deleteAgency);
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({ queryKey: ["agencies"], queryFn: () => listFn() });
 
@@ -72,9 +73,17 @@ export function AgenciesPage() {
   const [resetTarget, setResetTarget] = useState<{ id: string; name: string } | null>(null);
   const [resetPw, setResetPw] = useState("");
 
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
+
   const resetMut = useMutation({
     mutationFn: () => resetPwFn({ data: { agencyId: resetTarget!.id, newPassword: resetPw } }),
     onSuccess: () => { toast.success("Password reset"); setResetTarget(null); setResetPw(""); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const deleteMut = useMutation({
+    mutationFn: () => deleteFn({ data: { agencyId: deleteTarget!.id } }),
+    onSuccess: () => { toast.success("Agency deleted successfully"); setDeleteTarget(null); qc.invalidateQueries({ queryKey: ["agencies"] }); },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -126,6 +135,14 @@ export function AgenciesPage() {
                     <Button size="sm" variant="outline" onClick={() => setStatus.mutate({ id: a.id, status: a.status === "active" ? "disabled" : "active" })}>
                       {a.status === "active" ? <PowerOff className="w-4 h-4" /> : <Power className="w-4 h-4" />}
                     </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10" 
+                      onClick={() => setDeleteTarget({ id: a.id, name: a.name })}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -147,6 +164,27 @@ export function AgenciesPage() {
             <Button variant="ghost" onClick={() => setResetTarget(null)}>Cancel</Button>
             <Button onClick={() => resetMut.mutate()} disabled={resetPw.length < 8 || resetMut.isPending}>
               {resetMut.isPending && <Loader2 className="w-4 h-4 animate-spin mr-2" />} Reset
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-destructive flex items-center gap-2">
+              ⚠️ Delete Agency — {deleteTarget?.name}
+            </DialogTitle>
+            <CardDescription className="text-sm mt-2 text-foreground/80">
+              Are you absolutely sure you want to delete this agency?
+              <br />
+              <strong className="text-destructive">This action is permanent and cannot be undone.</strong> All sales records, customers, products, and user accounts associated with this agency will be deleted immediately.
+            </CardDescription>
+          </DialogHeader>
+          <DialogFooter className="pt-4">
+            <Button variant="ghost" onClick={() => setDeleteTarget(null)}>Cancel</Button>
+            <Button variant="destructive" onClick={() => deleteMut.mutate()} disabled={deleteMut.isPending}>
+              {deleteMut.isPending && <Loader2 className="w-4 h-4 animate-spin mr-2" />} Yes, Delete Agency
             </Button>
           </DialogFooter>
         </DialogContent>

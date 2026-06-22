@@ -792,3 +792,47 @@ export const resetAgencyUserPassword = createServerFn({ method: "POST" })
 
     return { ok: true };
   });
+
+export const deleteAgency = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ agencyId: z.string().uuid() }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: roles } = await context.supabase
+      .from("user_roles")
+      .select("role")
+      .eq("role", "platform_admin")
+      .maybeSingle();
+    if (!roles) throw new Error("Forbidden");
+
+    const admin = getAdminClient();
+    
+    // 1. Get all users belonging to this agency
+    const { data: users } = await admin
+      .from("agency_users")
+      .select("user_id")
+      .eq("agency_id", data.agencyId);
+    
+    // 2. Delete those users from Supabase Auth
+    if (users && users.length > 0) {
+      for (const u of users) {
+        if (u.user_id) {
+          try {
+            await admin.auth.admin.deleteUser(u.user_id);
+          } catch (e) {
+            console.error(`Failed to delete auth user ${u.user_id}:`, e);
+          }
+        }
+      }
+    }
+
+    // 3. Delete the agency itself. Cascades will clean up public tables.
+    const { error } = await admin
+      .from("agencies")
+      .delete()
+      .eq("id", data.agencyId);
+      
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
