@@ -132,16 +132,7 @@ const MAINTENANCE_CONFIG = {
   message: "We are currently performing scheduled maintenance to upgrade our system database and optimize query performances. We will be back online shortly.",
 };
 
-function MaintenanceComponent({ untilDate, message }: { untilDate: string; message: string }) {
-  const formattedDate = new Date(untilDate).toLocaleDateString("en-IN", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-
+function MaintenanceComponent({ message }: { message: string }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#090d16] text-[#f8fafc] px-4 font-sans relative overflow-hidden">
       {/* Background gradients */}
@@ -170,15 +161,6 @@ function MaintenanceComponent({ untilDate, message }: { untilDate: string; messa
           </p>
         </div>
 
-        {/* Info card */}
-        <div className="bg-[#1f2937]/50 border border-white/5 rounded-2xl p-5 flex items-start gap-4 text-left max-w-md mx-auto">
-          <Clock className="w-5 h-5 text-indigo-400 shrink-0 mt-0.5" />
-          <div className="space-y-1">
-            <div className="text-xs text-slate-500 font-bold uppercase tracking-wider">Estimated Back Online</div>
-            <div className="text-sm font-semibold text-slate-200">{formattedDate}</div>
-          </div>
-        </div>
-
         {/* Small footer */}
         <div className="text-xs text-slate-500 font-medium">
           LPG Distribution Platform Management System
@@ -199,7 +181,7 @@ function RootComponent() {
   if (isMaintenanceActive && !isPlatformAdminRoute) {
     return (
       <QueryClientProvider client={queryClient}>
-        <MaintenanceComponent untilDate={MAINTENANCE_CONFIG.untilDate} message={MAINTENANCE_CONFIG.message} />
+        <MaintenanceComponent message={MAINTENANCE_CONFIG.message} />
       </QueryClientProvider>
     );
   }
