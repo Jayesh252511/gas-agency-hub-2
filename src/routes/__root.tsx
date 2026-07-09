@@ -16,7 +16,6 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
-import { Construction, Clock, Sparkles } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import { initI18n } from "@/lib/i18n";
@@ -126,66 +125,8 @@ function AuthListener() {
   return null;
 }
 
-const MAINTENANCE_CONFIG = {
-  active: true,
-  untilDate: "2026-07-02T23:59:59.000Z", // Auto-expires after this date
-  message: "We are currently performing scheduled maintenance to upgrade our system database and optimize query performances. We will be back online shortly.",
-};
-
-function MaintenanceComponent({ message }: { message: string }) {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-[#090d16] text-[#f8fafc] px-4 font-sans relative overflow-hidden">
-      {/* Background gradients */}
-      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-primary/20 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none" />
-
-      <div className="max-w-xl w-full text-center relative z-10 space-y-8 bg-[#111827]/60 backdrop-blur-xl border border-white/10 p-8 md:p-12 rounded-3xl shadow-2xl">
-        {/* Animated Icon */}
-        <div className="relative inline-flex items-center justify-center">
-          <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-pulse" />
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-primary to-indigo-500 flex items-center justify-center shadow-lg border border-white/10 relative">
-            <Construction className="w-10 h-10 text-white animate-bounce" />
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="space-y-4">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-xs font-semibold text-primary tracking-wide uppercase">
-            <Sparkles className="w-3.5 h-3.5" /> System Upgrade In Progress
-          </div>
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400">
-            Under Maintenance
-          </h1>
-          <p className="text-sm md:text-base text-slate-400 leading-relaxed max-w-md mx-auto">
-            {message}
-          </p>
-        </div>
-
-        {/* Small footer */}
-        <div className="text-xs text-slate-500 font-medium">
-          LPG Distribution Platform Management System
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const router = useRouter();
-  const pathname = router.state.location.pathname;
-
-  const isMaintenanceActive = MAINTENANCE_CONFIG.active && new Date() < new Date(MAINTENANCE_CONFIG.untilDate);
-  const isPlatformAdminRoute = pathname.startsWith("/platform-admin");
-
-  if (isMaintenanceActive && !isPlatformAdminRoute) {
-    return (
-      <QueryClientProvider client={queryClient}>
-        <MaintenanceComponent message={MAINTENANCE_CONFIG.message} />
-      </QueryClientProvider>
-    );
-  }
-
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
