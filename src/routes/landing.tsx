@@ -49,7 +49,7 @@ const CSS = `
     60%      { transform: scale(1.8); opacity:0; }
   }
   @keyframes cardIn {
-    from { opacity:0; transform: translateY(20px) scale(0.97); }
+    from { opacity:0; transform: translateY(16px) scale(0.98); }
     to   { opacity:1; transform: translateY(0)    scale(1);    }
   }
   @keyframes blobPulse {
@@ -269,35 +269,293 @@ const CSS = `
   .center { text-align:center; }
   .sec-desc.center { margin:0 auto; }
 
-  /* ── Features grid ── */
-  .feat-grid {
-    display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:52px;
+  /* ── Interactive Feature Explorer ── */
+  .explorer-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 32px;
+    margin-top: 52px;
+    align-items: stretch;
   }
-  .feat-card {
-    background:#fff; border-radius:18px; padding:28px 24px;
-    border:1.5px solid #f1f5f9;
-    box-shadow:0 2px 8px rgba(0,0,0,.04);
-    transition:all .3s cubic-bezier(.34,1.56,.64,1);
-    cursor:default; position:relative; overflow:hidden;
+  .explorer-tabs {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 570px;
+    overflow-y: auto;
+    padding-right: 8px;
   }
-  .feat-card::after {
-    content:''; position:absolute; inset:0; border-radius:18px;
-    background:linear-gradient(135deg,rgba(249,115,22,.04),rgba(30,76,195,.04));
-    opacity:0; transition:opacity .3s;
+  .explorer-tabs::-webkit-scrollbar {
+    width: 6px;
   }
-  .feat-card:hover {
-    transform:translateY(-6px);
-    border-color:#fed7aa;
-    box-shadow:0 16px 48px rgba(0,0,0,.1);
+  .explorer-tabs::-webkit-scrollbar-track {
+    background: transparent;
   }
-  .feat-card:hover::after { opacity:1; }
-  .feat-icon {
-    width:50px; height:50px; border-radius:14px;
-    display:flex; align-items:center; justify-content:center;
-    font-size:24px; margin-bottom:16px; position:relative; z-index:1;
+  .explorer-tabs::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 10px;
   }
-  .feat-title { font-size:16px; font-weight:800; margin-bottom:8px; color:#0f172a; position:relative; z-index:1; }
-  .feat-desc  { font-size:14px; color:#6b7280; line-height:1.65; position:relative; z-index:1; }
+  .explorer-tab-btn {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 18px;
+    border-radius: 16px;
+    background: #ffffff;
+    border: 2px solid #f1f5f9;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .explorer-tab-btn:hover {
+    border-color: #ffedd5;
+    background: #fffbf9;
+    transform: translateX(4px);
+  }
+  .explorer-tab-btn.active {
+    border-color: #f97316;
+    background: #fff8f5;
+    box-shadow: 0 4px 20px rgba(249, 115, 22, 0.08);
+  }
+  .explorer-tab-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    transition: transform 0.25s;
+  }
+  .explorer-tab-btn:hover .explorer-tab-icon {
+    transform: scale(1.1);
+  }
+  .explorer-tab-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 4px;
+  }
+  .explorer-tab-desc {
+    font-size: 13px;
+    color: #6b7280;
+    line-height: 1.5;
+  }
+
+  .explorer-screen {
+    background: #ffffff;
+    border-radius: 24px;
+    border: 2px solid #f1f5f9;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 570px;
+  }
+  .explorer-screen-header {
+    background: #f8fafc;
+    border-bottom: 2px solid #f1f5f9;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    justify-content: space-between;
+  }
+  .browser-dots {
+    display: flex;
+    gap: 6px;
+  }
+  .browser-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+  .browser-dot.red { background: #ef4444; }
+  .browser-dot.yellow { background: #eab308; }
+  .browser-dot.green { background: #22c55e; }
+  .browser-address {
+    flex-grow: 1;
+    max-width: 320px;
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 5px 12px;
+    font-size: 12px;
+    color: #64748b;
+    font-family: monospace;
+    text-align: center;
+  }
+  .explorer-screen-body {
+    padding: 24px;
+    flex-grow: 1;
+    background: #fafbfe;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow-y: auto;
+    max-height: 500px;
+  }
+
+  /* Mock App Layout Components */
+  .mock-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .mock-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: #0f172a;
+  }
+  .mock-subtitle {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 2px;
+  }
+  .mock-btn-sm {
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .mock-btn-primary {
+    background: #f97316;
+    color: #ffffff;
+  }
+  .mock-btn-primary:hover {
+    background: #ea580c;
+  }
+  .mock-btn-secondary {
+    background: #eff6ff;
+    color: #1e4cc3;
+  }
+  .mock-btn-secondary:hover {
+    background: #dbeafe;
+  }
+
+  /* Tables, Grid & Forms inside Mock App */
+  .mock-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .mock-stat-card {
+    background: #ffffff;
+    border: 1.5px solid #f1f5f9;
+    border-radius: 12px;
+    padding: 12px;
+  }
+  .mock-stat-label {
+    font-size: 10px;
+    color: #94a3b8;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .mock-stat-value {
+    font-size: 16px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-top: 4px;
+  }
+  .mock-card {
+    background: #ffffff;
+    border: 1.5px solid #f1f5f9;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+  }
+  .mock-table-wrapper {
+    overflow-x: auto;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1.5px solid #f1f5f9;
+  }
+  .mock-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 460px;
+  }
+  .mock-table th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    color: #94a3b8;
+    padding: 10px 12px;
+    border-bottom: 1.5px solid #f1f5f9;
+    text-transform: uppercase;
+    background: #f8fafc;
+  }
+  .mock-table td {
+    font-size: 13px;
+    color: #334155;
+    padding: 12px;
+    border-bottom: 1.5px solid #f8fafc;
+  }
+  .mock-table tr:last-child td {
+    border-bottom: none;
+  }
+  .mock-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 9999px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .mock-badge-success { background: #dcfce7; color: #166534; }
+  .mock-badge-warning { background: #fef9c3; color: #854d0e; }
+  .mock-badge-danger { background: #fee2e2; color: #991b1b; }
+  .mock-badge-info { background: #dbeafe; color: #1e40af; }
+
+  /* Forms */
+  .mock-form-group {
+    margin-bottom: 12px;
+  }
+  .mock-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: #475569;
+    margin-bottom: 4px;
+  }
+  .mock-input, .mock-select {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1.5px solid #e2e8f0;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .mock-input:focus, .mock-select:focus {
+    border-color: #f97316;
+  }
+
+  /* Responsive Explorer Layout */
+  @media(max-width: 900px) {
+    .explorer-layout {
+      grid-template-columns: 1fr;
+    }
+    .explorer-tabs {
+      flex-direction: row;
+      overflow-x: auto;
+      padding-bottom: 12px;
+      max-height: none;
+    }
+    .explorer-tab-btn {
+      flex-shrink: 0;
+      width: 260px;
+    }
+  }
 
   /* ── Feature icon row (bottom bar reference style) ── */
   .feat-bar {
@@ -424,7 +682,7 @@ const CSS = `
 
   /* ── Responsive ── */
   @media(max-width:1024px){
-    .feat-grid        { grid-template-columns:repeat(2,1fr); }
+    .explorer-layout  { grid-template-columns:1fr; }
     .preview-inner    { grid-template-columns:1fr; gap:40px; }
     .hiw-grid         { grid-template-columns:repeat(2,1fr); }
     .hiw-connector    { display:none; }
@@ -453,62 +711,71 @@ const CSS = `
 `;
 
 /* ─────────────────────────────────────────────────────────────────────────── */
-/*  Data — real features only, no fake stats                                  */
+/*  Data ── Real systems features list                                        */
 /* ─────────────────────────────────────────────────────────────────────────── */
 const FEATURES = [
   {
     icon: "📊",
     bg: "#eff6ff",
     title: "Sales Management",
-    desc: "Record every cylinder and regulator sale instantly. View daily totals, filter by product type, and never lose a sale entry.",
+    desc: "Record every cylinder & regulator sale instantly. View daily summaries, print receipts, and track order statuses dynamically.",
+    url: "localhost:8080/app/sales",
   },
   {
     icon: "👥",
     bg: "#f0fdf4",
     title: "Customer Ledger",
-    desc: "Maintain digital profiles for every customer. Track their full transaction history, outstanding balance, and contact details.",
+    desc: "Maintain digital profiles for every customer. Check complete history of refuels, payments, and running debit/credit statements.",
+    url: "localhost:8080/app/customers",
   },
   {
     icon: "💸",
     bg: "#fff7ed",
     title: "Udhari (Credit) Tracking",
-    desc: "Know exactly who owes you money and how much. Record credits, collect payments, and view outstanding reports at any time.",
+    desc: "Know who owes you outstanding balance at all times. Log credit receipts, collect pending dues, and send reminders.",
+    url: "localhost:8080/app/udhari",
   },
   {
     icon: "💰",
     bg: "#f0fdf4",
     title: "Cashbook & Payments",
-    desc: "Log all cash inflows and outflows. Keep a clean digital cashbook with daily summaries and running balance.",
+    desc: "Record all incoming cash collections and outgoing expenses. Check daily cash-in-hand totals and net bank balances.",
+    url: "localhost:8080/app/cashbook",
   },
   {
     icon: "🏍️",
     bg: "#fdf4ff",
-    title: "Delivery Boy Management",
-    desc: "Assign sales to delivery staff, track their performance, and manage commissions — all from one screen.",
+    title: "Delivery Boy Manager",
+    desc: "Assign orders to delivery boys. Track active pending deliveries, route coordinates, and staff refill commissions.",
+    url: "localhost:8080/app/delivery-boys",
   },
   {
     icon: "📦",
     bg: "#fffbeb",
     title: "Product & Stock",
-    desc: "Manage your cylinder inventory — 14.2 kg, 5 kg, 19 kg. Know your current stock and track product-wise sales.",
+    desc: "Monitor live stock levels for 14.2kg domestic, 19kg commercial, and 5kg cylinders. Auto-calculate available empty inventory.",
+    url: "localhost:8080/app/products",
   },
   {
     icon: "💳",
     bg: "#eff6ff",
-    title: "Payment Inflow & Outflow",
-    desc: "Separately track money received from customers and money paid to vendors or expenses. Full audit trail included.",
+    title: "Inflow & Outflow",
+    desc: "Track full cash entries separated into customer payments received (inflow) and supplier/vendor expenditures paid (outflow).",
+    url: "localhost:8080/app/payments",
   },
   {
     icon: "📈",
     bg: "#f0fdf4",
     title: "Reports & Analytics",
-    desc: "Generate sales reports, profit summaries, and outstanding dues. Export to Excel or PDF with a single tap.",
+    desc: "Generate professional monthly sales statements. Track revenue and credit changes, and export clean PDF/Excel documents.",
+    url: "localhost:8080/app/reports",
   },
   {
     icon: "🔒",
     bg: "#fff7ed",
     title: "Multi-User & Roles",
-    desc: "Add staff members with different roles — admin, manager, accountant. Each sees only what they need.",
+    desc: "Manage permission levels for agency staff. Add managers with select reports access or operators with bill-only roles.",
+    url: "localhost:8080/app/users",
   },
 ];
 
@@ -535,7 +802,7 @@ const PREVIEW_BULLETS = [
 ];
 
 /* ─────────────────────────────────────────────────────────────────────────── */
-/*  IntersectFade                                                              */
+/*  IntersectFade Component                                                    */
 /* ─────────────────────────────────────────────────────────────────────────── */
 function Fade({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -559,7 +826,7 @@ function Fade({ children, delay = 0, className = "" }: { children: React.ReactNo
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */
-/*  Scribble underline                                                         */
+/*  Scribble SVG                                                               */
 /* ─────────────────────────────────────────────────────────────────────────── */
 function Scribble({ color = "#f97316" }: { color?: string }) {
   return (
@@ -591,9 +858,6 @@ function DoodleStars({ size = 100, color = "#f97316" }: { size?: number; color?:
   );
 }
 
-/* ─────────────────────────────────────────────────────────────────────────── */
-/*  Marquee strip data                                                         */
-/* ─────────────────────────────────────────────────────────────────────────── */
 const MQ_ITEMS = [
   "🛢️ LPG Sales Management",
   "👥 Customer Ledger",
@@ -608,11 +872,873 @@ const MQ_ITEMS = [
 ];
 
 /* ─────────────────────────────────────────────────────────────────────────── */
-/*  Landing Page                                                               */
+/*  Interactive Explorer Body Simulations                                      */
+/* ─────────────────────────────────────────────────────────────────────────── */
+interface PreviewProps {
+  onSuccess: (msg: string) => void;
+}
+
+function SalesPreview({ onSuccess }: PreviewProps) {
+  const [customer, setCustomer] = useState("Ramesh Patil");
+  const [product, setProduct] = useState("14.2kg Domestic");
+  const [qty, setQty] = useState(1);
+  const [price, setPrice] = useState(950);
+  const [paymentType, setPaymentType] = useState("Cash");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [invoice, setInvoice] = useState<any>(null);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setTimeout(() => {
+      setIsSubmitting(false);
+      const generated = {
+        invoiceNo: "INV-" + Math.floor(100000 + Math.random() * 900000),
+        date: new Date().toLocaleDateString("en-IN"),
+        customer,
+        product,
+        qty,
+        total: price * qty,
+        paymentType,
+      };
+      setInvoice(generated);
+      onSuccess(`Invoice ${generated.invoiceNo} recorded successfully!`);
+    }, 1000);
+  };
+
+  return (
+    <div style={{ animation: "cardIn 0.4s ease both" }}>
+      <div className="mock-header">
+        <div>
+          <div className="mock-title">Record New Cylinder Sale</div>
+          <div className="mock-subtitle">Create instant billing invoice entry</div>
+        </div>
+        {invoice && (
+          <button className="mock-btn-sm mock-btn-secondary" onClick={() => setInvoice(null)}>
+            ← New Bill
+          </button>
+        )}
+      </div>
+
+      {!invoice ? (
+        <form onSubmit={handleSubmit} className="mock-card">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
+            <div className="mock-form-group">
+              <label className="mock-label">Select Customer</label>
+              <select className="mock-select" value={customer} onChange={(e) => setCustomer(e.target.value)}>
+                <option value="Ramesh Patil">Ramesh Patil (Bal: ₹950)</option>
+                <option value="Sunita Sharma">Sunita Sharma (Bal: ₹0)</option>
+                <option value="Amit Verma">Amit Verma (Bal: ₹1,200)</option>
+                <option value="Pooja Singh">Pooja Singh (Bal: ₹0)</option>
+              </select>
+            </div>
+            <div className="mock-form-group">
+              <label className="mock-label">Cylinder Product</label>
+              <select className="mock-select" value={product} onChange={(e) => {
+                setProduct(e.target.value);
+                setPrice(e.target.value.includes("19kg") ? 1850 : e.target.value.includes("5kg") ? 420 : 950);
+              }}>
+                <option value="14.2kg Domestic">14.2kg Domestic (₹950)</option>
+                <option value="19kg Commercial">19kg Commercial (₹1850)</option>
+                <option value="5kg Chotu">5kg Chotu (₹420)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px", marginBottom: "20px" }}>
+            <div className="mock-form-group">
+              <label className="mock-label">Quantity</label>
+              <input type="number" min="1" className="mock-input" value={qty} onChange={(e) => setQty(Number(e.target.value))} />
+            </div>
+            <div className="mock-form-group">
+              <label className="mock-label">Price (₹)</label>
+              <input type="number" className="mock-input" value={price} onChange={(e) => setPrice(Number(e.target.value))} />
+            </div>
+            <div className="mock-form-group">
+              <label className="mock-label">Payment Mode</label>
+              <select className="mock-select" value={paymentType} onChange={(e) => setPaymentType(e.target.value)}>
+                <option value="Cash">Cash</option>
+                <option value="Online (UPI)">Online (UPI)</option>
+                <option value="Udhari (Credit)">Udhari (Credit)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1.5px solid #f1f5f9", paddingTop: "16px" }}>
+            <div>
+              <div style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 700 }}>NET PAYABLE AMOUNT</div>
+              <div style={{ fontSize: "20px", fontWeight: 900, color: "#1e4cc3" }}>₹{(price * qty).toLocaleString("en-IN")}</div>
+            </div>
+            <button type="submit" disabled={isSubmitting} className="mock-btn-sm mock-btn-primary" style={{ padding: "12px 24px" }}>
+              {isSubmitting ? "Generating Bill..." : "Create Bill & Save →"}
+            </button>
+          </div>
+        </form>
+      ) : (
+        <div className="mock-card" style={{ border: "2px dashed #f97316", background: "#fffaf7" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1.5px solid #fed7aa", paddingBottom: "12px", marginBottom: "14px" }}>
+            <div>
+              <div style={{ fontSize: "14px", fontWeight: 800, color: "#c2410c" }}>{invoice.invoiceNo}</div>
+              <div style={{ fontSize: "11px", color: "#f97316", fontWeight: 600 }}>Invoice Date: {invoice.date}</div>
+            </div>
+            <span className={`mock-badge ${invoice.paymentType.includes("Udhari") ? "mock-badge-danger" : "mock-badge-success"}`}>
+              {invoice.paymentType.includes("Udhari") ? "Pending Credit" : "Paid"}
+            </span>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "13px", color: "#475569" }}>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span>Customer Details:</span>
+              <strong style={{ color: "#0f172a" }}>{invoice.customer}</strong>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span>Item / Cylinder Description:</span>
+              <strong style={{ color: "#0f172a" }}>{invoice.product}</strong>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span>Quantity × Rate:</span>
+              <strong style={{ color: "#0f172a" }}>{invoice.qty} × ₹{price}</strong>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", borderTop: "1.5px solid #fed7aa", paddingTop: "8px", marginTop: "4px" }}>
+              <span style={{ fontWeight: 700 }}>Total Collected Balance:</span>
+              <strong style={{ color: "#1e4cc3", fontSize: "16px", fontWeight: 900 }}>₹{invoice.total.toLocaleString("en-IN")}</strong>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", color: "#94a3b8" }}>
+              <span>Payment Mode Used:</span>
+              <span>{invoice.paymentType}</span>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CustomerPreview() {
+  const [selectedCust, setSelectedCust] = useState("Ramesh");
+  const data: Record<string, any> = {
+    Ramesh: {
+      name: "Ramesh Patil",
+      phone: "+91 98450 12345",
+      outstanding: "₹950",
+      avatar: "RP",
+      tx: [
+        { date: "10 Jul 2026", desc: "14.2kg Refill", amt: "₹950", type: "Sales (Dr)", bal: "₹950" },
+        { date: "05 Jul 2026", desc: "Payment Received", amt: "₹950", type: "Cash (Cr)", bal: "₹0" },
+        { date: "01 Jul 2026", desc: "14.2kg Refill", amt: "₹950", type: "Sales (Dr)", bal: "₹950" },
+      ],
+    },
+    Sunita: {
+      name: "Sunita Sharma",
+      phone: "+91 94480 98765",
+      outstanding: "₹0",
+      avatar: "SS",
+      tx: [
+        { date: "09 Jul 2026", desc: "Payment Received", amt: "₹1,850", type: "UPI (Cr)", bal: "₹0" },
+        { date: "08 Jul 2026", desc: "19kg Commercial", amt: "₹1,850", type: "Sales (Dr)", bal: "₹1,850" },
+      ],
+    },
+    Amit: {
+      name: "Amit Verma",
+      phone: "+91 88900 11223",
+      outstanding: "₹1,200",
+      avatar: "AV",
+      tx: [
+        { date: "11 Jul 2026", desc: "Regulator Delivery", amt: "₹250", type: "Sales (Dr)", bal: "₹1,200" },
+        { date: "02 Jul 2026", desc: "14.2kg Refill", amt: "₹950", type: "Sales (Dr)", bal: "₹950" },
+      ],
+    },
+  };
+
+  const current = data[selectedCust] || data.Ramesh;
+
+  return (
+    <div style={{ animation: "cardIn 0.4s ease both" }}>
+      <div className="mock-header">
+        <div>
+          <div className="mock-title">Digital Customer Ledger</div>
+          <div className="mock-subtitle">Select profile to view statement statement statement</div>
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1.1fr 1.9fr", gap: "16px" }}>
+        {/* Customer tabs */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          {Object.keys(data).map((key) => (
+            <button
+              key={key}
+              onClick={() => setSelectedCust(key)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                padding: "12px",
+                borderRadius: "10px",
+                border: "1.5px solid " + (selectedCust === key ? "#1e4cc3" : "#f1f5f9"),
+                background: selectedCust === key ? "#eff6ff" : "#ffffff",
+                cursor: "pointer",
+                textAlign: "left",
+                transition: "all 0.2s",
+              }}
+            >
+              <div style={{
+                width: "28px",
+                height: "28px",
+                borderRadius: "50%",
+                background: selectedCust === key ? "#1e4cc3" : "#e2e8f0",
+                color: selectedCust === key ? "#ffffff" : "#64748b",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "11px",
+                fontWeight: 700,
+              }}>
+                {data[key].avatar}
+              </div>
+              <div style={{ flexGrow: 1 }}>
+                <div style={{ fontSize: "13px", fontWeight: 700, color: "#0f172a" }}>{data[key].name}</div>
+                <div style={{ fontSize: "11px", color: data[key].outstanding !== "₹0" ? "#dc2626" : "#64748b", fontWeight: 600 }}>
+                  {data[key].outstanding !== "₹0" ? "Owes: " + data[key].outstanding : "Settled"}
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        {/* Ledger view */}
+        <div className="mock-card" style={{ padding: "16px" }}>
+          <div style={{ borderBottom: "1.5px solid #f1f5f9", paddingBottom: "10px", marginBottom: "12px" }}>
+            <div style={{ fontSize: "14px", fontWeight: 800, color: "#0f172a" }}>{current.name}</div>
+            <div style={{ fontSize: "11px", color: "#64748b" }}>Phone: {current.phone}</div>
+          </div>
+
+          <div className="mock-table-wrapper">
+            <table className="mock-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Details</th>
+                  <th>Amount</th>
+                  <th>Balance</th>
+                </tr>
+              </thead>
+              <tbody>
+                {current.tx.map((t: any, index: number) => (
+                  <tr key={index}>
+                    <td>{t.date}</td>
+                    <td>
+                      <div style={{ fontWeight: 600 }}>{t.desc}</div>
+                      <div style={{ fontSize: "10px", color: "#94a3b8" }}>{t.type}</div>
+                    </td>
+                    <td style={{ color: t.type.includes("Dr") ? "#dc2626" : "#166534", fontWeight: 700 }}>
+                      {t.type.includes("Dr") ? "+" : "-"}{t.amt}
+                    </td>
+                    <td style={{ fontWeight: 700 }}>{t.bal}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function UdhariPreview({ onSuccess }: PreviewProps) {
+  const [remindedList, setRemindedList] = useState<string[]>([]);
+  const [balances, setBalances] = useState<Record<string, number>>({
+    "Ramesh Patil": 950,
+    "Amit Verma": 1200,
+    "Sanjay Kadam": 2400,
+  });
+
+  const sendReminder = (name: string) => {
+    if (remindedList.includes(name)) return;
+    setRemindedList([...remindedList, name]);
+    onSuccess(`WhatsApp payment reminder sent to ${name}!`);
+  };
+
+  const collectPayment = (name: string) => {
+    if (balances[name] === 0) return;
+    const oldVal = balances[name];
+    setBalances({ ...balances, [name]: 0 });
+    onSuccess(`Collected ₹${oldVal} payment from ${name}. Ledger balance updated to ₹0.`);
+  };
+
+  return (
+    <div style={{ animation: "cardIn 0.4s ease both" }}>
+      <div className="mock-header">
+        <div>
+          <div className="mock-title">Active Outstanding Credits (Udhari)</div>
+          <div className="mock-subtitle">Collect pending dues or send WhatsApp notifications</div>
+        </div>
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+        {Object.entries(balances).map(([name, bal]) => (
+          <div key={name} className="mock-card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 20px" }}>
+            <div>
+              <div style={{ fontSize: "14px", fontWeight: 800, color: "#0f172a" }}>{name}</div>
+              <div style={{ fontSize: "11px", color: "#64748b", marginTop: "2px" }}>Pending collection ledger ledger</div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+              <div style={{ textAlign: "right" }}>
+                <div style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 700 }}>OUTSTANDING DUES</div>
+                <div style={{ fontSize: "18px", fontWeight: 900, color: bal > 0 ? "#dc2626" : "#166534" }}>
+                  ₹{bal.toLocaleString("en-IN")}
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <button
+                  className="mock-btn-sm mock-btn-secondary"
+                  disabled={bal === 0}
+                  onClick={() => sendReminder(name)}
+                  style={{ opacity: bal === 0 ? 0.5 : 1 }}
+                >
+                  {remindedList.includes(name) ? "Sent ✓" : "Remind 💬"}
+                </button>
+                <button
+                  className="mock-btn-sm mock-btn-primary"
+                  disabled={bal === 0}
+                  onClick={() => collectPayment(name)}
+                  style={{ background: bal === 0 ? "#e2e8f0" : "#22c55e", color: bal === 0 ? "#94a3b8" : "#ffffff" }}
+                >
+                  {bal === 0 ? "Collected ✓" : "Collect Cash"}
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CashbookPreview({ onSuccess }: PreviewProps) {
+  const [tab, setTab] = useState<"in" | "out">("in");
+  const [amount, setAmount] = useState("");
+  const [particulars, setParticulars] = useState("");
+  const [logs, setLogs] = useState([
+    { date: "Today, 12:45 PM", desc: "Refill delivery (Ramesh Patil)", amt: "₹950", type: "in" },
+    { date: "Today, 11:30 AM", desc: "Diesel for transport truck", amt: "₹1,200", type: "out" },
+    { date: "Today, 09:15 AM", desc: "Cash collected (Amit Verma)", amt: "₹950", type: "in" },
+  ]);
+
+  const handleAdd = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!amount) return;
+    const cleanAmt = Number(amount);
+    const newLog = {
+      date: "Just now",
+      desc: particulars || (tab === "in" ? "Direct cash inflow entry" : "Direct expense outflow entry"),
+      amt: `₹${cleanAmt.toLocaleString("en-IN")}`,
+      type: tab,
+    };
+    setLogs([newLog, ...logs]);
+    setAmount("");
+    setParticulars("");
+    onSuccess(`Added cash ${tab === "in" ? "inflow" : "outflow"} of ₹${cleanAmt.toLocaleString("en-IN")}`);
+  };
+
+  return (
+    <div style={{ animation: "cardIn 0.4s ease both" }}>
+      <div className="mock-header">
+        <div>
+          <div className="mock-title">Daily Cashbook Log</div>
+          <div className="mock-subtitle">Record direct expenses and cash collections</div>
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1.1fr 1.9fr", gap: "16px" }}>
+        <form onSubmit={handleAdd} className="mock-card" style={{ padding: "16px" }}>
+          <div style={{ display: "flex", gap: "4px", background: "#f1f5f9", padding: "3px", borderRadius: "8px", marginBottom: "14px" }}>
+            <button
+              type="button"
+              onClick={() => setTab("in")}
+              style={{
+                flex: 1,
+                border: "none",
+                padding: "8px",
+                borderRadius: "6px",
+                fontSize: "12px",
+                fontWeight: 700,
+                cursor: "pointer",
+                background: tab === "in" ? "#22c55e" : "transparent",
+                color: tab === "in" ? "#ffffff" : "#475569",
+                transition: "all 0.2s",
+              }}
+            >
+              Cash In (+)
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab("out")}
+              style={{
+                flex: 1,
+                border: "none",
+                padding: "8px",
+                borderRadius: "6px",
+                fontSize: "12px",
+                fontWeight: 700,
+                cursor: "pointer",
+                background: tab === "out" ? "#ef4444" : "transparent",
+                color: tab === "out" ? "#ffffff" : "#475569",
+                transition: "all 0.2s",
+              }}
+            >
+              Cash Out (-)
+            </button>
+          </div>
+
+          <div className="mock-form-group">
+            <label className="mock-label">Amount (₹)</label>
+            <input type="number" required placeholder="e.g. 500" className="mock-input" value={amount} onChange={(e) => setAmount(e.target.value)} />
+          </div>
+          <div className="mock-form-group" style={{ marginBottom: "16px" }}>
+            <label className="mock-label">Particulars (Description)</label>
+            <input type="text" placeholder="e.g. Office tea expense" className="mock-input" value={particulars} onChange={(e) => setParticulars(e.target.value)} />
+          </div>
+
+          <button
+            type="submit"
+            className="mock-btn-sm mock-btn-primary"
+            style={{ width: "100%", justifyContent: "center", background: tab === "in" ? "#22c55e" : "#ef4444", padding: "10px" }}
+          >
+            Add Cash {tab === "in" ? "In" : "Out"} Entry
+          </button>
+        </form>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          {logs.map((log, i) => (
+            <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "#ffffff", border: "1.5px solid #f1f5f9", padding: "10px 14px", borderRadius: "10px" }}>
+              <div>
+                <div style={{ fontSize: "12px", fontWeight: 700, color: "#0f172a" }}>{log.desc}</div>
+                <div style={{ fontSize: "10px", color: "#94a3b8", marginTop: "2px" }}>{log.date}</div>
+              </div>
+              <div style={{ fontSize: "14px", fontWeight: 800, color: log.type === "in" ? "#22c55e" : "#ef4444" }}>
+                {log.type === "in" ? "+" : "-"}{log.amt}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DeliveryPreview({ onSuccess }: PreviewProps) {
+  const [deliveries, setDeliveries] = useState([
+    { id: "B-2051", customer: "Ramesh Patil", address: "Sector 4, Plot 12", boy: "Amit K.", status: "Pending" },
+    { id: "B-2052", customer: "Sanjay Kadam", address: "Ganesh Nagar Lane 3", boy: "None", status: "Unassigned" },
+    { id: "B-2053", customer: "Pooja Singh", address: "Star Towers Flat 402", boy: "Vijay M.", status: "Delivered" },
+  ]);
+
+  const handleAssign = (id: string, name: string) => {
+    setDeliveries(deliveries.map(d => d.id === id ? { ...d, boy: name, status: "Out for Delivery" } : d));
+    onSuccess(`Assigned order ${id} to delivery staff ${name}! Status: Out for Delivery.`);
+  };
+
+  const handleComplete = (id: string) => {
+    setDeliveries(deliveries.map(d => d.id === id ? { ...d, status: "Delivered" } : d));
+    onSuccess(`Marked delivery order ${id} as completed successfully!`);
+  };
+
+  return (
+    <div style={{ animation: "cardIn 0.4s ease both" }}>
+      <div className="mock-header">
+        <div>
+          <div className="mock-title">Delivery Boy Dispatcher</div>
+          <div className="mock-subtitle">Assign bookings and track shipment statuses</div>
+        </div>
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+        {deliveries.map((d) => (
+          <div key={d.id} className="mock-card" style={{ padding: "14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <span style={{ fontSize: "12px", fontWeight: 800, color: "#1e4cc3" }}>{d.id}</span>
+                <span className={`mock-badge ${d.status === "Delivered" ? "mock-badge-success" : d.status === "Pending" ? "mock-badge-warning" : d.status.includes("Out") ? "mock-badge-info" : "mock-badge-danger"}`}>
+                  {d.status}
+                </span>
+              </div>
+              <div style={{ fontSize: "13px", fontWeight: 700, color: "#0f172a", marginTop: "4px" }}>{d.customer}</div>
+              <div style={{ fontSize: "11px", color: "#64748b" }}>Addr: {d.address}</div>
+            </div>
+
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <div style={{ textTransform: "none", fontSize: "11px", textAlign: "right" }}>
+                <div style={{ color: "#94a3b8", fontWeight: 700 }}>STAFF MEMBER</div>
+                <div style={{ fontWeight: 700, color: d.boy === "None" ? "#ef4444" : "#475569" }}>{d.boy}</div>
+              </div>
+
+              <div>
+                {d.status === "Unassigned" ? (
+                  <div style={{ display: "flex", gap: "4px" }}>
+                    <button className="mock-btn-sm mock-btn-secondary" style={{ padding: "6px 10px" }} onClick={() => handleAssign(d.id, "Amit K.")}>Assign Amit</button>
+                    <button className="mock-btn-sm mock-btn-secondary" style={{ padding: "6px 10px" }} onClick={() => handleAssign(d.id, "Vijay M.")}>Assign Vijay</button>
+                  </div>
+                ) : d.status !== "Delivered" ? (
+                  <button className="mock-btn-sm mock-btn-primary" style={{ background: "#22c55e" }} onClick={() => handleComplete(d.id)}>
+                    Mark Delivered
+                  </button>
+                ) : (
+                  <span style={{ fontSize: "20px" }}>✅</span>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function StockPreview({ onSuccess }: PreviewProps) {
+  const [stocks, setStocks] = useState<Record<string, number>>({
+    "14.2kg Domestic": 142,
+    "19kg Commercial": 8,
+    "5kg Chotu Refill": 45,
+  });
+
+  const adjustStock = (name: string, diff: number) => {
+    const nextVal = Math.max(0, stocks[name] + diff);
+    setStocks({ ...stocks, [name]: nextVal });
+    if (diff > 0) {
+      onSuccess(`Added +${diff} refills to ${name} stock inventory.`);
+    } else {
+      onSuccess(`Dispatched cylinder: ${name} stock level decreased.`);
+    }
+  };
+
+  return (
+    <div style={{ animation: "cardIn 0.4s ease both" }}>
+      <div className="mock-header">
+        <div>
+          <div className="mock-title">Real-time Stock Monitor</div>
+          <div className="mock-subtitle">Current physical cylinder stock counts</div>
+        </div>
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+        {Object.entries(stocks).map(([name, val]) => (
+          <div key={name} className="mock-card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 20px" }}>
+            <div>
+              <div style={{ fontSize: "14px", fontWeight: 800, color: "#0f172a" }}>{name}</div>
+              <div style={{ display: "flex", gap: "6px", marginTop: "4px" }}>
+                {val <= 10 && <span className="mock-badge mock-badge-danger">Low Stock Alert</span>}
+                <span className="mock-badge mock-badge-info">Cylinders</span>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+              <div style={{ textTransform: "none", fontSize: "11px", textAlign: "right" }}>
+                <div style={{ color: "#94a3b8", fontWeight: 700 }}>AVAILABLE STOCK</div>
+                <div style={{ fontSize: "22px", fontWeight: 900, color: val <= 10 ? "#dc2626" : "#1e4cc3" }}>{val}</div>
+              </div>
+              <div style={{ display: "flex", gap: "4px" }}>
+                <button className="mock-btn-sm mock-btn-secondary" style={{ padding: "8px 12px", fontSize: "14px" }} onClick={() => adjustStock(name, -1)}>-</button>
+                <button className="mock-btn-sm mock-btn-secondary" style={{ padding: "8px 12px", fontSize: "14px" }} onClick={() => adjustStock(name, 1)}>+</button>
+                <button className="mock-btn-sm mock-btn-primary" style={{ padding: "6px 12px" }} onClick={() => adjustStock(name, 50)}>+50 Refills</button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function InflowPreview() {
+  const [view, setView] = useState<"inflow" | "outflow">("inflow");
+
+  const inflowData = [
+    { desc: "Sales cash collection (Ramesh Patil)", amt: "+₹950", mode: "Cash", date: "Today" },
+    { desc: "Online advance refill (Sunita Sharma)", amt: "+₹1,850", mode: "Online UPI", date: "Today" },
+    { desc: "Udhari deposit collected (Amit Verma)", amt: "+₹950", mode: "Cash", date: "Yesterday" },
+  ];
+
+  const outflowData = [
+    { desc: "Purchase refill stock (BPCL depot)", amt: "-₹28,400", mode: "Bank RTGS", date: "Today" },
+    { desc: "Truck diesel refill expense", amt: "-₹1,200", mode: "Cash", date: "Today" },
+    { desc: "Staff delivery commission payout", amt: "-₹850", mode: "Cash", date: "Yesterday" },
+  ];
+
+  const current = view === "inflow" ? inflowData : outflowData;
+
+  return (
+    <div style={{ animation: "cardIn 0.4s ease both" }}>
+      <div className="mock-header">
+        <div>
+          <div className="mock-title">Payment Inflows & Outflows</div>
+          <div className="mock-subtitle">Separately audit income collections vs agency expenses</div>
+        </div>
+      </div>
+
+      <div style={{ display: "flex", gap: "4px", background: "#f1f5f9", padding: "3px", borderRadius: "8px", marginBottom: "16px" }}>
+        <button
+          type="button"
+          onClick={() => setView("inflow")}
+          style={{
+            flex: 1,
+            border: "none",
+            padding: "10px",
+            borderRadius: "6px",
+            fontSize: "13px",
+            fontWeight: 700,
+            cursor: "pointer",
+            background: view === "inflow" ? "#22c55e" : "transparent",
+            color: view === "inflow" ? "#ffffff" : "#475569",
+            transition: "all 0.2s",
+          }}
+        >
+          Customer Inflows (Income Receipts)
+        </button>
+        <button
+          type="button"
+          onClick={() => setView("outflow")}
+          style={{
+            flex: 1,
+            border: "none",
+            padding: "10px",
+            borderRadius: "6px",
+            fontSize: "13px",
+            fontWeight: 700,
+            cursor: "pointer",
+            background: view === "outflow" ? "#ef4444" : "transparent",
+            color: view === "outflow" ? "#ffffff" : "#475569",
+            transition: "all 0.2s",
+          }}
+        >
+          Supplier & Expense Outflows (Debit)
+        </button>
+      </div>
+
+      <div className="mock-table-wrapper">
+        <table className="mock-table">
+          <thead>
+            <tr>
+              <th>Particulars</th>
+              <th>Date</th>
+              <th>Mode</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            {current.map((t, idx) => (
+              <tr key={idx}>
+                <td style={{ fontWeight: 600 }}>{t.desc}</td>
+                <td>{t.date}</td>
+                <td><span className="mock-badge mock-badge-info" style={{ background: "#f1f5f9", color: "#475569" }}>{t.mode}</span></td>
+                <td style={{ color: view === "inflow" ? "#22c55e" : "#ef4444", fontWeight: 800, fontSize: "14px" }}>
+                  {t.amt}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function ReportsPreview({ onSuccess }: PreviewProps) {
+  const [downloading, setDownloading] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  const startDownload = () => {
+    if (downloading) return;
+    setDownloading(true);
+    setProgress(0);
+    let currentPrg = 0;
+    const interval = setInterval(() => {
+      currentPrg += 10;
+      setProgress(currentPrg);
+      if (currentPrg >= 100) {
+        clearInterval(interval);
+        setDownloading(false);
+        onSuccess("Sales report PDF downloaded successfully!");
+      }
+    }, 150);
+  };
+
+  return (
+    <div style={{ animation: "cardIn 0.4s ease both" }}>
+      <div className="mock-header">
+        <div>
+          <div className="mock-title">Agency Reports & Analytics</div>
+          <div className="mock-subtitle">Generate business statements in one click</div>
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1.2fr 0.8fr", gap: "16px", marginBottom: "16px" }}>
+        <div className="mock-card" style={{ padding: "16px" }}>
+          <div style={{ fontSize: "12px", fontWeight: 700, color: "#64748b", marginBottom: "12px" }}>SALES REVENUE OVERVIEW</div>
+          {/* Mock Chart Graphic */}
+          <div style={{ height: "140px", display: "flex", alignItems: "flex-end", gap: "14px", borderBottom: "1.5px solid #e2e8f0", paddingBottom: "10px", paddingLeft: "10px" }}>
+            <div style={{ flex: 1, height: "40%", background: "#cbd5e1", borderRadius: "4px 4px 0 0" }}></div>
+            <div style={{ flex: 1, height: "65%", background: "#cbd5e1", borderRadius: "4px 4px 0 0" }}></div>
+            <div style={{ flex: 1, height: "85%", background: "#f97316", borderRadius: "4px 4px 0 0" }}></div>
+            <div style={{ flex: 1, height: "55%", background: "#cbd5e1", borderRadius: "4px 4px 0 0" }}></div>
+            <div style={{ flex: 1, height: "95%", background: "#1e4cc3", borderRadius: "4px 4px 0 0" }}></div>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "9px", color: "#94a3b8", marginTop: "6px", fontWeight: 700 }}>
+            <span>MAY</span>
+            <span>JUN</span>
+            <span>JUL (TODAY)</span>
+            <span>AUG</span>
+            <span>SEP</span>
+          </div>
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px", justifyContent: "center" }}>
+          <button className="mock-btn-sm mock-btn-primary" style={{ padding: "14px", justifyContent: "center" }} onClick={startDownload}>
+            📄 Download Sales PDF
+          </button>
+          <button className="mock-btn-sm mock-btn-secondary" style={{ padding: "14px", justifyContent: "center" }} onClick={startDownload}>
+            📊 Export Ledger to Excel
+          </button>
+        </div>
+      </div>
+
+      {downloading && (
+        <div style={{ background: "#f8fafc", border: "1.5px solid #e2e8f0", padding: "14px", borderRadius: "10px", animation: "fadeIn 0.2s ease" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>
+            <span>Compiling database query queries...</span>
+            <span>{progress}%</span>
+          </div>
+          <div style={{ width: "100%", height: "8px", background: "#e2e8f0", borderRadius: "999px", overflow: "hidden" }}>
+            <div style={{ width: `${progress}%`, height: "100%", background: "#1e4cc3", transition: "width 0.15s" }}></div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function UsersPreview({ onSuccess }: PreviewProps) {
+  const [selectedRole, setSelectedRole] = useState<"admin" | "manager" | "delivery">("admin");
+  const [permissions, setPermissions] = useState<Record<string, boolean>>({
+    viewSales: true,
+    createBills: true,
+    deleteTransactions: true,
+    viewProfitLoss: true,
+  });
+
+  const togglePermission = (key: string) => {
+    setPermissions({ ...permissions, [key]: !permissions[key] });
+    onSuccess("Staff capability permissions toggled successfully.");
+  };
+
+  const handleRoleChange = (role: "admin" | "manager" | "delivery") => {
+    setSelectedRole(role);
+    if (role === "admin") {
+      setPermissions({ viewSales: true, createBills: true, deleteTransactions: true, viewProfitLoss: true });
+    } else if (role === "manager") {
+      setPermissions({ viewSales: true, createBills: true, deleteTransactions: false, viewProfitLoss: true });
+    } else {
+      setPermissions({ viewSales: true, createBills: true, deleteTransactions: false, viewProfitLoss: false });
+    }
+  };
+
+  return (
+    <div style={{ animation: "cardIn 0.4s ease both" }}>
+      <div className="mock-header">
+        <div>
+          <div className="mock-title">Staff Permission Roles</div>
+          <div className="mock-subtitle">Assign select security access constraints</div>
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          <div style={{ fontSize: "11px", fontWeight: 700, color: "#94a3b8" }}>SELECT STAFF USER PROFILE</div>
+          <button
+            onClick={() => handleRoleChange("admin")}
+            style={{
+              padding: "12px",
+              borderRadius: "8px",
+              border: "1.5px solid " + (selectedRole === "admin" ? "#f97316" : "#f1f5f9"),
+              background: selectedRole === "admin" ? "#fff8f5" : "#ffffff",
+              cursor: "pointer",
+              textAlign: "left",
+            }}
+          >
+            <strong>Rajesh Patil</strong>
+            <div style={{ fontSize: "11px", color: "#f97316", fontWeight: 700 }}>Role: Administrator</div>
+          </button>
+          <button
+            onClick={() => handleRoleChange("manager")}
+            style={{
+              padding: "12px",
+              borderRadius: "8px",
+              border: "1.5px solid " + (selectedRole === "manager" ? "#f97316" : "#f1f5f9"),
+              background: selectedRole === "manager" ? "#fff8f5" : "#ffffff",
+              cursor: "pointer",
+              textAlign: "left",
+            }}
+          >
+            <strong>Sunita Sharma</strong>
+            <div style={{ fontSize: "11px", color: "#1e4cc3", fontWeight: 700 }}>Role: Agency Manager</div>
+          </button>
+          <button
+            onClick={() => handleRoleChange("delivery")}
+            style={{
+              padding: "12px",
+              borderRadius: "8px",
+              border: "1.5px solid " + (selectedRole === "delivery" ? "#f97316" : "#f1f5f9"),
+              background: selectedRole === "delivery" ? "#fff8f5" : "#ffffff",
+              cursor: "pointer",
+              textAlign: "left",
+            }}
+          >
+            <strong>Amit Kumar</strong>
+            <div style={{ fontSize: "11px", color: "#166534", fontWeight: 700 }}>Role: Delivery Agent</div>
+          </button>
+        </div>
+
+        <div className="mock-card" style={{ padding: "16px" }}>
+          <div style={{ fontSize: "11px", fontWeight: 700, color: "#94a3b8", marginBottom: "12px" }}>PERMITTED CAPABILITIES</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", cursor: "pointer" }}>
+              <input type="checkbox" checked={permissions.viewSales} onChange={() => togglePermission("viewSales")} />
+              View Sales & Ledger Reports
+            </label>
+            <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", cursor: "pointer" }}>
+              <input type="checkbox" checked={permissions.createBills} onChange={() => togglePermission("createBills")} />
+              Create & Print Invoice Bills
+            </label>
+            <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", cursor: "pointer" }}>
+              <input type="checkbox" checked={permissions.deleteTransactions} onChange={() => togglePermission("deleteTransactions")} />
+              Delete Ledger Payments
+            </label>
+            <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", cursor: "pointer" }}>
+              <input type="checkbox" checked={permissions.viewProfitLoss} onChange={() => togglePermission("viewProfitLoss")} />
+              View Profit & Loss Statements
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/*  Main Landing Page Component                                                */
 /* ─────────────────────────────────────────────────────────────────────────── */
 function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [mobOpen, setMobOpen] = useState(false);
+  const [activeFeature, setActiveFeature] = useState(0);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const showToast = (message: string) => {
+    setToastMessage(message);
+    setTimeout(() => {
+      setToastMessage((curr) => (curr === message ? null : curr));
+    }, 3000);
+  };
 
   useEffect(() => {
     document.body.classList.add("lp-body");
@@ -621,9 +1747,61 @@ function LandingPage() {
     return () => { document.body.classList.remove("lp-body"); window.removeEventListener("scroll", fn); };
   }, []);
 
+  const renderActivePreview = () => {
+    switch (activeFeature) {
+      case 0:
+        return <SalesPreview onSuccess={showToast} />;
+      case 1:
+        return <CustomerLedgerPreview />;
+      case 2:
+        return <UdhariPreview onSuccess={showToast} />;
+      case 3:
+        return <CashbookPreview onSuccess={showToast} />;
+      case 4:
+        return <DeliveryPreview onSuccess={showToast} />;
+      case 5:
+        return <StockPreview onSuccess={showToast} />;
+      case 6:
+        return <InflowPreview />;
+      case 7:
+        return <ReportsPreview onSuccess={showToast} />;
+      case 8:
+        return <UsersPreview onSuccess={showToast} />;
+      default:
+        return null;
+    }
+  };
+
+  // Safe wrapper alias to resolve naming clash
+  const CustomerLedgerPreview = () => <CustomerPreview />;
+
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
+
+      {/* ── Toast Notification System ──────────────── */}
+      {toastMessage && (
+        <div style={{
+          position: "fixed",
+          bottom: "24px",
+          right: "24px",
+          zIndex: 1000,
+          background: "#0f172a",
+          color: "#ffffff",
+          padding: "14px 20px",
+          borderRadius: "12px",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
+          fontSize: "13px",
+          fontWeight: 600,
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          animation: "cardIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both",
+        }}>
+          <span>⚡</span>
+          {toastMessage}
+        </div>
+      )}
 
       {/* ── Mobile drawer ─────────────────────────── */}
       <div className={`mob-drawer${mobOpen ? " open" : ""}`}>
@@ -751,7 +1929,7 @@ function LandingPage() {
         </div>
       </div>
 
-      {/* ── Features ──────────────────────────────── */}
+      {/* ── Features Explorer Section ──────────────── */}
       <section className="lp-section" id="features" style={{ background: "#f8f9fb" }}>
         <div className="lp-wrap">
           <Fade>
@@ -765,30 +1943,48 @@ function LandingPage() {
                 </span>
               </h2>
               <p className="sec-desc center">
-                From recording sales to tracking udhari to generating reports — every workflow your gas agency needs, built into one clean, fast app.
+                Click any capability below to interact with it and see exactly how our dashboard handles your daily workloads.
               </p>
             </div>
           </Fade>
 
-          <div className="feat-grid">
-            {FEATURES.map((f, i) => (
-              <Fade key={i} delay={i * 0.05}>
-                <div className="feat-card">
-                  {/* Doodle corner */}
-                  <svg style={{ position: "absolute", top: 12, right: 12, opacity: .15 }} width="20" height="20" viewBox="0 0 20 20">
-                    <circle cx="4" cy="4" r="1.5" fill="#9ca3af" />
-                    <circle cx="10" cy="4" r="1.5" fill="#9ca3af" />
-                    <circle cx="16" cy="4" r="1.5" fill="#9ca3af" />
-                    <circle cx="4" cy="10" r="1.5" fill="#9ca3af" />
-                    <circle cx="10" cy="10" r="1.5" fill="#9ca3af" />
-                    <circle cx="16" cy="10" r="1.5" fill="#9ca3af" />
-                  </svg>
-                  <div className="feat-icon" style={{ background: f.bg }}>{f.icon}</div>
-                  <div className="feat-title">{f.title}</div>
-                  <div className="feat-desc">{f.desc}</div>
+          <div className="explorer-layout">
+            {/* Left Tabs */}
+            <div className="explorer-tabs">
+              {FEATURES.map((f, i) => (
+                <button
+                  key={i}
+                  className={`explorer-tab-btn ${activeFeature === i ? "active" : ""}`}
+                  onClick={() => setActiveFeature(i)}
+                >
+                  <div className="explorer-tab-icon" style={{ background: f.bg }}>
+                    {f.icon}
+                  </div>
+                  <div>
+                    <div className="explorer-tab-title">{f.title}</div>
+                    <div className="explorer-tab-desc">{f.desc}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {/* Right Interactive Mock Screen */}
+            <div className="explorer-screen">
+              <div className="explorer-screen-header">
+                <div className="browser-dots">
+                  <div className="browser-dot red" />
+                  <div className="browser-dot yellow" />
+                  <div className="browser-dot green" />
                 </div>
-              </Fade>
-            ))}
+                <div className="browser-address">
+                  {FEATURES[activeFeature].url}
+                </div>
+                <div style={{ width: "40px" }} /> {/* spacer */}
+              </div>
+              <div className="explorer-screen-body">
+                {renderActivePreview()}
+              </div>
+            </div>
           </div>
 
           {/* Bottom feature bar */}
