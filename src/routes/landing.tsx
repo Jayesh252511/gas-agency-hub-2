@@ -834,6 +834,19 @@ const PREVIEW_BULLETS = [
   "Access everything on mobile — even in low-network areas",
 ];
 
+const MQ_ITEMS = [
+  "LPG Sales Management",
+  "Customer Ledger",
+  "Udhari Tracking",
+  "Delivery Management",
+  "Stock Inventory",
+  "Cashbook",
+  "Business Reports",
+  "Multi-User Access",
+  "Works on Mobile",
+  "Made for India",
+];
+
 /* ─────────────────────────────────────────────────────────────────────────── */
 /*  IntersectFade Component                                                    */
 /* ─────────────────────────────────────────────────────────────────────────── */
