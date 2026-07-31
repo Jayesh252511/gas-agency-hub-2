@@ -189,7 +189,8 @@ function Page() {
         r.payment_mode.toUpperCase(),
         fmtCurrency(r.amount)
       ]);
-      exportToPDF("Payment History Ledger", cols, data, "payments_ledger");
+      const branding = { companyName: agency?.name || "LPG AGENCY ERP", subTitle: "AUTHORIZED LPG DISTRIBUTORSHIP PLATFORM", logoUrl: (agency as any)?.logo_url };
+      exportToPDF("Payment History Ledger", cols, data, "payments_ledger", branding);
     } else {
       const data = filtered.map((r) => ({
         "Receipt ID": r.id.substring(0, 8).toUpperCase(),
@@ -199,7 +200,8 @@ function Page() {
         "Amount Received (INR)": Number(r.amount),
         "Is Voided": r.is_deleted ? "Yes" : "No"
       }));
-      exportToExcel(data, "payments_ledger", "Payments Ledger");
+      const branding = { companyName: agency?.name || "LPG AGENCY ERP", subTitle: "AUTHORIZED LPG DISTRIBUTORSHIP PLATFORM", logoUrl: (agency as any)?.logo_url };
+      exportToExcel(data, "payments_ledger", "Payments Ledger", branding);
     }
   };
 

@@ -280,9 +280,9 @@ function Dash() {
       <Card className="border-muted-foreground/10 bg-card/60 backdrop-blur-md shadow-md overflow-hidden">
         <CardContent className="p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center gap-3 min-w-0">
-            {agency?.logo_url ? (
+            {(agency as any)?.logo_url ? (
               <img 
-                src={agency.logo_url} 
+                src={(agency as any).logo_url} 
                 className="w-12 h-12 rounded-xl object-cover border border-border/80 shadow-sm shrink-0" 
                 alt="Agency Logo" 
               />

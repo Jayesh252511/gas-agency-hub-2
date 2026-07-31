@@ -906,14 +906,31 @@ function Page() {
     };
     const text = (s: string, x: number, y: number, opts?: any) => doc.text(s, x, y, opts);
 
-    // ── Page Title ──
-    fillRect(ML, MT, PW - ML - MR, 9, NAVY);
-    doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(...WHITE);
-    text(`Daily Cash Book - ${fmtDate(date)}`, ML + 3, MT + 6);
-    doc.setFontSize(10);
-    text(`Agency Cash Report`, PW - MR - 50, MT + 6);
+    // ── Page Title Header Banner ──
+    const headerBannerH = 12;
+    fillRect(ML, MT, PW - ML - MR, headerBannerH, NAVY);
+    
+    let textX = ML + 3;
+    const logoUrl = (agency as any)?.logo_url;
+    if (logoUrl) {
+      try {
+        const fmt = logoUrl.includes("image/png") ? "PNG" : "JPEG";
+        doc.addImage(logoUrl, fmt, ML + 2, MT + 1.5, 9, 9);
+        textX = ML + 14;
+      } catch (e) {
+        try {
+          doc.addImage(logoUrl, "PNG", ML + 2, MT + 1.5, 9, 9);
+          textX = ML + 14;
+        } catch (e2) {}
+      }
+    }
 
-    let y = MT + 13;
+    doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(...WHITE);
+    text(`Daily Cash Book - ${fmtDate(date)}`, textX, MT + 7.5);
+    doc.setFontSize(10);
+    text(agency?.name ? `${agency.name.toUpperCase()} — CASH REPORT` : `AGENCY CASH REPORT`, PW - MR - 4, MT + 7.5, { align: "right" });
+
+    let y = MT + headerBannerH + 3;
 
     // ── Column Header Row ──
     const hdrH = 7;

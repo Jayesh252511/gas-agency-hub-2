@@ -228,7 +228,8 @@ function Page() {
         r.display_notes ?? "—",
         r.is_deleted ? "Voided" : "Active"
       ]);
-      exportToPDF("Overhead Expenses Log", cols, data, "expenses_ledger");
+      const branding = { companyName: agency?.name || "LPG AGENCY ERP", subTitle: "AUTHORIZED LPG DISTRIBUTORSHIP PLATFORM", logoUrl: (agency as any)?.logo_url };
+      exportToPDF("Overhead Expenses Log", cols, data, "expenses_ledger", branding);
     } else {
       const data = filtered.map((r) => ({
         Date: fmtDate(r.expense_date),
@@ -237,7 +238,8 @@ function Page() {
         Notes: r.display_notes ?? "—",
         "Is Voided": r.is_deleted ? "Yes" : "No"
       }));
-      exportToExcel(data, "expenses_ledger", "Overhead Expenses");
+      const branding = { companyName: agency?.name || "LPG AGENCY ERP", subTitle: "AUTHORIZED LPG DISTRIBUTORSHIP PLATFORM", logoUrl: (agency as any)?.logo_url };
+      exportToExcel(data, "expenses_ledger", "Overhead Expenses", branding);
     }
   };
 

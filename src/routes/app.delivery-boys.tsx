@@ -190,7 +190,8 @@ function Page() {
         fmtCurrency(b.commission_rate),
         b.is_deleted ? "Archived" : "Active"
       ]);
-      exportToPDF("Delivery Team Roster", cols, data, "delivery_team");
+      const branding = { companyName: agency?.name || "LPG AGENCY ERP", subTitle: "AUTHORIZED LPG DISTRIBUTORSHIP PLATFORM", logoUrl: (agency as any)?.logo_url };
+      exportToPDF("Delivery Team Roster", cols, data, "delivery_team", branding);
     } else {
       const data = filtered.map((b) => ({
         Name: b.name,
@@ -198,7 +199,8 @@ function Page() {
         "Commission Rate (INR)": Number(b.commission_rate),
         Status: b.is_deleted ? "Archived" : "Active"
       }));
-      exportToExcel(data, "delivery_team", "Delivery Roster");
+      const branding = { companyName: agency?.name || "LPG AGENCY ERP", subTitle: "AUTHORIZED LPG DISTRIBUTORSHIP PLATFORM", logoUrl: (agency as any)?.logo_url };
+      exportToExcel(data, "delivery_team", "Delivery Roster", branding);
     }
   };
 

@@ -296,7 +296,8 @@ function Page() {
         fmtCurrency(r.total),
         r.payment_mode.toUpperCase()
       ]);
-      exportToPDF("Sales Invoice Register", cols, data, "sales_report");
+      const branding = { companyName: agency?.name || "LPG AGENCY ERP", subTitle: "AUTHORIZED LPG DISTRIBUTORSHIP PLATFORM", logoUrl: (agency as any)?.logo_url };
+      exportToPDF("Sales Invoice Register", cols, data, "sales_report", branding);
     } else {
       const data = filtered.map((r) => ({
         Date: fmtDate(r.sale_date),
@@ -312,7 +313,8 @@ function Page() {
         "Net Cash Received": Number(r.net_amount),
         "Is Voided": r.is_deleted ? "Yes" : "No"
       }));
-      exportToExcel(data, "sales_report", "Sales Invoice Register");
+      const branding = { companyName: agency?.name || "LPG AGENCY ERP", subTitle: "AUTHORIZED LPG DISTRIBUTORSHIP PLATFORM", logoUrl: (agency as any)?.logo_url };
+      exportToExcel(data, "sales_report", "Sales Invoice Register", branding);
     }
   };
 

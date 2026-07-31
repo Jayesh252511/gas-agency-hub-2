@@ -109,7 +109,8 @@ function Page() {
         c.consumer_number ?? "", 
         fmtCurrency(c.outstanding)
       ]);
-      exportToPDF("Customer Directory", cols, data, "customers");
+      const branding = { companyName: agency?.name || "LPG AGENCY ERP", subTitle: "AUTHORIZED LPG DISTRIBUTORSHIP PLATFORM", logoUrl: (agency as any)?.logo_url };
+      exportToPDF("Customer Directory", cols, data, "customers", branding);
     } else {
       const data = filtered.map((c) => ({
         "Customer Name": c.name,
@@ -119,7 +120,8 @@ function Page() {
         "Outstanding Balance (INR)": Number(c.outstanding),
         "Is Archived": c.is_deleted ? "Yes" : "No"
       }));
-      exportToExcel(data, "customers", "Customers");
+      const branding = { companyName: agency?.name || "LPG AGENCY ERP", subTitle: "AUTHORIZED LPG DISTRIBUTORSHIP PLATFORM", logoUrl: (agency as any)?.logo_url };
+      exportToExcel(data, "customers", "Customers", branding);
     }
   };
 

@@ -345,7 +345,8 @@ function Page() {
         r.credit > 0 ? fmtCurrency(r.credit) : "—",
         fmtCurrency(r.balance)
       ]);
-      exportToPDF(title, headers, data, "customer_statement");
+      const branding = { companyName: agency?.name || "LPG AGENCY ERP", subTitle: "AUTHORIZED LPG DISTRIBUTORSHIP PLATFORM", logoUrl: (agency as any)?.logo_url };
+      exportToPDF(title, headers, data, "customer_statement", branding);
     } else {
       const data = ledger.map(r => ({
         Date: fmtDate(r.date),
@@ -357,7 +358,8 @@ function Page() {
         "Running Balance (INR)": r.balance,
         "Is Voided": r.is_deleted ? "Yes" : "No"
       }));
-      exportToExcel(data, "customer_statement", "Account Statement");
+      const branding = { companyName: agency?.name || "LPG AGENCY ERP", subTitle: "AUTHORIZED LPG DISTRIBUTORSHIP PLATFORM", logoUrl: (agency as any)?.logo_url };
+      exportToExcel(data, "customer_statement", "Account Statement", branding);
     }
   };
 

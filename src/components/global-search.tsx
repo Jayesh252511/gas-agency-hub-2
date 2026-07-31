@@ -121,7 +121,7 @@ export function GlobalSearch() {
           .select("id, expense_date, amount, category, notes")
           .eq("agency_id", agency.id)
           .eq("is_deleted", false)
-          .in("category", matchingCats)
+          .in("category", matchingCats as any)
           .limit(3);
       } else {
         // Search by notes if column exists, else skip
@@ -204,9 +204,9 @@ export function GlobalSearch() {
   const navigate = (result: SearchResult) => {
     setOpen(false);
     if (result.params) {
-      nav({ to: result.to as any, params: result.params });
+      (nav as any)({ to: result.to, params: result.params });
     } else {
-      nav({ to: result.to as any });
+      (nav as any)({ to: result.to });
     }
   };
 

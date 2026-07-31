@@ -608,7 +608,7 @@ function Page() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild><Button variant="outline" size="sm"><Download className="h-4 w-4 mr-1.5" />Export</Button></DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => exportToPDF(title, cols, data, "report")}><FileText className="h-4 w-4 mr-2" />PDF</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => exportToPDF(title, cols, data, "report", { companyName: agency?.name || "LPG AGENCY ERP", subTitle: "AUTHORIZED LPG DISTRIBUTORSHIP PLATFORM", logoUrl: (agency as any)?.logo_url })}><FileText className="h-4 w-4 mr-2" />PDF</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => {
                   const formattedExcelData = data.map((row) => {
                     const obj: any = {};
@@ -617,7 +617,7 @@ function Page() {
                     });
                     return obj;
                   });
-                  exportToExcel(formattedExcelData, "report", title);
+                  exportToExcel(formattedExcelData, "report", title, { companyName: agency?.name || "LPG AGENCY ERP", subTitle: "AUTHORIZED LPG DISTRIBUTORSHIP PLATFORM", logoUrl: (agency as any)?.logo_url });
                 }}><FileText className="h-4 w-4 mr-2" />Excel</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

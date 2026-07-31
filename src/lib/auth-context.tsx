@@ -16,6 +16,7 @@ interface Agency {
   code: string;
   language: string;
   status: string;
+  logo_url?: string | null;
 }
 
 interface AuthState {
