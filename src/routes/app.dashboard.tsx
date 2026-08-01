@@ -30,7 +30,6 @@ interface TopCustomer {
 }
 
 function Dash() {
-  const { t } = useTranslation();
   const { agency } = useAuth();
 
   const { data: dashData, isLoading: queryLoading } = useQuery({
