@@ -115,6 +115,13 @@ const CSS = `
   @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
   @keyframes marquee { from{transform:translateX(0);} to{transform:translateX(-50%);} }
   @keyframes cardIn { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
+  @keyframes truckDrive { 0%{transform:translateX(-120px);} 100%{transform:translateX(calc(100vw + 120px));} }
+  @keyframes pixelBlink { 0%,100%{opacity:1;} 50%{opacity:0;} }
+  @keyframes pixelFloat { 0%,100%{transform:translateY(0px);} 50%{transform:translateY(-8px);} }
+  @keyframes scanlines {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 4px; }
+  }
 
   /* ── NAVIGATION BAR ── */
   .nav {
@@ -440,7 +447,93 @@ const CSS = `
     content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--orange);
   }
 
+  /* ── PIXEL ART SHOWCASE SECTION ── */
+  .pixel-showcase {
+    background: #111111; position: relative; overflow: hidden;
+    border-top: 3px solid var(--orange); border-bottom: 3px solid var(--orange);
+  }
+  .pixel-showcase::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 2;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 1px, transparent 1px, transparent 4px);
+    animation: scanlines 0.1s linear infinite;
+  }
+  .pixel-showcase-inner {
+    max-width: 1400px; margin: 0 auto; padding: 80px 40px;
+    display: grid; grid-template-columns: 1fr 1.2fr; gap: 60px; align-items: center;
+    position: relative; z-index: 3;
+  }
+  .pixel-label-tag {
+    font-family: var(--font-pixel); font-size: 10px; color: var(--orange);
+    letter-spacing: .2em; text-transform: uppercase; margin-bottom: 20px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .pixel-label-tag::before { content: '▶'; font-size: 8px; }
+  .pixel-big-h {
+    font-family: var(--font-pixel); font-size: clamp(24px, 3.2vw, 40px);
+    color: #FFFFFF; line-height: 1.3; letter-spacing: .02em; margin-bottom: 20px;
+  }
+  .pixel-big-h em { color: var(--orange); font-style: normal; }
+  .pixel-desc { font-family: var(--font-mono); font-size: 12px; color: #888888; line-height: 1.8; }
+  .pixel-img-frame {
+    position: relative; border: 2px solid #333333;
+    border-radius: 4px; overflow: hidden;
+    box-shadow: 0 0 0 4px #222222, 0 0 40px rgba(255,107,0,0.2);
+    image-rendering: pixelated;
+  }
+  .pixel-img-frame img {
+    width: 100%; display: block;
+    image-rendering: pixelated; image-rendering: crisp-edges;
+  }
+  .pixel-img-frame::before {
+    content: '● ● ●'; position: absolute; top: 0; left: 0; right: 0;
+    background: #1A1A1A; padding: 6px 12px; font-family: var(--font-mono); font-size: 10px;
+    color: #555555; z-index: 4; letter-spacing: 4px;
+  }
+  .pixel-stats-row {
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-top: 28px;
+  }
+  .pixel-stat-box {
+    background: #1A1A1A; border: 1px solid #333333; border-radius: 4px; padding: 14px 12px;
+    text-align: center;
+  }
+  .pixel-stat-val { font-family: var(--font-pixel); font-size: 18px; color: var(--orange); }
+  .pixel-stat-lab { font-family: var(--font-mono); font-size: 9px; color: #666666; margin-top: 4px; text-transform: uppercase; letter-spacing: .08em; }
+
+  /* ── PIXEL FEATURES BANNER ── */
+  .pixel-features-banner {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 18px; padding: 24px; margin-top: 48px; overflow: hidden;
+    position: relative;
+  }
+  .pixel-features-banner img {
+    width: 100%; height: 180px; object-fit: cover;
+    image-rendering: pixelated; image-rendering: crisp-edges;
+    border-radius: 10px; display: block;
+  }
+  .pixel-label {
+    font-family: var(--font-pixel); font-size: 10px; color: var(--orange);
+    letter-spacing: .12em; text-transform: uppercase;
+    background: var(--orange-light); border: 1px solid rgba(255,107,0,0.2);
+    padding: 3px 10px; border-radius: 4px; display: inline-block; margin-bottom: 12px;
+  }
+
   /* ── FOOTER ── */
+  .footer-pixel-scene {
+    position: relative; overflow: hidden; height: 140px;
+    background: linear-gradient(180deg, #FFF8F0 0%, #FFF0E0 100%);
+    border-top: 2px solid #FFDDBB;
+  }
+  .footer-pixel-scene img.cityscape {
+    position: absolute; bottom: 0; left: 0; width: 100%;
+    height: 130px; object-fit: cover; object-position: bottom;
+    image-rendering: pixelated; image-rendering: crisp-edges;
+  }
+  .footer-truck {
+    position: absolute; bottom: 8px; z-index: 3;
+    height: 60px; width: auto;
+    image-rendering: pixelated; image-rendering: crisp-edges;
+    animation: truckDrive 18s linear infinite;
+  }
   .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
   .footer-brand-name { font-family: var(--font-pixel); font-weight: 700; font-size: 14px; color: var(--text); }
   .footer-p { font-size: 13px; color: var(--text-sub); line-height: 1.7; max-width: 280px; margin-top: 10px; }
@@ -448,10 +541,44 @@ const CSS = `
   .f-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
   .f-links a { font-size: 13px; color: var(--text-sub); text-decoration: none; transition: color .2s; }
   .f-links a:hover { color: var(--orange); }
+  .footer-india-badge {
+    display: block; width: 90px; margin-top: 12px;
+    image-rendering: pixelated; image-rendering: crisp-edges;
+  }
   .footer-bot {
     border-top: 1px solid var(--border); padding-top: 24px;
     display: flex; justify-content: space-between; align-items: center;
     font-family: var(--font-mono); font-size: 10px; color: var(--text-sub); letter-spacing: .06em;
+  }
+  .footer-pixel-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--font-pixel); font-size: 9px;
+    color: var(--orange); background: var(--orange-light);
+    border: 1px solid rgba(255,107,0,0.25); padding: 4px 10px; border-radius: 4px;
+  }
+  .footer-pixel-badge::before { content: '■'; font-size: 7px; animation: pixelBlink 1.2s step-end infinite; }
+
+  /* ── CTA PIXEL SECTION ── */
+  .cta-box {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 24px;
+    padding: 70px 60px; text-align: center; position: relative; overflow: hidden;
+    box-shadow: 0 16px 50px rgba(0,0,0,0.03);
+  }
+  .cta-box::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--orange);
+  }
+  .cta-pixel-row {
+    display: flex; justify-content: center; gap: 20px; margin-bottom: 36px; flex-wrap: wrap;
+  }
+  .cta-pixel-badge {
+    display: flex; align-items: center; gap: 8px; padding: 8px 16px;
+    font-family: var(--font-pixel); font-size: 9px; color: var(--text-sub);
+    background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 4px;
+    letter-spacing: .08em;
+  }
+  .cta-pixel-badge span.dot {
+    width: 6px; height: 6px; background: var(--orange); border-radius: 1px;
+    animation: pixelBlink 1s step-end infinite;
   }
 
   /* ── RESPONSIVE ── */
@@ -463,6 +590,7 @@ const CSS = `
     .feat-panel-info { border-right: none; border-bottom: 1px solid var(--border); }
     .hiw-grid { grid-template-columns: 1fr 1fr; gap: 16px; }
     .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+    .pixel-showcase-inner { grid-template-columns: 1fr; }
   }
   @media(max-width:768px) {
     .nav-links { display: none; }
@@ -493,6 +621,10 @@ const CSS = `
     body.lp-body { cursor: auto; }
     .cur, .cur-ring { display: none; }
     .cta-box { padding: 48px 24px; }
+    .pixel-showcase-inner { padding: 48px 20px; }
+    .pixel-big-h { font-size: 20px; }
+    .footer-pixel-scene { height: 100px; }
+    .footer-truck { height: 44px; }
   }
   @media(max-width:480px) {
     .nav-brand-sub { display: none; }
@@ -500,6 +632,7 @@ const CSS = `
     .btn-fire::after { content: 'Trial'; }
     .hero-actions { flex-direction: column; align-items: flex-start; }
     .hero-trust { gap: 12px; }
+    .pixel-stats-row { grid-template-columns: 1fr 1fr; }
   }
 `;
 
@@ -852,9 +985,9 @@ export default function LandingPage() {
             <div className="hmi-sub">12 active customers</div>
           </div>
 
-          {/* Center 3D Cylinder Stage */}
+          {/* Center Pixel Art Cylinder Stage */}
           <div className="cyl-stage">
-            <img src="/cylinder-pedestal.png" alt="LPG Cylinder Hardware" className="cyl-img"/>
+            <img src="/pixel-cylinder.png" alt="LPG Cylinder Pixel Art" className="cyl-img" style={{imageRendering:'pixelated'}}/>
             <div className="cyl-pedestal"/>
           </div>
         </div>
@@ -920,6 +1053,37 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ══ PIXEL ART SHOWCASE SECTION ══ */}
+      <div className="pixel-showcase">
+        <div className="pixel-showcase-inner">
+          <div>
+            <div className="pixel-label-tag">POWERFUL FEATURES</div>
+            <h2 className="pixel-big-h">
+              ALL THE TOOLS YOU NEED,<br/>
+              ONE <em>POWERFUL</em> PLATFORM
+            </h2>
+            <p className="pixel-desc">
+              Designed pixel-perfect for India's LPG distributors.
+              Web, Mobile &amp; Tablet — all synced in real time.
+              Works offline. Start your agency running same day.
+            </p>
+            <div className="pixel-stats-row">
+              {[["500+","Agencies"],["99.9%","Uptime"],["₹0","Setup Fee"]].map(([v,l])=>(
+                <div key={l} className="pixel-stat-box">
+                  <div className="pixel-stat-val">{v}</div>
+                  <div className="pixel-stat-lab">{l}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div className="pixel-img-frame" style={{marginTop:20}}>
+              <img src="/pixel-dashboard.png" alt="Pixel Art Dashboard" style={{marginTop:24}}/>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* ══ HOW IT WORKS SECTION ══ */}
       <section className="sec" id="how" style={{ background: "var(--bg-subtle)", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
         <div className="sec-inner">
@@ -942,6 +1106,12 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
+
+          {/* Pixel Features Image Banner */}
+          <div className="pixel-features-banner">
+            <div className="pixel-label">PIXEL — BUILT FOR INDIA</div>
+            <img src="/pixel-features.png" alt="Feature Icons Pixel Art" />
+          </div>
         </div>
       </section>
 
@@ -954,9 +1124,16 @@ export default function LandingPage() {
               READY TO TRANSFORM YOUR<br/>
               <span className="pixel-accent">GAS AGENCY?</span>
             </h2>
-            <p className="sec-p" style={{ margin: "0 auto 36px", textAlign: "center" }}>
+            <p className="sec-p" style={{ margin: "0 auto 24px", textAlign: "center" }}>
               Start your free trial today. No credit card required. No setup fees. Just your agency, running smarter.
             </p>
+
+            {/* Pixel Art Badges Row */}
+            <div className="cta-pixel-row">
+              {["No Credit Card","Works Offline","Any Device","Made in India"].map(t=>(
+                <div key={t} className="cta-pixel-badge"><span className="dot"/>{t}</div>
+              ))}
+            </div>
 
             <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
               <a href={TRIAL_WA_URL} target="_blank" rel="noopener noreferrer" className="btn-hero-lg">
@@ -971,51 +1148,62 @@ export default function LandingPage() {
       </section>
 
       {/* ══ FOOTER ══ */}
-      <footer style={{ borderTop: "1px solid var(--border)", background: "var(--surface)", paddingTop: 60, paddingBottom: 40 }}>
-        <div className="sec-inner">
-          <div className="footer-grid">
-            <div>
-              <div className="nav-brand" style={{ marginBottom: 14 }}>
-                <div className="nav-brand-mark"><I.Flame/></div>
-                <div className="footer-brand-name">GasAgency Hub</div>
+      <footer style={{ background: "var(--surface)" }}>
+
+        {/* Pixel Art Cityscape Scene */}
+        <div className="footer-pixel-scene">
+          <img className="cityscape" src="/pixel-cityscape.png" alt="Pixel Art City"/>
+          <img className="footer-truck" src="/pixel-truck.png" alt="Pixel Delivery Truck"/>
+        </div>
+
+        <div style={{ borderTop: "3px solid var(--orange)", paddingTop: 56, paddingBottom: 40 }}>
+          <div className="sec-inner">
+            <div className="footer-grid">
+              <div>
+                <div className="nav-brand" style={{ marginBottom: 14 }}>
+                  <div className="nav-brand-mark"><I.Flame/></div>
+                  <div className="footer-brand-name">GasAgency Hub</div>
+                </div>
+                <p className="footer-p">
+                  India's trusted LPG gas agency management platform. Engineered for speed, reliability, and growth.
+                </p>
+                <div className="footer-pixel-badge" style={{marginTop:16}}>LIVE SYS.ACTIVE</div>
               </div>
-              <p className="footer-p">
-                India's trusted LPG gas agency management platform. Engineered for speed, reliability, and growth.
-              </p>
-            </div>
 
-            <div>
-              <div className="f-col-label">PRODUCT</div>
-              <ul className="f-links">
-                <li><a href="#features">Features</a></li>
-                <li><a href="#features">Live Demo</a></li>
-                <li><a href="#features">Analytics</a></li>
-                <li><a href="#how">How It Works</a></li>
-              </ul>
-            </div>
+              <div>
+                <div className="f-col-label">PRODUCT</div>
+                <ul className="f-links">
+                  <li><a href="#features">Features</a></li>
+                  <li><a href="#features">Live Demo</a></li>
+                  <li><a href="#features">Analytics</a></li>
+                  <li><a href="#how">How It Works</a></li>
+                </ul>
+              </div>
 
-            <div>
-              <div className="f-col-label">SUPPORT</div>
-              <ul className="f-links">
-                <li><a href={TRIAL_WA_URL} target="_blank" rel="noopener noreferrer">Contact Us</a></li>
-                <li><a href="mailto:jayeshneo07@gmail.com">Email Support</a></li>
-                <li><a href="#features">Documentation</a></li>
-              </ul>
-            </div>
+              <div>
+                <div className="f-col-label">SUPPORT</div>
+                <ul className="f-links">
+                  <li><a href={TRIAL_WA_URL} target="_blank" rel="noopener noreferrer">Contact Us</a></li>
+                  <li><a href="mailto:jayeshneo07@gmail.com">Email Support</a></li>
+                  <li><a href="#features">Documentation</a></li>
+                </ul>
+              </div>
 
-            <div>
-              <div className="f-col-label">MADE IN INDIA</div>
-              <div style={{ fontSize: 13, color: "var(--text-sub)", lineHeight: 1.7, marginTop: 8 }}>
-                Designed &amp; built for Indian LPG distributors.
+              <div>
+                <div className="f-col-label">MADE IN INDIA</div>
+                <div style={{ fontSize: 13, color: "var(--text-sub)", lineHeight: 1.7, marginTop: 8 }}>
+                  Designed &amp; built for Indian LPG distributors.
+                </div>
+                <img className="footer-india-badge" src="/pixel-india.png" alt="Made in India Pixel Badge"/>
               </div>
             </div>
-          </div>
 
-          <div className="footer-bot">
-            <div>© {new Date().getFullYear()} GasAgency Hub. All rights reserved.</div>
-            <div style={{ display: "flex", gap: 20 }}>
-              <Link to="/login" style={{ color: "var(--text-sub)", textDecoration: "none" }}>Agency Login</Link>
-              <a href={TRIAL_WA_URL} target="_blank" rel="noopener noreferrer" style={{ color: "var(--orange)", textDecoration: "none" }}>Start Free Trial</a>
+            <div className="footer-bot">
+              <div>© {new Date().getFullYear()} GasAgency Hub. All rights reserved.</div>
+              <div style={{ display: "flex", gap: 20 }}>
+                <Link to="/login" style={{ color: "var(--text-sub)", textDecoration: "none" }}>Agency Login</Link>
+                <a href={TRIAL_WA_URL} target="_blank" rel="noopener noreferrer" style={{ color: "var(--orange)", textDecoration: "none" }}>Start Free Trial</a>
+              </div>
             </div>
           </div>
         </div>
