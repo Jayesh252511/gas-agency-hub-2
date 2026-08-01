@@ -117,198 +117,215 @@ function AppLayout() {
   }
 
   return (
-    <div className="min-h-screen flex bg-muted/30 text-foreground transition-colors duration-200">
-      {/* Sidebar (desktop) */}
-      <aside className="hidden lg:flex w-64 shrink-0 flex-col bg-sidebar border-r border-sidebar-border">
-        <div className="h-16 px-5 flex items-center justify-between border-b border-sidebar-border">
-          <div className="flex items-center gap-2.5 min-w-0">
-            {me?.agency?.logo_url ? (
-              <img
-                src={me.agency.logo_url}
-                className="w-9 h-9 rounded-lg object-cover border border-sidebar-border shadow-sm"
-                alt="Agency Logo"
-              />
-            ) : (
-              <div className="w-9 h-9 rounded-lg bg-primary text-primary-foreground grid place-items-center shadow-sm">
-                <Flame className="w-5 h-5" />
+    <div className="min-h-screen flex text-foreground transition-colors duration-200 app-editorial app-editorial-bg" style={{backgroundColor: 'var(--background)'}}>
+      {/* ── SIDEBAR (desktop) ── */}
+      <aside className="hidden lg:flex w-64 shrink-0 flex-col bg-sidebar border-r border-sidebar-border" style={{position:'relative',zIndex:10}}>
+
+        {/* Agency Brand Header */}
+        <div style={{padding:'18px 20px 14px', borderBottom:'1px solid var(--sidebar-border)', background:'var(--sidebar)'}}>
+          <div style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
+            <div style={{display:'flex', alignItems:'center', gap:10, minWidth:0}}>
+              {me?.agency?.logo_url ? (
+                <img src={me.agency.logo_url} style={{width:36,height:36,borderRadius:10,objectFit:'cover',border:'1px solid var(--sidebar-border)',flexShrink:0}} alt="Agency Logo"/>
+              ) : (
+                <div style={{width:36,height:36,borderRadius:10,background:'#FF6B00',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,boxShadow:'0 2px 8px rgba(255,107,0,0.3)'}}>
+                  <Flame className="w-4 h-4"/>
+                </div>
+              )}
+              <div style={{minWidth:0}}>
+                <div style={{fontFamily:"'Space Grotesk','Inter',sans-serif",fontWeight:700,fontSize:14,letterSpacing:'-0.01em',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',color:'var(--sidebar-foreground)'}}>
+                  {me?.agency?.name ?? "LPG Agency"}
+                </div>
+                <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:10,color:'#FF6B00',letterSpacing:'.1em',marginTop:2}}>
+                  {me?.agency?.code ?? ""}
+                </div>
               </div>
-            )}
-            <div className="leading-tight min-w-0">
-              <div className="font-bold text-sm truncate max-w-[100px]">{me?.agency?.name ?? "LPG Agency"}</div>
-              <div className="text-xs text-muted-foreground">{me?.agency?.code}</div>
+            </div>
+            <div style={{display:'flex',alignItems:'center',gap:4,flexShrink:0}}>
+              <NotificationCenter align="left"/>
+              <button onClick={toggleTheme} style={{padding:'6px',borderRadius:8,background:'transparent',border:'none',cursor:'pointer',color:'var(--muted-foreground)',transition:'color .2s'}} title={theme==="dark"?"Switch to Light":"Switch to Dark"}>
+                <div className={cn("transition-transform duration-500",theme==="dark"?"rotate-[360deg] scale-110":"rotate-0")}>
+                  {theme==="dark"?<Sun className="w-4 h-4" style={{color:'#F59E0B'}}/>:<Moon className="w-4 h-4"/>}
+                </div>
+              </button>
             </div>
           </div>
-
-          <div className="flex items-center gap-1 shrink-0">
-            <NotificationCenter align="left" />
-            <button
-              onClick={toggleTheme}
-              className="text-muted-foreground hover:text-foreground p-1.5 rounded-lg hover:bg-sidebar-accent transition-all duration-300 active:scale-90"
-              title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
-            >
-              <div className={cn("transition-transform duration-500", theme === "dark" ? "rotate-[360deg] scale-110" : "rotate-0")}>
-                {theme === "dark" ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4" />}
-              </div>
-            </button>
-          </div>
         </div>
 
-        {/* Search bar in sidebar */}
-        <div className="px-3 pt-3 pb-1">
-          <GlobalSearch />
+        {/* Search */}
+        <div style={{padding:'12px 14px 4px'}}>
+          <GlobalSearch/>
         </div>
 
-        <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
-          {navItems.map((n) => (
-            <Link
-              key={n.to} to={n.to}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent transition-all duration-200 active:scale-[0.98] hover:translate-x-[2px]"
-              activeProps={{ className: "bg-sidebar-accent text-sidebar-primary" }}
-              activeOptions={{ exact: (n as any).exact }}
+        {/* Nav */}
+        <nav style={{flex:1, padding:'8px 10px', overflowY:'auto', display:'flex', flexDirection:'column', gap:2}}>
+
+          {/* // MAIN */}
+          <div style={{fontFamily:"'Silkscreen',monospace",fontSize:'8px',color:'#AAAAAA',letterSpacing:'.18em',textTransform:'uppercase',padding:'10px 8px 4px'}}>// Main</div>
+          {[
+            {to:"/app",label:"Dashboard",icon:LayoutDashboard,exact:true},
+            {to:"/app/sales",label:"Sales",icon:ShoppingCart},
+            {to:"/app/customers",label:"Customers",icon:Users},
+          ].map(n=>(
+            <Link key={n.to} to={n.to}
+              className={cn("flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 hover:translate-x-[2px]")}
+              style={{fontFamily:"'Inter',sans-serif",fontWeight:500,fontSize:13,color:'var(--sidebar-foreground)',textDecoration:'none'}}
+              activeProps={{className:"nav-item-active",style:{fontFamily:"'Inter',sans-serif",fontWeight:600,fontSize:13,color:'#FF6B00',textDecoration:'none',background:'rgba(255,107,0,0.08)',borderLeft:'3px solid #FF6B00',paddingLeft:9}}}
+              activeOptions={{exact:(n as any).exact}}
             >
-              <n.icon className="w-5 h-5 shrink-0" />
-              <span className="truncate">{n.label}</span>
+              <n.icon className="w-4 h-4 shrink-0"/>
+              <span>{n.label}</span>
+            </Link>
+          ))}
+
+          {/* // FINANCE */}
+          <div style={{fontFamily:"'Silkscreen',monospace",fontSize:'8px',color:'#AAAAAA',letterSpacing:'.18em',textTransform:'uppercase',padding:'14px 8px 4px'}}>// Finance</div>
+          {[
+            {to:"/app/udhari",label:"Credit Book",icon:IndianRupee},
+            {to:"/app/payments",label:"Payments",icon:Wallet},
+            {to:"/app/expenses",label:"Expenses",icon:Receipt},
+            {to:"/app/cashbook",label:"Cash Book",icon:BookOpen},
+            {to:"/app/payment-inflow",label:"Payment Inflow",icon:ArrowDownToLine},
+            {to:"/app/payment-outflow",label:"Payment Outflow",icon:ArrowUpFromLine},
+            {to:"/app/outstanding",label:"Outstanding",icon:Coins},
+          ].map(n=>(
+            <Link key={n.to} to={n.to}
+              style={{fontFamily:"'Inter',sans-serif",fontWeight:500,fontSize:13,color:'var(--sidebar-foreground)',textDecoration:'none'}}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 hover:translate-x-[2px]"
+              activeProps={{className:"nav-item-active",style:{fontFamily:"'Inter',sans-serif",fontWeight:600,fontSize:13,color:'#FF6B00',textDecoration:'none',background:'rgba(255,107,0,0.08)',borderLeft:'3px solid #FF6B00',paddingLeft:9}}}
+            >
+              <n.icon className="w-4 h-4 shrink-0"/>
+              <span>{n.label}</span>
+            </Link>
+          ))}
+
+          {/* // MANAGE */}
+          <div style={{fontFamily:"'Silkscreen',monospace",fontSize:'8px',color:'#AAAAAA',letterSpacing:'.18em',textTransform:'uppercase',padding:'14px 8px 4px'}}>// Manage</div>
+          {[
+            {to:"/app/products",label:"Products",icon:Package},
+            {to:"/app/delivery-boys",label:"Delivery Boys",icon:Truck},
+            {to:"/app/analytics",label:"Analytics",icon:BarChart2},
+            {to:"/app/reports",label:"Reports",icon:Receipt},
+            {to:"/app/profile",label:"Profile",icon:UserCog},
+            ...(isAdmin?[{to:"/app/users",label:"Users",icon:UserCog}]:[]),
+          ].map(n=>(
+            <Link key={n.to} to={n.to}
+              style={{fontFamily:"'Inter',sans-serif",fontWeight:500,fontSize:13,color:'var(--sidebar-foreground)',textDecoration:'none'}}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 hover:translate-x-[2px]"
+              activeProps={{className:"nav-item-active",style:{fontFamily:"'Inter',sans-serif",fontWeight:600,fontSize:13,color:'#FF6B00',textDecoration:'none',background:'rgba(255,107,0,0.08)',borderLeft:'3px solid #FF6B00',paddingLeft:9}}}
+            >
+              <n.icon className="w-4 h-4 shrink-0"/>
+              <span>{n.label}</span>
             </Link>
           ))}
         </nav>
-        <div className="p-3 border-t border-sidebar-border space-y-2">
-          <div className="flex items-center justify-between px-3">
-            <div className="text-xs text-muted-foreground truncate">
-              Signed in as: <span className="font-semibold text-sidebar-foreground">{me?.user?.full_name ?? me?.user?.username}</span>
+
+        {/* Footer */}
+        <div style={{padding:'12px 14px',borderTop:'1px solid var(--sidebar-border)'}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}}>
+            <div style={{display:'flex',alignItems:'center',gap:6}}>
+              <span style={{width:6,height:6,borderRadius:2,background:'#10B981',display:'inline-block'}} className="pixel-blink"/>
+              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:10,color:'var(--muted-foreground)'}}>
+                {me?.user?.full_name ?? me?.user?.username}
+              </span>
             </div>
           </div>
-          <Button variant="ghost" className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover-spring" onClick={signOut}>
-            <LogOut className="w-4 h-4 mr-2" /> Sign Out
-          </Button>
+          <button onClick={signOut} style={{width:'100%',display:'flex',alignItems:'center',gap:8,padding:'8px 12px',borderRadius:10,border:'1px solid var(--sidebar-border)',background:'transparent',cursor:'pointer',color:'var(--muted-foreground)',fontFamily:"'Inter',sans-serif",fontSize:13,transition:'all .2s'}}
+            onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='#FF6B00';(e.currentTarget as HTMLButtonElement).style.color='#FF6B00';}}
+            onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='var(--sidebar-border)';(e.currentTarget as HTMLButtonElement).style.color='var(--muted-foreground)';}}>
+            <LogOut className="w-4 h-4"/> Sign Out
+          </button>
         </div>
       </aside>
 
-      {/* Mobile container */}
+      {/* ── MOBILE CONTAINER ── */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Mobile header */}
-        <header className="lg:hidden h-14 px-4 flex items-center justify-between border-b bg-background sticky top-0 z-30">
-          <button onClick={() => setOpen(!open)} className="p-2 -ml-2 text-foreground"><Menu className="w-6 h-6" /></button>
-          <div className="flex items-center gap-2 font-semibold">
-            {me?.agency?.logo_url ? (
-              <img
-                src={me.agency.logo_url}
-                className="w-7 h-7 rounded-md object-cover border border-sidebar-border shadow-sm"
-                alt="Agency Logo"
-              />
-            ) : (
-              <div className="w-7 h-7 rounded-md bg-primary text-primary-foreground grid place-items-center shadow-sm">
-                <Flame className="w-4 h-4" />
-              </div>
-            )}
-            <span className="truncate max-w-[120px] text-sm">{me?.agency?.name ?? "LPG Agency"}</span>
+
+        {/* Mobile Header */}
+        <header style={{background:'var(--sidebar)',borderBottom:'1px solid var(--sidebar-border)',position:'sticky',top:0,zIndex:30,padding:'0 16px',height:56,display:'flex',alignItems:'center',justifyContent:'space-between'}} className="lg:hidden">
+          <button onClick={()=>setOpen(!open)} style={{padding:8,marginLeft:-8,background:'none',border:'none',cursor:'pointer',color:'var(--foreground)'}}>
+            <Menu className="w-5 h-5"/>
+          </button>
+          <div style={{display:'flex',alignItems:'center',gap:8}}>
+            {me?.agency?.logo_url
+              ?<img src={me.agency.logo_url} style={{width:28,height:28,borderRadius:8,objectFit:'cover'}} alt="Agency Logo"/>
+              :<div style={{width:28,height:28,borderRadius:8,background:'#FF6B00',display:'flex',alignItems:'center',justifyContent:'center'}}><Flame className="w-3.5 h-3.5 text-white"/></div>
+            }
+            <span style={{fontFamily:"'Space Grotesk','Inter',sans-serif",fontWeight:700,fontSize:14,letterSpacing:'-0.01em',maxWidth:140,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
+              {me?.agency?.name ?? "LPG Agency"}
+            </span>
           </div>
-          <div className="flex items-center gap-1">
-            <NotificationCenter />
-            <button
-              onClick={toggleTheme}
-              className="p-2 text-muted-foreground hover:text-foreground transition-all duration-300 active:scale-90"
-              title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
-            >
-              <div className={cn("transition-transform duration-500", theme === "dark" ? "rotate-[360deg] scale-110" : "rotate-0")}>
-                {theme === "dark" ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5" />}
+          <div style={{display:'flex',alignItems:'center',gap:4}}>
+            <NotificationCenter/>
+            <button onClick={toggleTheme} style={{padding:8,background:'none',border:'none',cursor:'pointer',color:'var(--muted-foreground)'}}>
+              <div className={cn("transition-transform duration-500",theme==="dark"?"rotate-[360deg]":"")}>
+                {theme==="dark"?<Sun className="w-5 h-5" style={{color:'#F59E0B'}}/>:<Moon className="w-5 h-5"/>}
               </div>
             </button>
-            <button onClick={signOut} className="p-2 -mr-2 text-muted-foreground hover:text-foreground transition-all duration-200 active:scale-95"><LogOut className="w-5 h-5" /></button>
+            <button onClick={signOut} style={{padding:8,marginRight:-8,background:'none',border:'none',cursor:'pointer',color:'var(--muted-foreground)'}}>
+              <LogOut className="w-5 h-5"/>
+            </button>
           </div>
         </header>
 
-        {/* Mobile drawer with slide transition */}
-        <div className={cn("lg:hidden fixed inset-0 z-40 transition-opacity duration-300", open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none")} onClick={() => setOpen(false)}>
-          <div className="absolute inset-0 bg-black/40" />
-          <aside className={cn("absolute left-0 top-0 bottom-0 w-72 bg-sidebar shadow-xl p-3 overflow-y-auto transition-transform duration-300 ease-out", open ? "translate-x-0" : "-translate-x-full")} onClick={(e) => e.stopPropagation()}>
-            <div className="mb-3 px-2 py-3 border-b border-sidebar-border flex items-center gap-2.5">
-              {me?.agency?.logo_url ? (
-                <img
-                  src={me.agency.logo_url}
-                  className="w-9 h-9 rounded-lg object-cover border border-sidebar-border shadow-sm"
-                  alt="Agency Logo"
-                />
-              ) : (
-                <div className="w-9 h-9 rounded-lg bg-primary text-primary-foreground grid place-items-center shadow-sm">
-                  <Flame className="w-5 h-5" />
-                </div>
-              )}
-              <div className="leading-tight min-w-0">
-                <div className="font-bold text-sm truncate">{me?.agency?.name}</div>
-                <div className="text-xs text-muted-foreground">{me?.agency?.code}</div>
+        {/* Mobile Drawer */}
+        <div className={cn("lg:hidden fixed inset-0 z-40 transition-opacity duration-300", open?"opacity-100 pointer-events-auto":"opacity-0 pointer-events-none")} onClick={()=>setOpen(false)}>
+          <div style={{position:'absolute',inset:0,background:'rgba(0,0,0,0.4)'}}/>
+          <aside className={cn("absolute left-0 top-0 bottom-0 w-72 shadow-xl p-3 overflow-y-auto transition-transform duration-300 ease-out", open?"translate-x-0":"-translate-x-full")}
+            style={{background:'var(--sidebar)'}} onClick={e=>e.stopPropagation()}>
+            <div style={{marginBottom:12,padding:'12px 8px 14px',borderBottom:'1px solid var(--sidebar-border)',display:'flex',alignItems:'center',gap:10}}>
+              {me?.agency?.logo_url
+                ?<img src={me.agency.logo_url} style={{width:36,height:36,borderRadius:10,objectFit:'cover'}} alt="Agency Logo"/>
+                :<div style={{width:36,height:36,borderRadius:10,background:'#FF6B00',display:'flex',alignItems:'center',justifyContent:'center'}}><Flame className="w-4 h-4 text-white"/></div>
+              }
+              <div>
+                <div style={{fontFamily:"'Space Grotesk','Inter',sans-serif",fontWeight:700,fontSize:14,letterSpacing:'-0.01em'}}>{me?.agency?.name}</div>
+                <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:10,color:'#FF6B00',letterSpacing:'.1em'}}>{me?.agency?.code}</div>
               </div>
             </div>
-            {/* Mobile search */}
-            <div className="mb-3">
-              <GlobalSearch />
-            </div>
-            <div className="space-y-0.5">
-              {navItems.map((n) => (
-                <Link key={n.to} to={n.to} onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
-                  activeProps={{ className: "bg-sidebar-accent text-sidebar-primary" }}
-                  activeOptions={{ exact: (n as any).exact }}
+            <div style={{marginBottom:12}}><GlobalSearch/></div>
+            <div style={{display:'flex',flexDirection:'column',gap:2}}>
+              {navItems.map(n=>(
+                <Link key={n.to} to={n.to} onClick={()=>setOpen(false)}
+                  style={{display:'flex',alignItems:'center',gap:12,padding:'11px 12px',borderRadius:10,fontFamily:"'Inter',sans-serif",fontWeight:500,fontSize:14,color:'var(--sidebar-foreground)',textDecoration:'none',transition:'all .15s'}}
+                  activeProps={{style:{display:'flex',alignItems:'center',gap:12,padding:'11px 9px',borderRadius:10,fontFamily:"'Inter',sans-serif",fontWeight:600,fontSize:14,color:'#FF6B00',textDecoration:'none',background:'rgba(255,107,0,0.08)',borderLeft:'3px solid #FF6B00'}}}
+                  activeOptions={{exact:(n as any).exact}}
                 >
-                  <n.icon className="w-5 h-5 shrink-0" />{n.label}
+                  <n.icon className="w-5 h-5 shrink-0"/>{n.label}
                 </Link>
               ))}
             </div>
           </aside>
         </div>
 
-        {/* Main Content Pane */}
-        <main className="flex-1 p-4 pb-24 lg:p-8 max-w-7xl w-full mx-auto">
-          <Outlet />
+        {/* Main Content */}
+        <main className="flex-1 p-4 pb-24 lg:p-8 max-w-7xl w-full mx-auto" style={{position:'relative',zIndex:1}}>
+          <Outlet/>
         </main>
 
-        {/* Mobile Bottom Navigation Bar (Sticky) */}
-        <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-background border-t border-border flex items-center justify-around z-30 pb-safe shadow-lg">
-          <Link
-            to="/app"
-            activeOptions={{ exact: true }}
-            className="flex flex-col items-center justify-center flex-1 h-full text-muted-foreground transition-colors hover:text-foreground"
-            activeProps={{ className: "text-primary font-semibold dark:text-primary" }}
-          >
-            <LayoutDashboard className="w-5 h-5 mb-0.5" />
-            <span className="text-[10px]">Home</span>
-          </Link>
-          <Link
-            to="/app/sales"
-            className="flex flex-col items-center justify-center flex-1 h-full text-muted-foreground transition-colors hover:text-foreground"
-            activeProps={{ className: "text-primary font-semibold dark:text-primary" }}
-          >
-            <ShoppingCart className="w-5 h-5 mb-0.5" />
-            <span className="text-[10px]">Sales</span>
-          </Link>
-          <Link
-            to="/app/cashbook"
-            className="flex flex-col items-center justify-center flex-1 h-full text-muted-foreground transition-colors hover:text-foreground"
-            activeProps={{ className: "text-primary font-semibold dark:text-primary" }}
-          >
-            <BookOpen className="w-5 h-5 mb-0.5" />
-            <span className="text-[10px]">Cashbook</span>
-          </Link>
-          <Link
-            to="/app/expenses"
-            className="flex flex-col items-center justify-center flex-1 h-full text-muted-foreground transition-colors hover:text-foreground"
-            activeProps={{ className: "text-primary font-semibold dark:text-primary" }}
-          >
-            <Receipt className="w-5 h-5 mb-0.5" />
-            <span className="text-[10px]">Expenses</span>
-          </Link>
-          <Link
-            to="/app/profile"
-            className="flex flex-col items-center justify-center flex-1 h-full text-muted-foreground transition-colors hover:text-foreground"
-            activeProps={{ className: "text-primary font-semibold dark:text-primary" }}
-          >
-            <UserCog className="w-5 h-5 mb-0.5" />
-            <span className="text-[10px]">Profile</span>
-          </Link>
+        {/* Mobile Bottom Nav */}
+        <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 border-t flex items-center justify-around z-30 pb-safe"
+          style={{background:'var(--sidebar)',borderTopColor:'var(--sidebar-border)',boxShadow:'0 -4px 20px rgba(0,0,0,0.04)'}}>
+          {[
+            {to:"/app",label:"Home",icon:LayoutDashboard,exact:true},
+            {to:"/app/sales",label:"Sales",icon:ShoppingCart},
+            {to:"/app/cashbook",label:"Cashbook",icon:BookOpen},
+            {to:"/app/expenses",label:"Expenses",icon:Receipt},
+            {to:"/app/profile",label:"Profile",icon:UserCog},
+          ].map(n=>(
+            <Link key={n.to} to={n.to}
+              activeOptions={{exact:(n as any).exact}}
+              style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',flex:1,height:'100%',textDecoration:'none',color:'var(--muted-foreground)',gap:3,fontFamily:"'Inter',sans-serif",fontSize:10,fontWeight:500,transition:'color .2s'}}
+              activeProps={{style:{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',flex:1,height:'100%',textDecoration:'none',color:'#FF6B00',gap:3,fontFamily:"'Inter',sans-serif",fontSize:10,fontWeight:700}}}
+            >
+              <n.icon className="w-5 h-5"/>
+              <span>{n.label}</span>
+            </Link>
+          ))}
         </nav>
       </div>
 
-      {/* PWA Install Prompt */}
-      <PwaInstallPrompt />
+      <PwaInstallPrompt/>
     </div>
   );
 }

@@ -3,18 +3,14 @@ import { RequireAgencyUser } from "@/components/route-guards";
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { PageHeader, EmptyState } from "@/components/page-header";
 import { fmtCurrency, fmtDate, todayISO } from "@/lib/format";
-import { useTranslation } from "react-i18next";
-import { 
-  ShoppingCart, HandCoins, Receipt, UserPlus, TrendingUp, AlertCircle, 
-  BookOpen, Users, Clock, Flame, ChevronRight, Activity, Trash2, Calendar, Info,
+import {
+  ShoppingCart, HandCoins, Receipt, UserPlus, TrendingUp, AlertCircle,
+  Users, Clock, Flame, ChevronRight, Trash2, Calendar,
   ArrowDownToLine, ArrowUpFromLine
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { cn } from "@/lib/utils";
+
 
 export const Route = createFileRoute("/app/dashboard")({ component: () => <RequireAgencyUser><Dash/></RequireAgencyUser> });
 
@@ -275,210 +271,216 @@ function Dash() {
 
   return (
     <div className="space-y-6 pb-8 animate-page-in">
-      
-      {/* Compact Welcome & Agency Header Banner */}
-      <Card className="border-muted-foreground/10 bg-card/60 backdrop-blur-md shadow-md overflow-hidden">
-        <CardContent className="p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="flex items-center gap-3 min-w-0">
-            {(agency as any)?.logo_url ? (
-              <img 
-                src={(agency as any).logo_url} 
-                className="w-12 h-12 rounded-xl object-cover border border-border/80 shadow-sm shrink-0" 
-                alt="Agency Logo" 
-              />
-            ) : (
-              <div className="w-12 h-12 rounded-xl bg-primary text-primary-foreground grid place-items-center shadow-inner shrink-0">
-                <Flame className="w-6 h-6 animate-pulse" />
-              </div>
-            )}
-            <div className="min-w-0 space-y-0.5">
-              <h1 className="text-xl font-bold tracking-tight text-foreground truncate">{agency?.name ?? "LPG Distributorship"}</h1>
-              <div className="text-xs text-muted-foreground font-semibold flex items-center gap-2">
-                <span className="bg-primary/10 text-primary px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">{agency?.code || "LPG"}</span>
-                <span className="text-muted-foreground/60">•</span>
-                <span className="uppercase tracking-wider text-[10px] text-muted-foreground">Distributorship Dashboard</span>
-              </div>
+
+      {/* Agency Header — Editorial Banner */}
+      <div style={{
+        background:'#FFFFFF', border:'1px solid #E8E8E8', borderRadius:16,
+        padding:'20px 24px', display:'flex', flexDirection:'row', justifyContent:'space-between',
+        alignItems:'center', flexWrap:'wrap', gap:16,
+        boxShadow:'0 2px 8px rgba(0,0,0,0.03)', position:'relative', overflow:'hidden'
+      }} className="dark:bg-[#1A1A1A] dark:border-white/10">
+        <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:'#FF6B00'}}/>
+        <div style={{display:'flex',alignItems:'center',gap:14,minWidth:0}}>
+          {(agency as any)?.logo_url
+            ?<img src={(agency as any).logo_url} style={{width:48,height:48,borderRadius:12,objectFit:'cover',border:'1px solid #E8E8E8',flexShrink:0}} alt="Agency Logo"/>
+            :<div style={{width:48,height:48,borderRadius:12,background:'#FF6B00',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,boxShadow:'0 4px 14px rgba(255,107,0,0.3)'}}>
+              <Flame className="w-6 h-6 text-white animate-pulse"/>
+            </div>
+          }
+          <div style={{minWidth:0}}>
+            <h1 style={{fontFamily:"'Space Grotesk','Inter',sans-serif",fontWeight:700,fontSize:22,letterSpacing:'-0.02em',color:'#111111',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}} className="dark:text-[#F0F0F0]">
+              {agency?.name ?? "LPG Distributorship"}
+            </h1>
+            <div style={{display:'flex',alignItems:'center',gap:8,marginTop:4}}>
+              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:10,fontWeight:700,color:'#FF6B00',background:'rgba(255,107,0,0.08)',border:'1px solid rgba(255,107,0,0.2)',padding:'2px 8px',borderRadius:4,letterSpacing:'.1em'}}>
+                {agency?.code || "LPG"}
+              </span>
+              <span style={{fontFamily:"'Silkscreen',monospace",fontSize:8,color:'#AAAAAA',letterSpacing:'.18em',textTransform:'uppercase'}}>
+                Distributorship Dashboard
+              </span>
             </div>
           </div>
-          <div className="flex flex-col items-start sm:items-end justify-center shrink-0">
-            <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Today's Date</span>
-            <div className="flex items-center gap-1.5 font-bold text-foreground mt-0.5">
-              <Calendar className="h-4 w-4 text-primary shrink-0" />
-              <span className="text-sm tracking-tight">{fmtDate(todayISO())}</span>
-            </div>
+        </div>
+        <div style={{display:'flex',flexDirection:'column',alignItems:'flex-end'}}>
+          <span style={{fontFamily:"'Silkscreen',monospace",fontSize:8,color:'#AAAAAA',letterSpacing:'.14em',textTransform:'uppercase'}}>Today's Date</span>
+          <div style={{display:'flex',alignItems:'center',gap:6,marginTop:4}}>
+            <Calendar className="h-4 w-4" style={{color:'#FF6B00',flexShrink:0}}/>
+            <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:700,fontSize:14,color:'#111111',letterSpacing:'-0.01em'}} className="dark:text-[#F0F0F0]">
+              {fmtDate(todayISO())}
+            </span>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* KPI Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Kpi label="Today's Sales" value={fmtCurrency(metrics.grossSales)} icon={<TrendingUp className="h-4 w-4" />} accent="primary" description="Total cylinder sales logged today" tooltip="Total value of all cash, online, and Udhari sales logged today" />
-        <Kpi label="Today's Cash Received" value={fmtCurrency(metrics.cashCollections)} icon={<HandCoins className="h-4 w-4" />} accent="success" description="Total cash received today" tooltip="Total cash received today from sales, recoveries, and other receipts, net of commission" />
-        <Kpi label="Outstanding Customer Dues" value={fmtCurrency(metrics.outstanding)} icon={<AlertCircle className="h-4 w-4" />} accent="destructive" description="Total customer outstanding balance" tooltip="Dynamic sum of all customer outstanding ledger balances" />
-        <Kpi label="Today's Expenses" value={fmtCurrency(metrics.expenses)} icon={<Receipt className="h-4 w-4" />} accent="warning" description="Operating cash expenses logged today" tooltip="Total operating expenses and cash payouts paid today" />
-      </div>
-
-      {/* Quick Action Hub */}
-      <div className="space-y-3">
-        <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t("dashboard.quickActions")}</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          <QuickAction to="/app/sales" icon={<ShoppingCart className="h-5 w-5" />} label={t("dashboard.newSale")} />
-          <QuickAction to="/app/payments" icon={<HandCoins className="h-5 w-5" />} label={t("dashboard.receivePayment")} />
-          <QuickAction to="/app/expenses" icon={<Receipt className="h-5 w-5" />} label={t("dashboard.newExpense")} />
-          <QuickAction to="/app/customers" icon={<UserPlus className="h-5 w-5" />} label={t("dashboard.newCustomer")} />
-          <QuickAction to="/app/payment-inflow" icon={<ArrowDownToLine className="h-5 w-5" />} label="Record Inflow" />
-          <QuickAction to="/app/payment-outflow" icon={<ArrowUpFromLine className="h-5 w-5" />} label="Record Outflow" />
         </div>
       </div>
 
-      {/* Roster & Activity Panels */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        {/* Recent Audit Activities */}
-        <Card className="shadow-soft overflow-hidden"><CardContent className="p-0">
-          <div className="px-5 py-4 border-b border-border/60 bg-muted/30 flex items-center justify-between">
-            <h3 className="font-bold text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-              <Clock className="h-4 w-4 text-primary shrink-0" /> Recent Audit Activity
-            </h3>
-            <span className="text-[10px] bg-primary-soft text-primary font-semibold px-2 py-0.5 rounded">Live Feed</span>
-          </div>
+      {/* KPI Stat Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <KpiCard label="Today's Sales" value={fmtCurrency(metrics.grossSales)} desc="Total cylinder sales today" accent="orange" icon={<TrendingUp className="w-4 h-4"/>}/>
+        <KpiCard label="Cash Received" value={fmtCurrency(metrics.cashCollections)} desc="Cash collected today" accent="green" icon={<HandCoins className="w-4 h-4"/>}/>
+        <KpiCard label="Outstanding Dues" value={fmtCurrency(metrics.outstanding)} desc="Total customer balance pending" accent="red" icon={<AlertCircle className="w-4 h-4"/>}/>
+        <KpiCard label="Today's Expenses" value={fmtCurrency(metrics.expenses)} desc="Operating expenses today" accent="amber" icon={<Receipt className="w-4 h-4"/>}/>
+      </div>
 
-          <div className="divide-y divide-border/50 max-h-96 overflow-y-auto">
-            {busy ? (
-              <div className="p-8 text-center text-xs text-muted-foreground animate-pulse">Loading real-time audit feeds...</div>
-            ) : activities.length === 0 ? (
-              <EmptyState title="No transactions recorded today." />
-            ) : (
-              activities.map((act) => (
-                <div key={act.id} className={`p-4 flex items-center justify-between hover:bg-muted/10 transition-colors ${act.is_deleted ? "bg-destructive/5 text-muted-foreground" : ""}`}>
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${act.is_deleted ? "bg-destructive/10 text-destructive" : act.type === "sale" ? "bg-primary-soft text-primary" : act.type === "payment" ? "bg-success/15 text-success" : "bg-warning/15 text-warning-foreground"}`}>
-                      {act.is_deleted ? <Trash2 className="h-4 w-4" /> : act.type === "sale" ? <ShoppingCart className="h-4 w-4" /> : act.type === "payment" ? <HandCoins className="h-4 w-4" /> : <Receipt className="h-4 w-4" />}
+      {/* Quick Actions */}
+      <div>
+        <div style={{fontFamily:"'Silkscreen',monospace",fontSize:9,color:'#AAAAAA',letterSpacing:'.18em',textTransform:'uppercase',marginBottom:14}}>
+          // Quick Actions
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <QuickAct to="/app/sales" icon={<ShoppingCart className="w-5 h-5"/>} label="New Sale"/>
+          <QuickAct to="/app/payments" icon={<HandCoins className="w-5 h-5"/>} label="Receive Payment"/>
+          <QuickAct to="/app/expenses" icon={<Receipt className="w-5 h-5"/>} label="New Expense"/>
+          <QuickAct to="/app/customers" icon={<UserPlus className="w-5 h-5"/>} label="New Customer"/>
+          <QuickAct to="/app/payment-inflow" icon={<ArrowDownToLine className="w-5 h-5"/>} label="Record Inflow"/>
+          <QuickAct to="/app/payment-outflow" icon={<ArrowUpFromLine className="w-5 h-5"/>} label="Record Outflow"/>
+        </div>
+      </div>
+
+      {/* Activity / Dues / Products Panels */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+        {/* Recent Activity */}
+        <div className="ed-panel">
+          <div className="ed-panel-header">
+            <span className="ed-panel-title">
+              <Clock className="h-3.5 w-3.5" style={{color:'#FF6B00'}}/> Recent Audit Activity
+            </span>
+            <span className="ed-live-badge">● Live</span>
+          </div>
+          <div style={{maxHeight:360,overflowY:'auto'}}>
+            {busy
+              ?<div style={{padding:32,textAlign:'center',fontFamily:"'JetBrains Mono',monospace",fontSize:11,color:'#AAAAAA'}}>Loading...</div>
+              :activities.length===0
+                ?<div style={{padding:32,textAlign:'center',fontFamily:"'Inter',sans-serif",fontSize:13,color:'#AAAAAA'}}>No transactions recorded today.</div>
+                :activities.map(act=>(
+                <div key={act.id} style={{
+                  padding:'12px 20px', display:'flex', alignItems:'center', justifyContent:'space-between',
+                  borderBottom:'1px solid #F0F0F0', opacity:act.is_deleted?.5:1
+                }} className="dark:border-white/5 hover:bg-[#FAFAFA] dark:hover:bg-white/[0.02] transition-colors">
+                  <div style={{display:'flex',alignItems:'center',gap:12,minWidth:0}}>
+                    <div style={{
+                      width:34,height:34,borderRadius:10,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,
+                      background: act.is_deleted?'rgba(239,68,68,0.08)':act.type==='sale'?'rgba(255,107,0,0.08)':act.type==='payment'?'rgba(16,185,129,0.08)':'rgba(245,158,11,0.08)',
+                      color: act.is_deleted?'#EF4444':act.type==='sale'?'#FF6B00':act.type==='payment'?'#10B981':'#F59E0B'
+                    }}>
+                      {act.is_deleted?<Trash2 className="h-4 w-4"/>:act.type==='sale'?<ShoppingCart className="h-4 w-4"/>:act.type==='payment'?<HandCoins className="h-4 w-4"/>:<Receipt className="h-4 w-4"/>}
                     </div>
-                    <div className="min-w-0">
-                      <p className={`font-semibold text-sm truncate ${act.is_deleted ? "line-through" : ""}`}>{act.title}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {fmtDate(act.timestamp)} · {new Date(act.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    <div style={{minWidth:0}}>
+                      <p style={{fontFamily:"'Inter',sans-serif",fontWeight:600,fontSize:13,color:'#111111',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',textDecoration:act.is_deleted?'line-through':'none'}} className="dark:text-[#E0E0E0]">
+                        {act.title}
+                      </p>
+                      <p style={{fontFamily:"'JetBrains Mono',monospace",fontSize:10,color:'#AAAAAA',marginTop:2}}>
+                        {fmtDate(act.timestamp)} · {new Date(act.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
                       </p>
                     </div>
                   </div>
-                  <div className={`text-right font-bold text-sm whitespace-nowrap shrink-0 ml-2 ${act.is_deleted ? "line-through text-muted-foreground" : act.type === "expense" ? "text-destructive" : "text-success-dark"}`}>
-                    {act.type === "expense" ? "-" : "+"}{fmtCurrency(act.amount)}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </CardContent></Card>
-
-        {/* Top Dues Customer Dues Roster */}
-        <Card className="shadow-soft overflow-hidden"><CardContent className="p-0">
-          <div className="px-5 py-4 border-b border-border/60 bg-muted/30 flex items-center justify-between">
-            <h3 className="font-bold text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-              <Users className="h-4 w-4 text-primary shrink-0" /> Priority Udhari Dues
-            </h3>
-            <span className="text-[10px] text-destructive font-semibold">Alert</span>
-          </div>
-
-          <div className="divide-y divide-border/50">
-            {busy ? (
-              <div className="p-8 text-center text-xs text-muted-foreground animate-pulse">Loading priority dues...</div>
-            ) : topCustomers.length === 0 ? (
-              <EmptyState title="All customer ledger balances cleared!" />
-            ) : (
-              topCustomers.map((cust) => (
-                <Link 
-                  key={cust.id} 
-                  to="/app/customers/$id"
-                  params={{ id: cust.id }}
-                  className="p-4 flex justify-between items-center hover:bg-muted/30 transition-colors cursor-pointer group"
-                >
-                  <div className="min-w-0">
-                    <p className="font-bold text-sm text-foreground group-hover:text-primary transition-colors truncate">{cust.name}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">View Chronological Ledger</p>
-                  </div>
-                  <div className="flex items-center gap-1.5 shrink-0 ml-2">
-                    <span className="font-bold text-sm text-destructive-dark">{fmtCurrency(cust.outstanding)}</span>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:translate-x-0.5 transition-transform" />
-                  </div>
-                </Link>
-              ))
-            )}
-          </div>
-        </CardContent></Card>
-
-        {/* Today's Top Products */}
-        <Card className="shadow-soft overflow-hidden"><CardContent className="p-0">
-          <div className="px-5 py-4 border-b border-border/60 bg-muted/30 flex items-center justify-between">
-            <h3 className="font-bold text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-              <Flame className="h-4 w-4 text-primary shrink-0" /> Today's Top Products
-            </h3>
-            <span className="text-[10px] bg-primary-soft text-primary font-semibold px-2 py-0.5 rounded">Volume</span>
-          </div>
-
-          <div className="divide-y divide-border/50">
-            {busy ? (
-              <div className="p-8 text-center text-xs text-muted-foreground animate-pulse">Loading top products...</div>
-            ) : topProducts.length === 0 ? (
-              <div className="p-8 text-center text-xs text-muted-foreground select-none">No sales recorded today.</div>
-            ) : (
-              topProducts.map((p, idx) => (
-                <div key={p.name} className="p-4 flex justify-between items-center hover:bg-muted/10 transition-colors">
-                  <div className="min-w-0 flex items-center gap-3">
-                    <span className="font-bold text-xs text-muted-foreground w-4">#{idx + 1}</span>
-                    <p className="font-bold text-sm text-foreground truncate">{p.name}</p>
-                  </div>
-                  <span className="font-extrabold text-sm text-primary shrink-0 bg-primary-soft/10 px-2 py-0.5 rounded-md">
-                    {p.qty} unit(s)
+                  <span style={{
+                    fontFamily:"'JetBrains Mono',monospace",fontWeight:700,fontSize:13,flexShrink:0,marginLeft:8,
+                    color: act.is_deleted?'#AAAAAA':act.type==='expense'?'#EF4444':'#10B981',
+                    textDecoration:act.is_deleted?'line-through':'none'
+                  }}>
+                    {act.type==='expense'?'-':'+'}{fmtCurrency(act.amount)}
                   </span>
                 </div>
               ))
-            )}
+            }
           </div>
-        </CardContent></Card>
+        </div>
+
+        {/* Top Dues */}
+        <div className="ed-panel">
+          <div className="ed-panel-header">
+            <span className="ed-panel-title">
+              <Users className="h-3.5 w-3.5" style={{color:'#EF4444'}}/> Priority Udhari Dues
+            </span>
+            <span className="ed-alert-badge">⚠ Alert</span>
+          </div>
+          <div>
+            {busy
+              ?<div style={{padding:32,textAlign:'center',fontFamily:"'JetBrains Mono',monospace",fontSize:11,color:'#AAAAAA'}}>Loading...</div>
+              :topCustomers.length===0
+                ?<div style={{padding:32,textAlign:'center',fontFamily:"'Inter',sans-serif",fontSize:13,color:'#AAAAAA'}}>All customer balances cleared!</div>
+                :topCustomers.map(cust=>(
+                <Link key={cust.id} to="/app/customers/$id" params={{id:cust.id}}
+                  style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'14px 20px',borderBottom:'1px solid #F0F0F0',textDecoration:'none',transition:'background .15s'}}
+                  className="dark:border-white/5 hover:bg-[#FFF8F5] dark:hover:bg-white/[0.02]">
+                  <div style={{minWidth:0}}>
+                    <p style={{fontFamily:"'Inter',sans-serif",fontWeight:600,fontSize:14,color:'#111111',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}} className="dark:text-[#E0E0E0]">
+                      {cust.name}
+                    </p>
+                    <p style={{fontFamily:"'Silkscreen',monospace",fontSize:8,color:'#AAAAAA',letterSpacing:'.1em',textTransform:'uppercase',marginTop:3}}>
+                      View Ledger →
+                    </p>
+                  </div>
+                  <div style={{display:'flex',alignItems:'center',gap:6,flexShrink:0,marginLeft:12}}>
+                    <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:700,fontSize:14,color:'#EF4444'}}>
+                      {fmtCurrency(cust.outstanding)}
+                    </span>
+                    <ChevronRight className="h-4 w-4" style={{color:'#AAAAAA'}}/>
+                  </div>
+                </Link>
+              ))
+            }
+          </div>
+        </div>
+
+        {/* Today's Top Products */}
+        <div className="ed-panel">
+          <div className="ed-panel-header">
+            <span className="ed-panel-title">
+              <Flame className="h-3.5 w-3.5" style={{color:'#FF6B00'}}/> Today's Top Products
+            </span>
+            <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:9,fontWeight:600,color:'#FF6B00',letterSpacing:'.08em'}}>Volume</span>
+          </div>
+          <div>
+            {busy
+              ?<div style={{padding:32,textAlign:'center',fontFamily:"'JetBrains Mono',monospace",fontSize:11,color:'#AAAAAA'}}>Loading...</div>
+              :topProducts.length===0
+                ?<div style={{padding:32,textAlign:'center',fontFamily:"'Inter',sans-serif",fontSize:13,color:'#AAAAAA'}}>No sales recorded today.</div>
+                :topProducts.map((p,idx)=>(
+                <div key={p.name} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'13px 20px',borderBottom:'1px solid #F0F0F0'}} className="dark:border-white/5 hover:bg-[#FAFAFA] dark:hover:bg-white/[0.02] transition-colors">
+                  <div style={{display:'flex',alignItems:'center',gap:10,minWidth:0}}>
+                    <span style={{fontFamily:"'Silkscreen',monospace",fontSize:9,color:'#FF6B00',width:16}}>#{idx+1}</span>
+                    <p style={{fontFamily:"'Inter',sans-serif",fontWeight:600,fontSize:14,color:'#111111',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}} className="dark:text-[#E0E0E0]">
+                      {p.name}
+                    </p>
+                  </div>
+                  <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:700,fontSize:13,color:'#FF6B00',background:'rgba(255,107,0,0.08)',border:'1px solid rgba(255,107,0,0.15)',padding:'3px 10px',borderRadius:6,flexShrink:0}}>
+                    {p.qty} unit{p.qty!==1?'s':''}
+                  </span>
+                </div>
+              ))
+            }
+          </div>
+        </div>
 
       </div>
     </div>
   );
 }
 
-function Kpi({ label, value, icon, accent, description, tooltip }: { label: string; value: string; icon: React.ReactNode; accent: string; description?: string; tooltip?: string }) {
-  const cls: Record<string, string> = {
-    primary: "bg-gradient-to-br from-indigo-500 via-indigo-600 to-blue-600 text-white shadow-indigo-500/10 hover:shadow-indigo-500/20",
-    success: "bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-600 text-white shadow-emerald-500/10 hover:shadow-emerald-500/20",
-    destructive: "bg-gradient-to-br from-rose-500 via-rose-600 to-red-600 text-white shadow-rose-500/10 hover:shadow-rose-500/20",
-    warning: "bg-gradient-to-br from-amber-500 via-amber-600 to-orange-600 text-white shadow-amber-500/10 hover:shadow-amber-500/20",
-    muted: "bg-muted text-muted-foreground border-border border",
-  };
-  const isGradient = accent !== "muted";
-  
+function KpiCard({label,value,desc,accent,icon}:{label:string;value:string;desc:string;accent:'orange'|'green'|'red'|'amber';icon:React.ReactNode}) {
+  const accentColor = {orange:'#FF6B00',green:'#10B981',red:'#EF4444',amber:'#F59E0B'}[accent];
   return (
-    <Card title={tooltip} className={`${cls[accent] ?? "bg-card border-border border"} shadow-soft border-none transition-all hover:scale-[1.02] cursor-help`}>
-      <CardContent className="p-5">
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0 space-y-1">
-            <div className={cn("text-[10px] font-extrabold uppercase tracking-widest", isGradient ? "text-white/80" : "text-muted-foreground")}>{label}</div>
-            <div className={cn("text-xl md:text-2xl font-black tracking-tight", isGradient ? "text-white" : "text-foreground")}>{value}</div>
-            {description && <p className={cn("text-[10px] font-medium truncate", isGradient ? "text-white/70" : "text-muted-foreground/85")}>{description}</p>}
-          </div>
-          <div className={cn("h-10 w-10 rounded-xl flex items-center justify-center shrink-0 border shadow-inner", isGradient ? "bg-white/20 text-white border-white/10" : "bg-muted text-muted-foreground border-border")}>
-            {icon}
-          </div>
+    <div className={`kpi-card kpi-${accent}`}>
+      <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:10}}>
+        <div style={{minWidth:0}}>
+          <div className="kpi-label">{label}</div>
+          <div className="kpi-value" style={{color:accentColor}}>{value}</div>
+          <div className="kpi-desc">{desc}</div>
         </div>
-      </CardContent>
-    </Card>
+        <div className="kpi-icon" style={{background:`${accentColor}14`,color:accentColor}}>
+          {icon}
+        </div>
+      </div>
+    </div>
   );
 }
 
-function QuickAction({ to, icon, label }: { to: string; icon: React.ReactNode; label: string }) {
+function QuickAct({to,icon,label}:{to:string;icon:React.ReactNode;label:string}) {
   return (
-    <Button asChild variant="outline" className="h-24 flex-col gap-2 shadow-soft hover:bg-primary-soft/10 hover:border-primary/40 hover:text-primary hover-spring border group">
-      <Link to={to}>
-        <div className="h-10 w-10 rounded-xl bg-muted group-hover:bg-primary-soft flex items-center justify-center group-hover:text-primary transition-colors">
-          {icon}
-        </div>
-        <span className="text-xs font-semibold tracking-wide mt-1">{label}</span>
-      </Link>
-    </Button>
+    <Link to={to} className="qa-card">
+      <div className="qa-icon">{icon}</div>
+      <span className="qa-label">{label}</span>
+    </Link>
   );
 }
