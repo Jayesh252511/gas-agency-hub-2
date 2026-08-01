@@ -587,11 +587,27 @@ const CSS = `
     .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
   }
   @media(max-width:768px) {
-    .nav-links, .btn-gl { display: none; }
-    .mob-toggle { display: block; }
-    .hero-left { padding: 100px 6% 40px; }
-    .sec-inner { padding: 0 20px; }
-    .nav-inner { padding: 18px 20px; }
+    .nav-links { display: none; }
+    .mob-toggle { display: block; margin-left: 4px; }
+    .nav-actions { gap: 8px; }
+    .btn-gl {
+      display: inline-flex !important;
+      padding: 7px 15px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #FFFFFF !important;
+      border: 1px solid var(--fire);
+      background: var(--fire-dim);
+      border-radius: 6px;
+      box-shadow: 0 0 12px rgba(255,122,0,.25);
+    }
+    .btn-fire {
+      padding: 7px 14px;
+      font-size: 12px;
+    }
+    .hero-left { padding: 90px 5% 40px; }
+    .sec-inner { padding: 0 16px; }
+    .nav-inner { padding: 12px 16px; }
     .sec { padding: 80px 0; }
     .feat-tabs-strip { overflow-x: auto; }
     .feat-tab { min-width: 80px; }
@@ -605,6 +621,9 @@ const CSS = `
     .cta-layout { gap: 32px; }
   }
   @media(max-width:480px) {
+    .nav-brand-sub { display: none; }
+    .btn-fire span.btn-text-full { display: none; }
+    .btn-fire::after { content: 'Trial'; }
     .hero-actions { flex-direction: column; align-items: flex-start; }
     .hero-trust { gap: 18px; }
   }
@@ -958,7 +977,9 @@ export default function LandingPage() {
         </ul>
         <div className="nav-actions">
           <Link to="/login" className="btn-gl">Login</Link>
-          <a href={TRIAL_WA_URL} target="_blank" rel="noopener noreferrer" className="btn-fire">Start Free Trial <I.Arrow/></a>
+          <a href={TRIAL_WA_URL} target="_blank" rel="noopener noreferrer" className="btn-fire">
+            <span className="btn-text-full">Start Free Trial</span> <I.Arrow/>
+          </a>
         </div>
         <button className="mob-toggle" onClick={()=>setMobOpen(true)}><span/><span/><span/></button>
       </div>
