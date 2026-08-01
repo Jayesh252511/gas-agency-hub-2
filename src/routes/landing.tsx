@@ -581,6 +581,91 @@ const CSS = `
     animation: pixelBlink 1s step-end infinite;
   }
 
+  /* ── VIDEO EMBED COMPONENTS ── */
+  .vid-phone-wrap {
+    position: absolute; bottom: 6%; left: 4%; z-index: 4;
+    width: 160px;
+    animation: floatSlow 6s ease-in-out infinite;
+  }
+  .vid-phone-frame {
+    border-radius: 22px; overflow: hidden;
+    border: 3px solid #111;
+    background: #000;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,107,0,0.15), inset 0 0 0 1px rgba(255,255,255,0.05);
+    position: relative;
+  }
+  .vid-phone-frame::before {
+    content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 40px; height: 5px; background: #111; border-radius: 0 0 4px 4px; z-index: 2;
+  }
+  .vid-phone-frame video {
+    display: block; width: 100%; height: 260px; object-fit: cover;
+    border-radius: 19px;
+  }
+  .vid-phone-tag {
+    position: absolute; bottom: -28px; left: 50%; transform: translateX(-50%);
+    white-space: nowrap;
+    font-family: var(--font-pixel); font-size: 8px; color: var(--orange);
+    letter-spacing: .12em; text-transform: uppercase;
+    background: var(--orange-light); border: 1px solid rgba(255,107,0,0.2);
+    padding: 3px 10px; border-radius: 4px;
+  }
+  .vid-strip {
+    background: #0A0A0A; position: relative; overflow: hidden;
+    padding: 64px 0; border-top: 1px solid rgba(255,107,0,0.15); border-bottom: 1px solid rgba(255,107,0,0.15);
+  }
+  .vid-strip-inner {
+    max-width: 1200px; margin: 0 auto; padding: 0 40px;
+    display: grid; grid-template-columns: 1fr 1.6fr; gap: 56px; align-items: center;
+  }
+  .vid-strip-label { font-family: var(--font-pixel); font-size: 9px; color: var(--orange); letter-spacing: .18em; text-transform: uppercase; margin-bottom: 14px; }
+  .vid-strip-h { font-family: var(--font-head); font-size: clamp(22px,2.8vw,34px); font-weight: 700; color: #FFFFFF; line-height: 1.2; letter-spacing: -.02em; margin-bottom: 14px; }
+  .vid-strip-p { font-family: var(--font-body); font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.7; }
+  .vid-browser-frame {
+    background: #1A1A1A; border: 1px solid rgba(255,255,255,0.08); border-radius: 14px;
+    overflow: hidden; box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+  }
+  .vid-browser-bar {
+    background: #111; padding: 10px 14px; display: flex; align-items: center; gap: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .vid-browser-dots { display: flex; gap: 5px; }
+  .vid-browser-dot { width: 9px; height: 9px; border-radius: 50%; }
+  .vid-browser-url {
+    flex: 1; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 5px; padding: 4px 10px;
+    font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.3);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .vid-browser-frame video {
+    display: block; width: 100%; max-height: 380px; object-fit: cover;
+  }
+  .vid-cta-wrap {
+    width: 100%; max-width: 600px; margin: 0 auto 32px;
+    border-radius: 16px; overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.06);
+    position: relative;
+  }
+  .vid-cta-wrap video { display: block; width: 100%; max-height: 280px; object-fit: cover; }
+  .vid-cta-pill {
+    position: absolute; top: 12px; left: 12px;
+    font-family: var(--font-pixel); font-size: 8px; color: #fff;
+    background: var(--orange); padding: 4px 10px; border-radius: 4px; letter-spacing: .1em;
+  }
+  @media(max-width:1024px) {
+    .vid-phone-wrap { width: 130px; }
+    .vid-strip-inner { grid-template-columns: 1fr; gap: 32px; }
+    .vid-phone-frame video { height: 210px; }
+  }
+  @media(max-width:768px) {
+    .vid-phone-wrap { display: none; }
+    .vid-strip { padding: 48px 0; }
+    .vid-strip-inner { padding: 0 20px; }
+    .vid-browser-frame video { max-height: 220px; }
+    .vid-cta-wrap video { max-height: 200px; }
+  }
+
   /* ── RESPONSIVE ── */
   @media(max-width:1024px) {
     .hero { grid-template-columns: 1fr; height: auto; min-height: 100vh; padding-bottom: 60px; }
@@ -990,6 +1075,18 @@ export default function LandingPage() {
             <img src="/pixel-cylinder.png" alt="LPG Cylinder Pixel Art" className="cyl-img" style={{imageRendering:'pixelated'}}/>
             <div className="cyl-pedestal"/>
           </div>
+
+          {/* ── SPOT 1: Floating Phone Video Mockup ── */}
+          <div className="vid-phone-wrap">
+            <div className="vid-phone-frame">
+              <video
+                src="/promo-video.mp4"
+                autoPlay muted loop playsInline
+                style={{display:'block',width:'100%',height:260,objectFit:'cover',borderRadius:19}}
+              />
+            </div>
+            <div className="vid-phone-tag">Live Preview</div>
+          </div>
         </div>
       </section>
 
@@ -1084,6 +1181,49 @@ export default function LandingPage() {
         </div>
       </div>
 
+      {/* ══ SPOT 2: CINEMATIC VIDEO STRIP ══ */}
+      <div className="vid-strip">
+        <div className="vid-strip-inner">
+          <div>
+            <div className="vid-strip-label">▶ // PRODUCT DEMO</div>
+            <h2 className="vid-strip-h">
+              See GasAgency Hub<br/>
+              <span style={{color:'#FF6B00'}}>In Action.</span>
+            </h2>
+            <p className="vid-strip-p">
+              Watch how your agency operations transform — from billing and udhari tracking to delivery management and reports. All in one dashboard, built for India.
+            </p>
+            <div style={{marginTop:24,display:'flex',gap:12,flexWrap:'wrap'}}>
+              <a href="https://wa.me/918605601801?text=Hello%20Jayesh%2C%20I%20want%20to%20start%20a%20free%20trial%20for%20LPG%20Agency%20ERP." target="_blank" rel="noopener noreferrer"
+                style={{display:'inline-flex',alignItems:'center',gap:8,padding:'10px 20px',background:'#FF6B00',color:'#fff',borderRadius:8,fontFamily:"var(--font-body)",fontWeight:600,fontSize:13,textDecoration:'none',transition:'all .2s'}}
+              >
+                Start Free Trial →
+              </a>
+              <a href="#features"
+                style={{display:'inline-flex',alignItems:'center',gap:8,padding:'10px 20px',background:'transparent',color:'rgba(255,255,255,0.7)',border:'1px solid rgba(255,255,255,0.15)',borderRadius:8,fontFamily:"var(--font-body)",fontWeight:500,fontSize:13,textDecoration:'none'}}
+              >
+                Try Workbench
+              </a>
+            </div>
+          </div>
+          <div className="vid-browser-frame">
+            <div className="vid-browser-bar">
+              <div className="vid-browser-dots">
+                <div className="vid-browser-dot" style={{background:'#FF5F57'}}/>
+                <div className="vid-browser-dot" style={{background:'#FEBC2E'}}/>
+                <div className="vid-browser-dot" style={{background:'#28C840'}}/>
+              </div>
+              <div className="vid-browser-url">gasagency.app/dashboard</div>
+            </div>
+            <video
+              src="/promo-video.mp4"
+              autoPlay muted loop playsInline
+              style={{display:'block',width:'100%',maxHeight:380,objectFit:'cover'}}
+            />
+          </div>
+        </div>
+      </div>
+
       {/* ══ HOW IT WORKS SECTION ══ */}
       <section className="sec" id="how" style={{ background: "var(--bg-subtle)", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
         <div className="sec-inner">
@@ -1127,6 +1267,16 @@ export default function LandingPage() {
             <p className="sec-p" style={{ margin: "0 auto 24px", textAlign: "center" }}>
               Start your free trial today. No credit card required. No setup fees. Just your agency, running smarter.
             </p>
+
+            {/* ── SPOT 3: CTA Compact Video Preview ── */}
+            <div className="vid-cta-wrap">
+              <video
+                src="/promo-video.mp4"
+                autoPlay muted loop playsInline
+                style={{display:'block',width:'100%',maxHeight:280,objectFit:'cover',borderRadius:15}}
+              />
+              <div className="vid-cta-pill">● LIVE DEMO</div>
+            </div>
 
             {/* Pixel Art Badges Row */}
             <div className="cta-pixel-row">
