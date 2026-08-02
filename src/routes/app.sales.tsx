@@ -740,7 +740,19 @@ function SaleForm({ editSale, onDone }: { editSale: Row | null; onDone: () => vo
     })();
   }, [agency]);
 
-  const boy = useMemo(() => boys.find((b) => b.id === f.delivery_boy_id), [boys, f.delivery_boy_id]);
+  const boysOptions = useMemo(() => {
+    const list = [...boys];
+    if (f.delivery_boy_id && !list.some(b => b.id === f.delivery_boy_id)) {
+      list.push({
+        id: f.delivery_boy_id,
+        name: editSale?.delivery_boy_name || (editSale as any)?.delivery_boy?.name || "Assigned Delivery Boy",
+        commission_rate: 0,
+      });
+    }
+    return list;
+  }, [boys, f.delivery_boy_id, editSale]);
+
+  const boy = useMemo(() => boysOptions.find((b) => b.id === f.delivery_boy_id), [boysOptions, f.delivery_boy_id]);
 
   useEffect(() => {
     if (editSale) {
@@ -1127,7 +1139,7 @@ function SaleForm({ editSale, onDone }: { editSale: Row | null; onDone: () => vo
               <SelectValue placeholder="—" />
             </SelectTrigger>
             <SelectContent>
-              {boys.map((b) => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}
+              {boysOptions.map((b) => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}
             </SelectContent>
           </Select>
         </div>
