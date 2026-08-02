@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import LenisProvider from "@/components/showcase/LenisProvider";
-import SceneCanvas from "@/components/showcase/SceneCanvas";
+import ThreeCanvas from "@/components/showcase/ThreeCanvas";
 import ScrollOrchestrator from "@/components/showcase/ScrollOrchestrator";
 import CursorDot from "@/components/showcase/CursorDot";
 import ProgressDots from "@/components/showcase/ProgressDots";
@@ -20,8 +20,8 @@ export const Route = createFileRoute("/landing")({ component: LandingPage });
 function LandingPage() {
   return (
     <LenisProvider>
-      {/* 3D Canvas */}
-      <SceneCanvas />
+      {/* Pure Three.js 3D Canvas (React 19 compatible) */}
+      <ThreeCanvas />
 
       {/* GSAP Scroll Controller */}
       <ScrollOrchestrator />
