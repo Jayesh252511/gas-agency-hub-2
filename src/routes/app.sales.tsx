@@ -348,6 +348,7 @@ function Page() {
                 <SheetTitle>{editSale ? "Edit Sale Details" : t("sales.newSale")}</SheetTitle>
               </SheetHeader>
               <SaleForm 
+                key={editSale?.id || (open ? "new-sale" : "closed")}
                 editSale={editSale} 
                 onDone={() => { setOpen(false); setEditSale(null); void load(); }} 
               />
@@ -742,17 +743,40 @@ function SaleForm({ editSale, onDone }: { editSale: Row | null; onDone: () => vo
 
   const boysOptions = useMemo(() => {
     const list = [...boys];
-    if (editSale?.delivery_boy_id && !list.some(b => b.id === editSale.delivery_boy_id)) {
+    const targetBoyId = editSale?.delivery_boy_id || (f.delivery_boy_id !== "none" ? f.delivery_boy_id : "");
+    if (targetBoyId && !list.some(b => b.id === targetBoyId)) {
       list.push({
-        id: editSale.delivery_boy_id,
-        name: editSale.delivery_boy_name || (editSale as any)?.delivery_boy?.name || "Assigned Delivery Boy",
+        id: targetBoyId,
+        name: editSale?.delivery_boy_name || (editSale as any)?.delivery_boy?.name || "Assigned Delivery Boy",
         commission_rate: 0,
       });
     }
     return list;
-  }, [boys, editSale]);
+  }, [boys, editSale, f.delivery_boy_id]);
 
-  const boy = useMemo(() => boysOptions.find((b) => b.id === f.delivery_boy_id), [boysOptions, f.delivery_boy_id]);
+  const customersOptions = useMemo(() => {
+    const list = [...customers];
+    const targetCustId = editSale?.customer_id || f.customer_id;
+    if (targetCustId && !list.some(c => c.id === targetCustId)) {
+      list.push({
+        id: targetCustId,
+        name: editSale?.customer_name || (editSale as any)?.customer?.name || "Selected Customer",
+      });
+    }
+    return list;
+  }, [customers, editSale, f.customer_id]);
+
+  useEffect(() => {
+    if (editSale) {
+      let bId = editSale.delivery_boy_id;
+      if (!bId && editSale.delivery_boy_name && boys.length > 0) {
+        bId = boys.find(b => b.name === editSale.delivery_boy_name)?.id || "";
+      }
+      if (bId && f.delivery_boy_id !== bId) {
+        setF(prev => ({ ...prev, delivery_boy_id: bId }));
+      }
+    }
+  }, [editSale, boys]);
 
   useEffect(() => {
     if (editSale) {
@@ -803,7 +827,7 @@ function SaleForm({ editSale, onDone }: { editSale: Row | null; onDone: () => vo
         sale_date: editSale.sale_date,
         customer_id: editSale.customer_id ?? "",
         payment_mode: split ? "split" : editSale.payment_mode,
-        delivery_boy_id: foundBoy || "none",
+        delivery_boy_id: foundBoy || (editSale.delivery_boy_name ? "loading" : "none"),
         notes: remarks,
       });
     } else {
@@ -816,10 +840,10 @@ function SaleForm({ editSale, onDone }: { editSale: Row | null; onDone: () => vo
       ]);
       setF({
         sale_date: todayISO(), customer_id: "",
-        payment_mode: "split", delivery_boy_id: "", notes: "",
+        payment_mode: "split", delivery_boy_id: "none", notes: "",
       });
     }
-  }, [editSale]);
+  }, [editSale, boys]);
 
   const calculatedRows = useMemo(() => {
     return prodRows.map((row) => {
@@ -1123,7 +1147,7 @@ function SaleForm({ editSale, onDone }: { editSale: Row | null; onDone: () => vo
       <div className="space-y-1.5">
         <Label className="mb-1 block">{t("sales.customer")}</Label>
         <Combobox
-          options={customers.map((c) => ({ value: c.id, label: c.name }))}
+          options={customersOptions.map((c) => ({ value: c.id, label: c.name }))}
           value={f.customer_id}
           onValueChange={(v) => setF({...f, customer_id: v})}
           placeholder="Search / Select Customer..."
