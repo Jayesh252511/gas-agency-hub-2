@@ -4,520 +4,388 @@ import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { fmtCurrency, todayISO } from "@/lib/format";
-import { subDays, format, parseISO, startOfMonth, endOfMonth, subMonths } from "date-fns";
-import {
-  AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
-} from "recharts";
-import { TrendingUp, BarChart2, PieChart as PieIcon, Users, Truck, Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { fmtCurrency, fmtDate, todayISO } from "@/lib/format";
+import { subDays, format } from "date-fns";
+import { BookOpen, Calendar, Loader2, ArrowUpRight, ArrowDownRight, IndianRupee, FileText, CheckCircle2, AlertTriangle } from "lucide-react";
+import { PageHeader } from "@/components/page-header";
 
 export const Route = createFileRoute("/app/analytics")({
   component: () => <RequireAgencyUser><AnalyticsPage /></RequireAgencyUser>,
 });
 
-const COLORS = {
-  primary: "#6366f1",
-  success: "#10b981",
-  warning: "#f59e0b",
-  danger: "#ef4444",
-  purple: "#8b5cf6",
-  cyan: "#06b6d4",
-  pink: "#ec4899",
-  orange: "#f97316",
-};
-
-const PIE_COLORS = [COLORS.danger, COLORS.warning, COLORS.primary, COLORS.success];
-const DONUT_COLORS = [COLORS.success, COLORS.primary, COLORS.danger, COLORS.warning];
-
-type RangeOption = 30 | 60 | 90;
-
-// ─── Custom Tooltip ───────────────────────────────────────────────────────────
-function ChartTooltip({ active, payload, label, currency = false }: any) {
-  if (!active || !payload?.length) return null;
-  return (
-    <div className="bg-card border border-border rounded-xl shadow-xl p-3 text-xs min-w-[120px]">
-      {label && <p className="font-bold text-muted-foreground mb-1.5">{label}</p>}
-      {payload.map((p: any, i: number) => (
-        <div key={i} className="flex items-center justify-between gap-4">
-          <span className="flex items-center gap-1.5">
-            <span className="inline-block w-2 h-2 rounded-full" style={{ background: p.color || p.fill }} />
-            <span className="text-muted-foreground">{p.name}</span>
-          </span>
-          <span className="font-bold text-foreground">
-            {currency ? fmtCurrency(p.value) : p.value?.toLocaleString("en-IN")}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
+interface CashbookAnalyticsRow {
+  book_date: string;
+  opening_cash: number;
+  total_inflow: number;
+  total_outflow: number;
+  calculated_balance: number;
+  actual_closing: number | null;
+  difference: number | null;
+  notes: string | null;
+  daily_note: string | null;
 }
 
-// ─── Section header ───────────────────────────────────────────────────────────
-function SectionHeader({ icon, title, subtitle }: { icon: React.ReactNode; title: string; subtitle: string }) {
-  return (
-    <div className="flex items-center gap-3 mb-4">
-      <div className="h-9 w-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-        {icon}
-      </div>
-      <div>
-        <h2 className="font-bold text-sm text-foreground">{title}</h2>
-        <p className="text-[11px] text-muted-foreground">{subtitle}</p>
-      </div>
-    </div>
-  );
-}
-
-// ─── Loading skeleton ─────────────────────────────────────────────────────────
-function ChartSkeleton() {
-  return (
-    <div className="flex items-center justify-center h-56 text-muted-foreground animate-pulse">
-      <Loader2 className="w-6 h-6 animate-spin mr-2" />
-      <span className="text-sm">Loading chart data...</span>
-    </div>
-  );
-}
-
-// ─── Main Page ─────────────────────────────────────────────────────────────────
 function AnalyticsPage() {
   const { agency } = useAuth();
-  const [range, setRange] = useState<RangeOption>(30);
-  const [busy, setBusy] = useState(true);
-
-  // Raw data
-  const [salesData, setSalesData] = useState<any[]>([]);
-  const [expensesData, setExpensesData] = useState<any[]>([]);
-  const [ledgerData, setLedgerData] = useState<any[]>([]);
-  const [paymentData, setPaymentData] = useState<any[]>([]);
-  const [customerSalesData, setCustomerSalesData] = useState<any[]>([]);
-  const [deliveryData, setDeliveryData] = useState<any[]>([]);
+  const [startDate, setStartDate] = useState(format(subDays(new Date(), 30), "yyyy-MM-dd"));
+  const [endDate, setEndDate] = useState(todayISO());
+  const [loading, setLoading] = useState(true);
+  const [rows, setRows] = useState<CashbookAnalyticsRow[]>([]);
 
   useEffect(() => {
     if (!agency) return;
-    loadAll();
-  }, [agency, range]);
+    loadCashbookData();
+  }, [agency, startDate, endDate]);
 
-  const loadAll = async () => {
+  const loadCashbookData = async () => {
     if (!agency) return;
-    setBusy(true);
-    const today = todayISO();
-    const fromDate = format(subDays(new Date(), range), "yyyy-MM-dd");
-    const monthsBack = 6;
-
+    setLoading(true);
     try {
-      const [salesQ, expQ, ledgerQ, paysQ, custSalesQ, boysQ, boySalesQ] = await Promise.all([
-        // Sales for trend chart
-        supabase.from("sales").select("sale_date, gross_amount, payment_mode, notes")
-          .eq("agency_id", agency.id).eq("is_deleted", false)
-          .gte("sale_date", fromDate).lte("sale_date", today),
-        // Expenses for bar chart (monthly)
-        supabase.from("expenses").select("expense_date, amount")
-          .eq("agency_id", agency.id).eq("is_deleted", false)
-          .gte("expense_date", format(subMonths(new Date(), monthsBack), "yyyy-MM-dd")),
-        // Ledger for pie chart
-        (supabase.from("customer_ledger") as any).select("customer_id, debit, credit, created_at")
-          .eq("agency_id", agency.id),
-        // Payments for donut
-        supabase.from("payments").select("payment_date, amount, mode")
-          .eq("agency_id", agency.id).eq("is_deleted", false)
-          .gte("payment_date", fromDate),
-        // Top customers by sales
-        supabase.from("sales").select("customer_id, gross_amount, customer:customers(name)")
-          .eq("agency_id", agency.id).eq("is_deleted", false)
-          .gte("sale_date", fromDate).lte("sale_date", today),
-        // Delivery boys
-        supabase.from("delivery_boys").select("id, name")
-          .eq("agency_id", agency.id).eq("is_deleted", false),
-        // Delivery boy sales
-        supabase.from("sales").select("delivery_boy_id, quantity, commission_amount, gross_amount, payment_mode, notes")
-          .eq("agency_id", agency.id).eq("is_deleted", false)
-          .gte("sale_date", fromDate).lte("sale_date", today),
+      // 1. Fetch cash_book_days records for the date range
+      const { data: cbData, error: cbErr } = await supabase
+        .from("cash_book_days")
+        .select("book_date, opening_cash, actual_closing, notes")
+        .eq("agency_id", agency.id)
+        .gte("book_date", startDate)
+        .lte("book_date", endDate)
+        .order("book_date", { ascending: false });
+
+      if (cbErr) throw cbErr;
+
+      // 2. Fetch sales, payments, expenses, & outstanding entries for calculating true daily inflows/outflows
+      const [{ data: salesData }, { data: paysData }, { data: expData }] = await Promise.all([
+        supabase.from("sales").select("sale_date, gross_amount, payment_mode, notes").eq("agency_id", agency.id).eq("is_deleted", false).gte("sale_date", startDate).lte("sale_date", endDate),
+        supabase.from("payments").select("payment_date, amount, mode, remarks").eq("agency_id", agency.id).eq("is_deleted", false).gte("payment_date", startDate).lte("payment_date", endDate),
+        supabase.from("expenses").select("expense_date, amount").eq("agency_id", agency.id).eq("is_deleted", false).gte("expense_date", startDate).lte("expense_date", endDate),
       ]);
 
-      setSalesData(salesQ.data ?? []);
-      setExpensesData(expQ.data ?? []);
-      setLedgerData(ledgerQ.data ?? []);
-      setPaymentData(paysQ.data ?? []);
+      // Group daily figures
+      const dailyMap: Record<string, {
+        opening: number;
+        inflow: number;
+        outflow: number;
+        actualClosing: number | null;
+        manualCashEntry: number | null;
+        dailyNote: string | null;
+      }> = {};
 
-      // Top 10 customers by gross sales
-      const custMap: Record<string, { name: string; total: number }> = {};
-      (custSalesQ.data ?? []).forEach((s: any) => {
-        if (!s.customer_id) return;
-        const name = (s.customer as any)?.name ?? "Unknown";
-        if (!custMap[s.customer_id]) custMap[s.customer_id] = { name, total: 0 };
-        custMap[s.customer_id].total += Number(s.gross_amount || 0);
+      (cbData ?? []).forEach((row: any) => {
+        let manualCash: number | null = null;
+        let noteStr: string | null = null;
+        if (row.notes) {
+          try {
+            const m = JSON.parse(row.notes);
+            if (m.manual_cash_entry != null && m.manual_cash_entry !== "") {
+              manualCash = Number(m.manual_cash_entry);
+            }
+            if (m.daily_note) noteStr = m.daily_note;
+          } catch (_) {}
+        }
+
+        dailyMap[row.book_date] = {
+          opening: Number(row.opening_cash || 0),
+          inflow: 0,
+          outflow: 0,
+          actualClosing: row.actual_closing != null ? Number(row.actual_closing) : null,
+          manualCashEntry: manualCash,
+          dailyNote: noteStr,
+        };
       });
-      const top10 = Object.values(custMap).sort((a, b) => b.total - a.total).slice(0, 10);
-      setCustomerSalesData(top10);
 
-      // Delivery boys performance
-      const boys = boysQ.data ?? [];
-      const boySales = boySalesQ.data ?? [];
-      const boyPerf = boys.map((boy: any) => {
-        const bSales = (boySales as any[]).filter(s => s.delivery_boy_id === boy.id);
-        const deliveries = bSales.reduce((s: number, x: any) => s + Number(x.quantity || 0), 0);
-        const commission = bSales.reduce((s: number, x: any) => s + Number(x.commission_amount || 0), 0);
-        let cashCollected = 0;
-        bSales.forEach((s: any) => {
-          let cashAmt = 0;
-          if (s.notes) { try { const m = JSON.parse(s.notes); if (m?.is_split) cashAmt = Number(m.cash_amount || 0); } catch {} }
-          if (!cashAmt && s.payment_mode === "cash") cashAmt = Number(s.gross_amount || 0);
-          cashCollected += cashAmt;
-        });
-        return { name: boy.name, deliveries, commission, cashCollected };
-      }).filter((b: any) => b.deliveries > 0);
-      setDeliveryData(boyPerf);
+      // Calculate cash sales inflow
+      (salesData ?? []).forEach((s: any) => {
+        const d = s.sale_date;
+        if (!dailyMap[d]) {
+          dailyMap[d] = { opening: 0, inflow: 0, outflow: 0, actualClosing: null, manualCashEntry: null, dailyNote: null };
+        }
+        let cashAmt = 0;
+        if (s.notes) {
+          try {
+            const m = JSON.parse(s.notes);
+            if (m?.is_split) cashAmt = Number(m.cash_amount || 0);
+          } catch (_) {}
+        }
+        if (!cashAmt && s.payment_mode === "cash") {
+          cashAmt = Number(s.gross_amount || 0);
+        }
+        dailyMap[d].inflow += cashAmt;
+      });
+
+      // Calculate payment recoveries inflow
+      (paysData ?? []).forEach((p: any) => {
+        const d = p.payment_date;
+        if (!dailyMap[d]) {
+          dailyMap[d] = { opening: 0, inflow: 0, outflow: 0, actualClosing: null, manualCashEntry: null, dailyNote: null };
+        }
+        if (p.mode === "cash") {
+          dailyMap[d].inflow += Number(p.amount || 0);
+        }
+      });
+
+      // Calculate expenses outflow
+      (expData ?? []).forEach((e: any) => {
+        const d = e.expense_date;
+        if (!dailyMap[d]) {
+          dailyMap[d] = { opening: 0, inflow: 0, outflow: 0, actualClosing: null, manualCashEntry: null, dailyNote: null };
+        }
+        dailyMap[d].outflow += Number(e.amount || 0);
+      });
+
+      // Build structured rows
+      const formatted: CashbookAnalyticsRow[] = Object.entries(dailyMap)
+        .map(([bDate, val]) => {
+          const calcBal = val.opening + val.inflow - val.outflow;
+          const manualCount = val.manualCashEntry ?? val.actualClosing;
+          const diff = manualCount != null ? manualCount - calcBal : null;
+
+          return {
+            book_date: bDate,
+            opening_cash: val.opening,
+            total_inflow: val.inflow,
+            total_outflow: val.outflow,
+            calculated_balance: calcBal,
+            actual_closing: manualCount,
+            difference: diff,
+            notes: null,
+            daily_note: val.dailyNote,
+          };
+        })
+        .sort((a, b) => b.book_date.localeCompare(a.book_date));
+
+      setRows(formatted);
     } catch (err) {
-      console.error("Analytics error:", err);
+      console.error("Analytics Cashbook error:", err);
     } finally {
-      setBusy(false);
+      setLoading(false);
     }
   };
 
-  // ── Chart 1: Sales Trend ──────────────────────────────────────────────────
-  const salesTrendData = useMemo(() => {
-    const grouped: Record<string, number> = {};
-    salesData.forEach(s => {
-      const d = s.sale_date;
-      grouped[d] = (grouped[d] ?? 0) + Number(s.gross_amount || 0);
-    });
-    return Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b)).map(([date, total]) => ({
-      date: format(parseISO(date), "dd MMM"),
-      Sales: Math.round(total),
-    }));
-  }, [salesData]);
-
-  // ── Chart 2: Revenue vs Expenses (monthly) ────────────────────────────────
-  const revenueExpBar = useMemo(() => {
-    const months: Record<string, { Revenue: number; Expenses: number }> = {};
-    // Revenue per month
-    salesData.forEach(s => {
-      const mo = s.sale_date?.substring(0, 7);
-      if (!mo) return;
-      if (!months[mo]) months[mo] = { Revenue: 0, Expenses: 0 };
-      months[mo].Revenue += Number(s.gross_amount || 0);
-    });
-    expensesData.forEach((e: any) => {
-      const mo = e.expense_date?.substring(0, 7);
-      if (!mo) return;
-      if (!months[mo]) months[mo] = { Revenue: 0, Expenses: 0 };
-      months[mo].Expenses += Number(e.amount || 0);
-    });
-    return Object.entries(months).sort(([a], [b]) => a.localeCompare(b)).map(([month, val]) => ({
-      month: format(parseISO(month + "-01"), "MMM yy"),
-      Revenue: Math.round(val.Revenue),
-      Expenses: Math.round(val.Expenses),
-    }));
-  }, [salesData, expensesData]);
-
-  // ── Chart 3: Outstanding Aging Pie ────────────────────────────────────────
-  const agingPieData = useMemo(() => {
-    const now = new Date();
-    const buckets = { "0–30 days": 0, "31–60 days": 0, "61–90 days": 0, "90+ days": 0 };
-
-    // Build outstanding per customer
-    const custOutstanding: Record<string, number> = {};
-    ledgerData.forEach((r: any) => {
-      custOutstanding[r.customer_id] = (custOutstanding[r.customer_id] ?? 0) + Number(r.debit || 0) - Number(r.credit || 0);
-    });
-
-    // For simplicity, bucket by earliest debit date still unpaid
-    const custEarliestDebit: Record<string, Date> = {};
-    ledgerData.filter((r: any) => Number(r.debit || 0) > 0).forEach((r: any) => {
-      const d = new Date(r.created_at);
-      if (!custEarliestDebit[r.customer_id] || d < custEarliestDebit[r.customer_id]) {
-        custEarliestDebit[r.customer_id] = d;
-      }
-    });
-
-    Object.entries(custOutstanding).forEach(([cid, amt]) => {
-      if (amt <= 0) return;
-      const earliest = custEarliestDebit[cid];
-      if (!earliest) { buckets["90+ days"] += amt; return; }
-      const days = Math.floor((now.getTime() - earliest.getTime()) / 86400000);
-      if (days <= 30) buckets["0–30 days"] += amt;
-      else if (days <= 60) buckets["31–60 days"] += amt;
-      else if (days <= 90) buckets["61–90 days"] += amt;
-      else buckets["90+ days"] += amt;
-    });
-
-    return Object.entries(buckets).filter(([, v]) => v > 0).map(([name, value]) => ({
-      name, value: Math.round(value)
-    }));
-  }, [ledgerData]);
-
-  // ── Chart 4: Payment Mode Donut ────────────────────────────────────────────
-  const paymentModeData = useMemo(() => {
-    const modes: Record<string, number> = { Cash: 0, Online: 0, Credit: 0 };
-    salesData.forEach(s => {
-      const amt = Number(s.gross_amount || 0);
-      if (s.notes) {
-        try {
-          const m = JSON.parse(s.notes);
-          if (m?.is_split) {
-            modes["Cash"] += Number(m.cash_amount || 0);
-            modes["Online"] += Number(m.online_amount || 0);
-            modes["Credit"] += Number(m.credit_amount || 0);
-            return;
-          }
-        } catch {}
-      }
-      if (s.payment_mode === "cash") modes["Cash"] += amt;
-      else if (s.payment_mode === "credit") modes["Credit"] += amt;
-      else modes["Online"] += amt;
-    });
-    // Include payment recoveries in Cash
-    paymentData.forEach((p: any) => {
-      if (p.mode === "cash") modes["Cash"] += Number(p.amount || 0);
-      else modes["Online"] += Number(p.amount || 0);
-    });
-    return Object.entries(modes).filter(([, v]) => v > 0).map(([name, value]) => ({
-      name, value: Math.round(value)
-    }));
-  }, [salesData, paymentData]);
-
-  const RANGE_LABELS = { 30: "30 Days", 60: "60 Days", 90: "90 Days" };
+  const totals = useMemo(() => {
+    return rows.reduce(
+      (acc, r) => {
+        acc.inflow += r.total_inflow;
+        acc.outflow += r.total_outflow;
+        if (r.difference != null) {
+          if (r.difference < 0) acc.shortage += Math.abs(r.difference);
+          else if (r.difference > 0) acc.excess += r.difference;
+        }
+        return acc;
+      },
+      { inflow: 0, outflow: 0, shortage: 0, excess: 0 }
+    );
+  }, [rows]);
 
   return (
-    <div className="space-y-8 pb-12 animate-page-in">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-black tracking-tight text-foreground flex items-center gap-2">
-            <BarChart2 className="h-6 w-6 text-primary" />
-            Analytics
-          </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Business intelligence at a glance</p>
-        </div>
-        {/* Range Selector */}
-        <div className="flex items-center gap-1 bg-muted/60 rounded-xl p-1 shrink-0">
-          {([30, 60, 90] as RangeOption[]).map(r => (
-            <button
-              key={r}
-              onClick={() => setRange(r)}
-              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 ${
-                range === r
-                  ? "bg-primary text-white shadow-md"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {RANGE_LABELS[r]}
-            </button>
-          ))}
-        </div>
-      </div>
+    <div className="space-y-6 pb-12 animate-page-in">
+      <PageHeader
+        title="Cashbook Analytics & Audit"
+        subtitle="Automatic daily cashbook summary — total inflow, outflow, calculated cash balance, manual count, & discrepancy notes"
+      />
 
-      {/* ── Row 1: Sales Trend + Revenue vs Expenses ─────────────────────── */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+      {/* Date Filter Bar */}
+      <Card className="shadow-soft bg-muted/20">
+        <CardContent className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <Calendar className="h-5 w-5 text-primary shrink-0" />
+            <div>
+              <h3 className="font-bold text-sm text-foreground">Select Statement Period</h3>
+              <p className="text-xs text-muted-foreground">Automated Cashbook ledger logs for selected date range</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-muted-foreground uppercase">From:</span>
+              <Input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="h-10 text-xs font-semibold w-36"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-muted-foreground uppercase">To:</span>
+              <Input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="h-10 text-xs font-semibold w-36"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* Sales Trend Area Chart */}
-        <Card className="shadow-soft overflow-hidden">
-          <CardContent className="p-5">
-            <SectionHeader
-              icon={<TrendingUp className="h-4 w-4" />}
-              title={`Sales Trend — Last ${range} Days`}
-              subtitle="Daily gross sales volume"
-            />
-            {busy ? <ChartSkeleton /> : salesTrendData.length === 0 ? (
-              <div className="h-56 flex items-center justify-center text-sm text-muted-foreground">No sales data in this range.</div>
-            ) : (
-              <ResponsiveContainer width="100%" height={220}>
-                <AreaChart data={salesTrendData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={COLORS.primary} stopOpacity={0.25} />
-                      <stop offset="95%" stopColor={COLORS.primary} stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.5} />
-                  <XAxis dataKey="date" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} tickLine={false} axisLine={false} />
-                  <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} tickLine={false} axisLine={false} tickFormatter={v => `₹${(v/1000).toFixed(0)}k`} width={42} />
-                  <Tooltip content={<ChartTooltip currency />} />
-                  <Area type="monotone" dataKey="Sales" stroke={COLORS.primary} strokeWidth={2.5} fill="url(#salesGrad)" dot={false} activeDot={{ r: 5, strokeWidth: 0 }} />
-                </AreaChart>
-              </ResponsiveContainer>
-            )}
+      {/* Summary Highlight Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {/* Total Inflow */}
+        <Card className="border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/40 dark:bg-emerald-950/10">
+          <CardContent className="p-5 flex items-center justify-between">
+            <div>
+              <div className="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">Total Cash Received (Inflow)</div>
+              <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums mt-1">{fmtCurrency(totals.inflow)}</div>
+              <div className="text-[10px] text-muted-foreground mt-1">In period selected</div>
+            </div>
+            <div className="h-11 w-11 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-500/20">
+              <ArrowUpRight className="h-6 w-6" />
+            </div>
           </CardContent>
         </Card>
 
-        {/* Revenue vs Expenses Bar Chart */}
-        <Card className="shadow-soft overflow-hidden">
-          <CardContent className="p-5">
-            <SectionHeader
-              icon={<BarChart2 className="h-4 w-4" />}
-              title="Revenue vs Expenses"
-              subtitle="Monthly comparison (last 6 months)"
-            />
-            {busy ? <ChartSkeleton /> : revenueExpBar.length === 0 ? (
-              <div className="h-56 flex items-center justify-center text-sm text-muted-foreground">No data available.</div>
-            ) : (
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart data={revenueExpBar} margin={{ top: 4, right: 4, left: 0, bottom: 0 }} barGap={4}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.5} vertical={false} />
-                  <XAxis dataKey="month" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} tickLine={false} axisLine={false} />
-                  <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} tickLine={false} axisLine={false} tickFormatter={v => `₹${(v/1000).toFixed(0)}k`} width={42} />
-                  <Tooltip content={<ChartTooltip currency />} />
-                  <Legend wrapperStyle={{ fontSize: "11px", paddingTop: "8px" }} />
-                  <Bar dataKey="Revenue" fill={COLORS.primary} radius={[4, 4, 0, 0]} maxBarSize={32} />
-                  <Bar dataKey="Expenses" fill={COLORS.danger} radius={[4, 4, 0, 0]} maxBarSize={32} />
-                </BarChart>
-              </ResponsiveContainer>
-            )}
+        {/* Total Outflow */}
+        <Card className="border-red-200 dark:border-red-900/50 bg-red-50/40 dark:bg-red-950/10">
+          <CardContent className="p-5 flex items-center justify-between">
+            <div>
+              <div className="text-xs font-bold text-red-700 dark:text-red-400 uppercase tracking-wider">Total Paid Outflow</div>
+              <div className="text-2xl font-black text-red-600 dark:text-red-400 tabular-nums mt-1">{fmtCurrency(totals.outflow)}</div>
+              <div className="text-[10px] text-muted-foreground mt-1">Expenses & payouts</div>
+            </div>
+            <div className="h-11 w-11 rounded-xl bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center border border-red-500/20">
+              <ArrowDownRight className="h-6 w-6" />
+            </div>
           </CardContent>
         </Card>
-      </div>
 
-      {/* ── Row 2: Aging Pie + Payment Mode Donut ─────────────────────────── */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        {/* Net Cash Movement */}
+        <Card className="border-primary/20 bg-primary/5">
+          <CardContent className="p-5 flex items-center justify-between">
+            <div>
+              <div className="text-xs font-bold text-primary uppercase tracking-wider">Net Cash Flow</div>
+              <div className="text-2xl font-black text-primary tabular-nums mt-1">{fmtCurrency(totals.inflow - totals.outflow)}</div>
+              <div className="text-[10px] text-muted-foreground mt-1">Inflow minus Outflow</div>
+            </div>
+            <div className="h-11 w-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
+              <IndianRupee className="h-6 w-6" />
+            </div>
+          </CardContent>
+        </Card>
 
-        {/* Outstanding Aging Pie */}
-        <Card className="shadow-soft overflow-hidden">
-          <CardContent className="p-5">
-            <SectionHeader
-              icon={<PieIcon className="h-4 w-4" />}
-              title="Customer Outstanding Aging"
-              subtitle="Breakdown by overdue days bucket"
-            />
-            {busy ? <ChartSkeleton /> : agingPieData.length === 0 ? (
-              <div className="h-56 flex items-center justify-center text-sm text-muted-foreground">No outstanding dues 🎉</div>
-            ) : (
-              <div className="flex flex-col sm:flex-row items-center gap-4">
-                <ResponsiveContainer width="100%" height={200}>
-                  <PieChart>
-                    <Pie data={agingPieData} cx="50%" cy="50%" outerRadius={80} innerRadius={40} paddingAngle={3} dataKey="value">
-                      {agingPieData.map((_, i) => (
-                        <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip content={<ChartTooltip currency />} />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="space-y-2 shrink-0 min-w-[140px]">
-                  {agingPieData.map((d, i) => (
-                    <div key={d.name} className="flex items-center gap-2 text-xs">
-                      <span className="w-3 h-3 rounded-sm shrink-0" style={{ background: PIE_COLORS[i % PIE_COLORS.length] }} />
-                      <span className="text-muted-foreground">{d.name}</span>
-                      <span className="ml-auto font-bold text-foreground">{fmtCurrency(d.value)}</span>
-                    </div>
-                  ))}
-                  <div className="border-t border-border pt-2 mt-2 flex items-center justify-between text-xs font-bold">
-                    <span className="text-muted-foreground">Total</span>
-                    <span className="text-destructive">{fmtCurrency(agingPieData.reduce((s, d) => s + d.value, 0))}</span>
-                  </div>
-                </div>
+        {/* Cash Shortage Summary */}
+        <Card className={totals.shortage > 0 ? "border-red-300 bg-red-500/10" : "border-emerald-300 bg-emerald-500/10"}>
+          <CardContent className="p-5 flex items-center justify-between">
+            <div>
+              <div className="text-xs font-bold uppercase tracking-wider text-foreground">Discrepancy Audit</div>
+              <div className={`text-2xl font-black tabular-nums mt-1 ${totals.shortage > 0 ? "text-red-600" : "text-emerald-600"}`}>
+                {totals.shortage > 0 ? `- ${fmtCurrency(totals.shortage)}` : "Balanced"}
               </div>
-            )}
+              <div className="text-[10px] text-muted-foreground mt-1">
+                {totals.shortage > 0 ? "Cumulative Shortage" : "No Cash Shortages"}
+              </div>
+            </div>
+            <div className="h-11 w-11 rounded-xl flex items-center justify-center border border-border">
+              {totals.shortage > 0 ? (
+                <AlertTriangle className="h-6 w-6 text-red-600 animate-pulse" />
+              ) : (
+                <CheckCircle2 className="h-6 w-6 text-emerald-600" />
+              )}
+            </div>
           </CardContent>
         </Card>
+      </div>
 
-        {/* Payment Mode Donut */}
-        <Card className="shadow-soft overflow-hidden">
-          <CardContent className="p-5">
-            <SectionHeader
-              icon={<PieIcon className="h-4 w-4" />}
-              title="Payment Mode Split"
-              subtitle={`Cash vs Online vs Credit — Last ${range} days`}
-            />
-            {busy ? <ChartSkeleton /> : paymentModeData.length === 0 ? (
-              <div className="h-56 flex items-center justify-center text-sm text-muted-foreground">No payment data.</div>
-            ) : (
-              <div className="flex flex-col sm:flex-row items-center gap-4">
-                <ResponsiveContainer width="100%" height={200}>
-                  <PieChart>
-                    <Pie data={paymentModeData} cx="50%" cy="50%" outerRadius={80} innerRadius={50} paddingAngle={3} dataKey="value">
-                      {paymentModeData.map((_, i) => (
-                        <Cell key={i} fill={DONUT_COLORS[i % DONUT_COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip content={<ChartTooltip currency />} />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="space-y-2 shrink-0 min-w-[140px]">
-                  {paymentModeData.map((d, i) => {
-                    const total = paymentModeData.reduce((s, x) => s + x.value, 0);
-                    const pct = total > 0 ? ((d.value / total) * 100).toFixed(1) : "0";
+      {/* Main Cashbook Table */}
+      <Card className="shadow-soft overflow-hidden">
+        <CardContent className="p-0">
+          {loading ? (
+            <div className="flex items-center justify-center py-20 text-muted-foreground gap-2">
+              <Loader2 className="h-5 w-5 animate-spin text-primary" /> Loading Cashbook statement logs...
+            </div>
+          ) : rows.length === 0 ? (
+            <div className="text-center py-20 text-muted-foreground">
+              <BookOpen className="h-10 w-10 mx-auto mb-3 opacity-20 text-primary" />
+              <p className="font-bold text-base">No Cashbook records found for this period.</p>
+              <p className="text-xs mt-1">Open the Cash Book tab to record daily cash counts and notes.</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b bg-muted/40 font-bold text-xs uppercase tracking-wider text-muted-foreground">
+                    <th className="p-4 pl-6">Book Date</th>
+                    <th className="p-4 text-right">Opening Cash</th>
+                    <th className="p-4 text-right text-emerald-700 dark:text-emerald-400 bg-emerald-500/5">Total Inflow (Recd)</th>
+                    <th className="p-4 text-right text-red-700 dark:text-red-400 bg-red-500/5">Total Outflow (Paid)</th>
+                    <th className="p-4 text-right font-black text-foreground">Calc Cash Balance</th>
+                    <th className="p-4 text-right">Manual Cash Count</th>
+                    <th className="p-4 text-center">Shortage / Difference</th>
+                    <th className="p-4 pr-6">Daily Note / Remarks</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/60 text-xs">
+                  {rows.map((r) => {
+                    const hasShortage = r.difference != null && r.difference < -0.5;
+                    const hasExcess = r.difference != null && r.difference > 0.5;
+                    const isBalanced = r.difference != null && Math.abs(r.difference) <= 0.5;
+
                     return (
-                      <div key={d.name} className="flex items-center gap-2 text-xs">
-                        <span className="w-3 h-3 rounded-sm shrink-0" style={{ background: DONUT_COLORS[i % DONUT_COLORS.length] }} />
-                        <span className="text-muted-foreground">{d.name}</span>
-                        <span className="ml-auto font-bold text-foreground">{pct}%</span>
-                      </div>
+                      <tr key={r.book_date} className="hover:bg-muted/30 transition-colors">
+                        <td className="p-4 pl-6 font-bold text-foreground whitespace-nowrap">
+                          {fmtDate(r.book_date)}
+                        </td>
+
+                        <td className="p-4 text-right font-semibold text-muted-foreground tabular-nums">
+                          {fmtCurrency(r.opening_cash)}
+                        </td>
+
+                        {/* Green highlight for Total Inflow */}
+                        <td className="p-4 text-right font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/5 tabular-nums">
+                          + {fmtCurrency(r.total_inflow)}
+                        </td>
+
+                        {/* Red highlight for Total Outflow */}
+                        <td className="p-4 text-right font-black text-red-600 dark:text-red-400 bg-red-500/5 tabular-nums">
+                          - {fmtCurrency(r.total_outflow)}
+                        </td>
+
+                        {/* Calculated Cash Balance */}
+                        <td className="p-4 text-right font-extrabold text-foreground tabular-nums bg-muted/20">
+                          {fmtCurrency(r.calculated_balance)}
+                        </td>
+
+                        {/* Manual Cash Count */}
+                        <td className="p-4 text-right font-bold text-foreground tabular-nums">
+                          {r.actual_closing != null ? fmtCurrency(r.actual_closing) : <span className="text-muted-foreground opacity-50">—</span>}
+                        </td>
+
+                        {/* Discrepancy Highlight */}
+                        <td className="p-4 text-center whitespace-nowrap">
+                          {r.difference == null ? (
+                            <span className="text-[10px] text-muted-foreground font-medium italic">Unverified</span>
+                          ) : hasShortage ? (
+                            <span className="inline-flex items-center gap-1 font-black text-destructive bg-destructive/10 border border-destructive/20 px-2.5 py-1 rounded-full">
+                              <AlertTriangle className="h-3 w-3" /> Shortage: {fmtCurrency(Math.abs(r.difference))}
+                            </span>
+                          ) : hasExcess ? (
+                            <span className="inline-flex items-center gap-1 font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full">
+                              <ArrowUpRight className="h-3 w-3" /> Excess: +{fmtCurrency(r.difference)}
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full">
+                              <CheckCircle2 className="h-3 w-3" /> Balanced
+                            </span>
+                          )}
+                        </td>
+
+                        {/* Daily Note */}
+                        <td className="p-4 pr-6 max-w-xs truncate text-muted-foreground font-medium italic">
+                          {r.daily_note ? (
+                            <span className="flex items-center gap-1 text-foreground font-semibold" title={r.daily_note}>
+                              <FileText className="h-3.5 w-3.5 text-primary shrink-0" />
+                              {r.daily_note}
+                            </span>
+                          ) : (
+                            <span className="opacity-40">—</span>
+                          )}
+                        </td>
+                      </tr>
                     );
                   })}
-                  <div className="border-t border-border pt-2 mt-2 flex items-center justify-between text-xs font-bold">
-                    <span className="text-muted-foreground">Total</span>
-                    <span className="text-foreground">{fmtCurrency(paymentModeData.reduce((s, d) => s + d.value, 0))}</span>
-                  </div>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* ── Row 3: Top 10 Customers ──────────────────────────────────────────── */}
-      <Card className="shadow-soft overflow-hidden">
-        <CardContent className="p-5">
-          <SectionHeader
-            icon={<Users className="h-4 w-4" />}
-            title={`Top 10 Customers by Sales — Last ${range} Days`}
-            subtitle="Ranked by gross sales value"
-          />
-          {busy ? <ChartSkeleton /> : customerSalesData.length === 0 ? (
-            <div className="h-48 flex items-center justify-center text-sm text-muted-foreground">No customer sales in this range.</div>
-          ) : (
-            <ResponsiveContainer width="100%" height={Math.max(200, customerSalesData.length * 38)}>
-              <BarChart
-                layout="vertical"
-                data={customerSalesData.map(c => ({ name: c.name.length > 18 ? c.name.substring(0, 18) + "…" : c.name, Sales: Math.round(c.total) }))}
-                margin={{ top: 0, right: 16, left: 0, bottom: 0 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.5} horizontal={false} />
-                <XAxis type="number" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} tickLine={false} axisLine={false} tickFormatter={v => `₹${(v/1000).toFixed(0)}k`} />
-                <YAxis type="category" dataKey="name" width={130} tick={{ fontSize: 11, fill: "hsl(var(--foreground))" }} tickLine={false} axisLine={false} />
-                <Tooltip content={<ChartTooltip currency />} />
-                <Bar dataKey="Sales" fill={COLORS.primary} radius={[0, 4, 4, 0]} maxBarSize={22}>
-                  {customerSalesData.map((_, i) => (
-                    <Cell key={i} fill={i === 0 ? COLORS.warning : i === 1 ? COLORS.primary : i === 2 ? COLORS.cyan : COLORS.purple} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+                </tbody>
+              </table>
+            </div>
           )}
         </CardContent>
       </Card>
-
-      {/* ── Row 4: Delivery Boy Performance ────────────────────────────────── */}
-      <Card className="shadow-soft overflow-hidden">
-        <CardContent className="p-5">
-          <SectionHeader
-            icon={<Truck className="h-4 w-4" />}
-            title={`Delivery Boy Performance — Last ${range} Days`}
-            subtitle="Deliveries, commission earned, and cash collected"
-          />
-          {busy ? <ChartSkeleton /> : deliveryData.length === 0 ? (
-            <div className="h-48 flex items-center justify-center text-sm text-muted-foreground">No delivery data in this range.</div>
-          ) : (
-            <ResponsiveContainer width="100%" height={Math.max(200, deliveryData.length * 52)}>
-              <BarChart
-                data={deliveryData}
-                margin={{ top: 4, right: 8, left: 0, bottom: 0 }}
-                barGap={3}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.5} vertical={false} />
-                <XAxis dataKey="name" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} tickLine={false} axisLine={false} />
-                <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} tickLine={false} axisLine={false} tickFormatter={v => `₹${(v/1000).toFixed(0)}k`} width={42} />
-                <Tooltip content={<ChartTooltip currency />} />
-                <Legend wrapperStyle={{ fontSize: "11px", paddingTop: "8px" }} />
-                <Bar dataKey="commission" name="Commission Earned" fill={COLORS.warning} radius={[4, 4, 0, 0]} maxBarSize={28} />
-                <Bar dataKey="cashCollected" name="Cash Collected" fill={COLORS.success} radius={[4, 4, 0, 0]} maxBarSize={28} />
-              </BarChart>
-            </ResponsiveContainer>
-          )}
-        </CardContent>
-      </Card>
-
     </div>
   );
 }

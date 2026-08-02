@@ -52,10 +52,9 @@ const CATS = [
   "bank_deposit",
   "vehicle_expense",
   "fuel",
-  "repair",
-  "maintenance",
   "salary",
-  "delivery_boy_payment",
+  "tea_expenses",
+  "gadi_hamali",
   "other"
 ] as const;
 
@@ -63,10 +62,9 @@ const catLabels: Record<string, string> = {
   bank_deposit: "Bank Deposit",
   vehicle_expense: "Vehicle Expense",
   fuel: "Fuel",
-  repair: "Repair",
-  maintenance: "Maintenance",
   salary: "Salary",
-  delivery_boy_payment: "Delivery Boy Payment",
+  tea_expenses: "Tea Expenses",
+  gadi_hamali: "Gadi Hamali",
   other: "Other"
 };
 

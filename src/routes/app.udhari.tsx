@@ -92,6 +92,13 @@ function UdhariPage() {
         .eq("is_deleted", false)
         .order("payment_date", { ascending: false });
 
+      // 3. Fetch manual outstanding / adjustment entries from customer_ledger
+      const { data: ledgerData } = await (supabase.from("customer_ledger") as any)
+        .select("id, entry_date, debit, credit, description, kind, sale_id, payment_id")
+        .eq("agency_id", agency?.id)
+        .eq("customer_id", c.id)
+        .order("entry_date", { ascending: false });
+
       const items: any[] = [];
 
       // Process sales — include udhari (credit) or split-udhari entries
@@ -142,6 +149,24 @@ function UdhariPage() {
           mode: p.remarks?.startsWith("[CHEQUE]") ? "Cheque" : p.mode === "online" ? "UPI/Online" : p.mode === "paytm" ? "Paytm" : "Cash",
           amount: Number(p.amount),
         });
+      }
+
+      // Process manual outstanding / ledger adjustments
+      for (const l of (ledgerData ?? [])) {
+        if (!l.sale_id && !l.payment_id) {
+          const isDebit = Number(l.debit || 0) > 0;
+          const isCredit = Number(l.credit || 0) > 0;
+          if (isDebit || isCredit) {
+            items.push({
+              id: l.id,
+              date: l.entry_date,
+              type: isDebit ? "debit" : "credit",
+              label: l.description || "Manual Outstanding / Adjustment",
+              mode: "Udhari",
+              amount: isDebit ? Number(l.debit) : Number(l.credit),
+            });
+          }
+        }
       }
 
       // Sort by date desc
@@ -466,7 +491,7 @@ function UdhariPage() {
                         </Button>
                         {c.mobile && (
                           <a
-                            href={`https://wa.me/91${c.mobile.replace(/\D/g, "")}?text=${encodeURIComponent(`Hello ${c.name}, you have an outstanding balance of ₹${c.outstanding.toLocaleString("en-IN")} with our agency. Kindly clear your dues at the earliest. Thank you!`)}`}
+                            href={`https://wa.me/91${c.mobile.replace(/\D/g, "")}?text=${encodeURIComponent(`Hello ${c.name}, you have an outstanding balance of ₹${c.outstanding.toLocaleString("en-IN")} with ${agency?.name ?? "our agency"}. Kindly clear your dues at the earliest. Thank you!`)}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="h-9 w-9 shrink-0 flex items-center justify-center rounded-md border border-emerald-500 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
@@ -548,7 +573,7 @@ function UdhariPage() {
                               </Button>
                               {c.mobile && (
                                 <a
-                                  href={`https://wa.me/91${c.mobile.replace(/\D/g, "")}?text=${encodeURIComponent(`Hello ${c.name}, you have an outstanding balance of ₹${c.outstanding.toLocaleString("en-IN")} with our agency. Kindly clear your dues at the earliest. Thank you!`)}`}
+                                  href={`https://wa.me/91${c.mobile.replace(/\D/g, "")}?text=${encodeURIComponent(`Hello ${c.name}, you have an outstanding balance of ₹${c.outstanding.toLocaleString("en-IN")} with ${agency?.name ?? "our agency"}. Kindly clear your dues at the earliest. Thank you!`)}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="h-9 w-9 flex items-center justify-center rounded-md border border-emerald-500 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"

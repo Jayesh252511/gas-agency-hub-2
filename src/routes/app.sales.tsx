@@ -43,6 +43,7 @@ interface Row {
   total: number; 
   payment_mode: string;
   delivery_boy_id: string | null;
+  delivery_boy_name: string | null;
   commission_rate: number;
   commission_total: number;
   net_amount: number;
@@ -91,14 +92,15 @@ function Page() {
         .select(`
           *,
           customer:customers(name),
-          product:products(name)
+          product:products(name),
+          delivery_boy:delivery_boys(name)
         `)
         .eq("agency_id", agency.id);
-      
+
       if (!showArchived) {
         query = query.eq("is_deleted", false);
       }
-      
+
       const { data, error } = await query
         .order("sale_date", { ascending: false })
         .order("created_at", { ascending: false });
@@ -143,6 +145,7 @@ function Page() {
           total: Number(s.gross_amount),
           payment_mode: paymentMode,
           delivery_boy_id: s.delivery_boy_id,
+          delivery_boy_name: s.delivery_boy?.name ?? null,
           commission_rate: Number(s.commission_rate),
           commission_total: Number(s.commission_amount),
           net_amount: Number(s.net_amount),
@@ -462,7 +465,12 @@ function Page() {
                       )}
                     </div>
                     <div className="text-xs text-muted-foreground font-semibold space-y-0.5 sm:space-y-0">
-                      <div>Cust: <span className="text-foreground font-bold">{r.customer_name ?? "Direct / Walk-in"}</span></div>
+                      <div>
+                        Boy: <span className="text-foreground font-bold">{r.delivery_boy_name ?? "—"}</span>
+                        {r.customer_name && (
+                          <span className="ml-2 opacity-80">· Cust: <span className="text-foreground font-bold">{r.customer_name}</span></span>
+                        )}
+                      </div>
                       <div className="text-[11px] text-muted-foreground opacity-90">
                         Date: <span className="font-bold text-foreground">{fmtDate(r.sale_date)}</span> • Ref: <span className="font-mono font-bold uppercase">{r.id.substring(0, 8)}</span>
                       </div>
@@ -724,7 +732,7 @@ function SaleForm({ editSale, onDone }: { editSale: Row | null; onDone: () => vo
       const [p, c, d] = await Promise.all([
         supabase.from("products").select("id, name, rate").eq("agency_id", agency.id).eq("is_active", true).eq("is_deleted", false).order("name"),
         supabase.from("customers").select("id, name").eq("agency_id", agency.id).eq("is_deleted", false).order("name"),
-        supabase.from("delivery_boys").select("id, name, commission_rate:default_commission").eq("agency_id", agency.id).eq("is_active", true).eq("is_deleted", false),
+        supabase.from("delivery_boys").select("id, name, commission_rate:default_commission").eq("agency_id", agency.id).eq("is_deleted", false).order("name"),
       ]);
       setProducts((p.data ?? []) as typeof products);
       setCustomers((c.data ?? []) as typeof customers);

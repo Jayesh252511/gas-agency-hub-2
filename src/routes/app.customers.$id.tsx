@@ -69,6 +69,7 @@ function Page() {
 
   const [sales, setSales] = useState<any[]>([]);
   const [pays, setPays] = useState<any[]>([]);
+  const [ledgerEntries, setLedgerEntries] = useState<any[]>([]);
   const [showArchived, setShowArchived] = useState(false);
   const [tab, setTab] = useState("ledger");
   const [loading, setLoading] = useState(true);
@@ -89,15 +90,17 @@ function Page() {
     if (!agency) return;
     setLoading(true);
     try {
-      const [{ data: cust }, { data: s }, { data: p }] = await Promise.all([
+      const [{ data: cust }, { data: s }, { data: p }, { data: l }] = await Promise.all([
         (supabase.from("customers") as any).select("name, mobile, village, consumer_number, outstanding:outstanding_balance").eq("id", id).maybeSingle(),
         (supabase.from("sales") as any).select("id, sale_date, gross_amount, payment_mode, is_deleted, quantity, rate, commission_amount, commission_rate, net_amount, notes, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by, product:products(name)").eq("customer_id", id).order("sale_date", { ascending: true }),
         (supabase.from("payments") as any).select("id, payment_date, amount, mode, is_deleted, remarks, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by").eq("customer_id", id).order("payment_date", { ascending: true }),
+        (supabase.from("customer_ledger") as any).select("id, entry_date, debit, credit, description, reference, kind, sale_id, payment_id, created_at").eq("customer_id", id).order("entry_date", { ascending: true }),
       ]);
 
       setC(cust as any); 
       setSales((s ?? []) as any[]); 
       setPays((p ?? []) as any[]);
+      setLedgerEntries((l ?? []) as any[]);
     } catch (err: any) {
       toast.error(getFriendlyError(err));
     } finally {
@@ -129,9 +132,8 @@ function Page() {
             if (meta.is_cheque) {
               isCheque = true;
               paymentMode = "cheque";
-              creditAmt = Number(s.gross_amount);
+              displayNotes = meta.remarks ?? "";
             }
-            displayNotes = meta.remarks ?? "";
           }
         } catch (e) {}
       }
@@ -140,12 +142,10 @@ function Page() {
         id: s.id,
         date: s.sale_date,
         type: "sale",
-        description: isSplitSale 
-          ? `${s.product?.name ?? "Cylinder"} (Split: Cash/Online/Udhari)` + (debitAmt > 0 ? ` [Udhari portion: ${fmtCurrency(debitAmt)} on ${fmtDate(s.sale_date)}]` : "")
-          : `${s.product?.name ?? "Cylinder"} (${paymentMode === "credit" ? "Udhari" : paymentMode})`,
+        description: `Sale — ${s.product?.name ?? "Product"} (${s.quantity} qty)`,
         debit: debitAmt,
         credit: creditAmt,
-        paymentMode: paymentMode,
+        paymentMode,
         is_deleted: s.is_deleted,
         balance: 0,
         notes: displayNotes || null,
@@ -192,8 +192,32 @@ function Page() {
       };
     });
 
+    const adjItems: LedgerItem[] = ledgerEntries
+      .filter((entry: any) => !entry.sale_id && !entry.payment_id && (Number(entry.debit || 0) > 0 || Number(entry.credit || 0) > 0))
+      .map((entry: any) => {
+        const isDebit = Number(entry.debit || 0) > 0;
+        return {
+          id: entry.id || entry.reference,
+          date: entry.entry_date,
+          type: isDebit ? "sale" : "payment",
+          description: entry.description || "Manual Outstanding / Adjustment",
+          debit: Number(entry.debit || 0),
+          credit: Number(entry.credit || 0),
+          paymentMode: "udhari",
+          is_deleted: false,
+          balance: 0,
+          notes: entry.description || null,
+          created_at: entry.created_at || new Date().toISOString(),
+          created_by: null,
+          updated_at: null,
+          updated_by: null,
+          deleted_at: null,
+          deleted_by: null,
+        };
+      });
+
     // Filter archived unless toggled
-    const merged = [...sItems, ...pItems];
+    const merged = [...sItems, ...pItems, ...adjItems];
     const filtered = showArchived ? merged : merged.filter(item => !item.is_deleted);
     
     // Sort strictly chronological ascending to calculate running balances
