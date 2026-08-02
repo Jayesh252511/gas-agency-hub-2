@@ -742,15 +742,15 @@ function SaleForm({ editSale, onDone }: { editSale: Row | null; onDone: () => vo
 
   const boysOptions = useMemo(() => {
     const list = [...boys];
-    if (f.delivery_boy_id && !list.some(b => b.id === f.delivery_boy_id)) {
+    if (editSale?.delivery_boy_id && !list.some(b => b.id === editSale.delivery_boy_id)) {
       list.push({
-        id: f.delivery_boy_id,
-        name: editSale?.delivery_boy_name || (editSale as any)?.delivery_boy?.name || "Assigned Delivery Boy",
+        id: editSale.delivery_boy_id,
+        name: editSale.delivery_boy_name || (editSale as any)?.delivery_boy?.name || "Assigned Delivery Boy",
         commission_rate: 0,
       });
     }
     return list;
-  }, [boys, f.delivery_boy_id, editSale]);
+  }, [boys, editSale]);
 
   const boy = useMemo(() => boysOptions.find((b) => b.id === f.delivery_boy_id), [boysOptions, f.delivery_boy_id]);
 
@@ -797,11 +797,13 @@ function SaleForm({ editSale, onDone }: { editSale: Row | null; onDone: () => vo
         }
       ]);
 
+      const foundBoy = editSale.delivery_boy_id || (editSale.delivery_boy_name ? boys.find(b => b.name === editSale.delivery_boy_name)?.id : "") || "";
+
       setF({
         sale_date: editSale.sale_date,
         customer_id: editSale.customer_id ?? "",
         payment_mode: split ? "split" : editSale.payment_mode,
-        delivery_boy_id: editSale.delivery_boy_id ?? "",
+        delivery_boy_id: foundBoy || "none",
         notes: remarks,
       });
     } else {
@@ -986,7 +988,7 @@ function SaleForm({ editSale, onDone }: { editSale: Row | null; onDone: () => vo
 
     setBusy(true);
 
-    const finalDeliveryBoyId = isFirstCnc ? null : (f.delivery_boy_id || null);
+    const finalDeliveryBoyId = isFirstCnc ? null : (f.delivery_boy_id === "none" || !f.delivery_boy_id ? null : f.delivery_boy_id);
     
     // Shared transaction ID for inserts, or existing transaction ID for edit
     const txnNo = editSale?.txn_no || ("TXN-" + Date.now() + "-" + Math.random().toString(36).substring(2, 7).toUpperCase());
@@ -1139,6 +1141,7 @@ function SaleForm({ editSale, onDone }: { editSale: Row | null; onDone: () => vo
               <SelectValue placeholder="—" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="none">No Delivery Boy (Direct / Counter)</SelectItem>
               {boysOptions.map((b) => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}
             </SelectContent>
           </Select>

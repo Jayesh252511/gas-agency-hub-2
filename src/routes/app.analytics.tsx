@@ -383,67 +383,61 @@ function AnalyticsPage() {
         </CardContent>
       </Card>
 
-      {/* Summary Highlight Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {/* Summary Highlight Cards — Compact & Sleek */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {/* Total Inflow */}
-        <Card className="border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/40 dark:bg-emerald-950/10">
-          <CardContent className="p-5 flex items-center justify-between">
-            <div>
-              <div className="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">Total Cash Received (Inflow)</div>
-              <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums mt-1">{fmtCurrency(totals.inflow)}</div>
-              <div className="text-[10px] text-muted-foreground mt-1">In period selected</div>
+        <Card className="border-emerald-200/80 dark:border-emerald-900/50 bg-emerald-50/40 dark:bg-emerald-950/10">
+          <CardContent className="p-3.5 flex items-center justify-between">
+            <div className="min-w-0 flex-1">
+              <div className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide truncate">Total Cash Received</div>
+              <div className="text-lg font-black text-emerald-600 dark:text-emerald-400 tabular-nums mt-0.5">{fmtCurrency(totals.inflow)}</div>
             </div>
-            <div className="h-11 w-11 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-500/20">
-              <ArrowUpRight className="h-6 w-6" />
+            <div className="h-8 w-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-500/20 shrink-0 ml-2">
+              <ArrowUpRight className="h-4 w-4" />
             </div>
           </CardContent>
         </Card>
 
         {/* Total Outflow */}
-        <Card className="border-red-200 dark:border-red-900/50 bg-red-50/40 dark:bg-red-950/10">
-          <CardContent className="p-5 flex items-center justify-between">
-            <div>
-              <div className="text-xs font-bold text-red-700 dark:text-red-400 uppercase tracking-wider">Total Paid Outflow</div>
-              <div className="text-2xl font-black text-red-600 dark:text-red-400 tabular-nums mt-1">{fmtCurrency(totals.outflow)}</div>
-              <div className="text-[10px] text-muted-foreground mt-1">Expenses & payouts</div>
+        <Card className="border-red-200/80 dark:border-red-900/50 bg-red-50/40 dark:bg-red-950/10">
+          <CardContent className="p-3.5 flex items-center justify-between">
+            <div className="min-w-0 flex-1">
+              <div className="text-[10px] font-bold text-red-700 dark:text-red-400 uppercase tracking-wide truncate">Total Paid Outflow</div>
+              <div className="text-lg font-black text-red-600 dark:text-red-400 tabular-nums mt-0.5">{fmtCurrency(totals.outflow)}</div>
             </div>
-            <div className="h-11 w-11 rounded-xl bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center border border-red-500/20">
-              <ArrowDownRight className="h-6 w-6" />
+            <div className="h-8 w-8 rounded-lg bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center border border-red-500/20 shrink-0 ml-2">
+              <ArrowDownRight className="h-4 w-4" />
             </div>
           </CardContent>
         </Card>
 
-        {/* Net Cash Movement */}
+        {/* Net Cash Flow */}
         <Card className="border-primary/20 bg-primary/5">
-          <CardContent className="p-5 flex items-center justify-between">
-            <div>
-              <div className="text-xs font-bold text-primary uppercase tracking-wider">Net Cash Flow</div>
-              <div className="text-2xl font-black text-primary tabular-nums mt-1">{fmtCurrency(totals.inflow - totals.outflow)}</div>
-              <div className="text-[10px] text-muted-foreground mt-1">Inflow minus Outflow</div>
+          <CardContent className="p-3.5 flex items-center justify-between">
+            <div className="min-w-0 flex-1">
+              <div className="text-[10px] font-bold text-primary uppercase tracking-wide truncate">Net Cash Flow</div>
+              <div className="text-lg font-black text-primary tabular-nums mt-0.5">{fmtCurrency(totals.inflow - totals.outflow)}</div>
             </div>
-            <div className="h-11 w-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
-              <IndianRupee className="h-6 w-6" />
+            <div className="h-8 w-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center border border-primary/20 shrink-0 ml-2">
+              <IndianRupee className="h-4 w-4" />
             </div>
           </CardContent>
         </Card>
 
         {/* Cash Shortage Summary */}
         <Card className={totals.shortage > 0 ? "border-red-300 bg-red-500/10" : "border-emerald-300 bg-emerald-500/10"}>
-          <CardContent className="p-5 flex items-center justify-between">
-            <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-foreground">Discrepancy Audit</div>
-              <div className={`text-2xl font-black tabular-nums mt-1 ${totals.shortage > 0 ? "text-red-600" : "text-emerald-600"}`}>
+          <CardContent className="p-3.5 flex items-center justify-between">
+            <div className="min-w-0 flex-1">
+              <div className="text-[10px] font-bold uppercase tracking-wide text-foreground truncate">Discrepancy Audit</div>
+              <div className={`text-lg font-black tabular-nums mt-0.5 ${totals.shortage > 0 ? "text-red-600" : "text-emerald-600"}`}>
                 {totals.shortage > 0 ? `- ${fmtCurrency(totals.shortage)}` : "Balanced"}
               </div>
-              <div className="text-[10px] text-muted-foreground mt-1">
-                {totals.shortage > 0 ? "Cumulative Shortage" : "No Cash Shortages"}
-              </div>
             </div>
-            <div className="h-11 w-11 rounded-xl flex items-center justify-center border border-border">
+            <div className="h-8 w-8 rounded-lg flex items-center justify-center border border-border shrink-0 ml-2">
               {totals.shortage > 0 ? (
-                <AlertTriangle className="h-6 w-6 text-red-600 animate-pulse" />
+                <AlertTriangle className="h-4 w-4 text-red-600 animate-pulse" />
               ) : (
-                <CheckCircle2 className="h-6 w-6 text-emerald-600" />
+                <CheckCircle2 className="h-4 w-4 text-emerald-600" />
               )}
             </div>
           </CardContent>
