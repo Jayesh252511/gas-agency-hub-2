@@ -267,18 +267,27 @@ function Page() {
       let onlineAmt = 0;
       let creditAmt = 0;
       let prepQty = 0;
+      let userNote = "";
       try {
         const m = JSON.parse(s.notes ?? "{}");
-        if (m.is_split) {
-          isSplit = true;
-          onlineAmt = Number(m.online_amount || 0);
-          creditAmt = Number(m.credit_amount || 0);
+        if (m && typeof m === "object") {
+          if (m.is_split) {
+            isSplit = true;
+            onlineAmt = Number(m.online_amount || 0);
+            creditAmt = Number(m.credit_amount || 0);
+          }
+          if (m.website_prepaid_qty != null) {
+            prepQty = Number(m.website_prepaid_qty);
+          }
+          if (m.remarks && typeof m.remarks === "string" && m.remarks.trim() !== "") {
+            userNote = m.remarks.trim();
+          }
         }
-        if (m.website_prepaid_qty != null) {
-          prepQty = Number(m.website_prepaid_qty);
+      } catch (_) {
+        if (typeof s.notes === "string" && s.notes.trim() !== "" && !s.notes.startsWith("{")) {
+          userNote = s.notes.trim();
         }
-      } catch (_) {}
-
+      }
 
       // LEFT side always records the FULL sale (full qty × rate).
       // RIGHT side (prepaid, UPI, cheque, udhari) handles the non-cash breakdown.
@@ -318,12 +327,12 @@ function Page() {
         prepQtyTotal += prepQty;
       }
 
-      // 2. UPI (online UPI or paytm) - Group both legacy online/paytm payments here. Labeled simply as UPI.
+      // 2. UPI (online UPI or paytm) - Group both legacy online/paytm payments here. Labeled simply as UPI / Paytm.
       const isOnlineOrPaytmSale = !isSplit && (s.payment_mode === "online" || s.payment_mode === "paytm");
       const effectiveOnline = isSplit ? onlineAmt : (isOnlineOrPaytmSale ? (s.gross_amount - s.commission_total) : 0);
       if (effectiveOnline > 0) {
         const qrQty = isSplit ? 0 : s.quantity; // do NOT add qty for split payment
-        const dbKey = s.delivery_boy_name ?? "Counter / Walk-in";
+        const dbKey = userNote ? userNote : (s.delivery_boy_name ?? "Counter / Walk-in");
         if (!onlineByDriver[dbKey]) onlineByDriver[dbKey] = { name: dbKey, qty: 0, amount: 0 };
         onlineByDriver[dbKey].qty += qrQty;
         onlineByDriver[dbKey].amount += effectiveOnline;

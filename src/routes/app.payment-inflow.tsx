@@ -374,7 +374,7 @@ function PaymentInflowPage() {
                     <Input type="number" step="any" min="0" value={splitCash} onChange={(e) => setSplitCash(e.target.value)} className="h-10 text-xs font-bold" />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-[10px] uppercase font-bold text-muted-foreground">Online (₹)</Label>
+                    <Label className="text-[10px] uppercase font-bold text-muted-foreground">Paytm (₹)</Label>
                     <Input type="number" step="any" min="0" value={splitOnline} onChange={(e) => setSplitOnline(e.target.value)} className="h-10 text-xs font-bold" />
                   </div>
                   <div className="space-y-1">
@@ -445,7 +445,7 @@ function PaymentInflowPage() {
                       <Input type="number" step="any" min="0" value={editSplitCash} onChange={(e) => setEditSplitCash(e.target.value)} className="h-10 text-xs font-bold" />
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-[10px] uppercase font-bold text-muted-foreground">Online (₹)</Label>
+                      <Label className="text-[10px] uppercase font-bold text-muted-foreground">Paytm (₹)</Label>
                       <Input type="number" step="any" min="0" value={editSplitOnline} onChange={(e) => setEditSplitOnline(e.target.value)} className="h-10 text-xs font-bold" />
                     </div>
                     <div className="space-y-1">

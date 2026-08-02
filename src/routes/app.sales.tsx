@@ -1272,7 +1272,7 @@ function SaleForm({ editSale, onDone }: { editSale: Row | null; onDone: () => vo
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="split">Split Payment (Mix Cash/Online/Udhari)</SelectItem>
+            <SelectItem value="split">Split Payment (Mix Cash/Paytm/Udhari)</SelectItem>
             <SelectItem value="cheque">Cheque</SelectItem>
             {f.payment_mode !== "split" && f.payment_mode !== "cheque" && (
               <SelectItem value={f.payment_mode}>{f.payment_mode.toUpperCase()}</SelectItem>
@@ -1293,7 +1293,7 @@ function SaleForm({ editSale, onDone }: { editSale: Row | null; onDone: () => vo
             </div>
             
             <div className="space-y-1">
-              <Label className="text-[10px] uppercase font-bold text-muted-foreground">Online (₹)</Label>
+              <Label className="text-[10px] uppercase font-bold text-muted-foreground">Paytm (₹)</Label>
               <Input type="number" step="any" min="0" value={splitOnline} onChange={(e) => setSplitOnline(e.target.value)} className="h-10 text-xs font-bold" />
             </div>
 
