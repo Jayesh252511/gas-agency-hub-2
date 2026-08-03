@@ -754,6 +754,8 @@ function SaleForm({ editSale, onDone }: { editSale: Row | null; onDone: () => vo
     return list;
   }, [boys, editSale, f.delivery_boy_id]);
 
+  const boy = useMemo(() => boysOptions.find((b) => b.id === f.delivery_boy_id), [boysOptions, f.delivery_boy_id]);
+
   const customersOptions = useMemo(() => {
     const list = [...customers];
     const targetCustId = editSale?.customer_id || f.customer_id;
@@ -926,7 +928,7 @@ function SaleForm({ editSale, onDone }: { editSale: Row | null; onDone: () => vo
 
   const handleDeliveryBoyChange = (boyId: string) => {
     setF(prev => ({ ...prev, delivery_boy_id: boyId }));
-    const selectedBoy = boys.find(b => b.id === boyId);
+    const selectedBoy = boysOptions.find(b => b.id === boyId);
     if (selectedBoy) {
       setProdRows(prev => prev.map(row => {
         const prod = products.find(p => p.id === row.product_id);
