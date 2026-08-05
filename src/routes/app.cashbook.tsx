@@ -749,7 +749,7 @@ function Page() {
     }
 
     if (agg.outstandingTotal > 0) {
-      right.push({ label: "Outstanding (Loans/Udhari Given)", qty: "", amt: agg.outstandingTotal });
+      right.push({ label: "Outstanding", qty: "", amt: agg.outstandingTotal });
       agg.outstandingEntries.forEach(o => right.push({ label: `  - ${o.customer_name}${o.note ? ` (${o.note})` : ""}`, qty: "", amt: o.amount, sub: true }));
     }
 
@@ -892,10 +892,12 @@ function Page() {
     const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" }) as any;
     const PW = 297, PH = 210;
     const ML = 10, MR = 10, MT = 12;
-    const colW = (PW - ML - MR - 8) / 2; // width of each column block
+    const colW = (PW - ML - MR - 8) / 2; // width of each column block (134.5 mm)
     const col2X = ML + colW + 8;           // X start of right column
-    const labelW = colW - 22 - 18;        // label portion
-    const qtyW = 18, amtW = 22;
+    const labelW = 72.5;
+    const qtyW = 14;
+    const subAmtW = 24;
+    const totAmtW = 24;
 
     // ── Colors ──
     const NAVY  = [26, 60, 94]  as [number,number,number];
@@ -945,13 +947,16 @@ function Page() {
     const hdrH = 7;
     fillRect(ML, y, colW, hdrH, BLUE);
     fillRect(col2X, y, colW, hdrH, BLUE);
-    doc.setFont("helvetica", "bold"); doc.setFontSize(8.5); doc.setTextColor(...WHITE);
+    doc.setFont("helvetica", "bold"); doc.setFontSize(8); doc.setTextColor(...WHITE);
     text("PAYMENT RECEIVED", ML + 2, y + 5);
-    text("Qty",       ML + labelW + 4,       y + 5, { align: "right" });
-    text("Amount (Rs)",ML + labelW + qtyW + amtW - 1, y + 5, { align: "right" });
+    text("Qty",           ML + labelW + qtyW - 1,                y + 5, { align: "right" });
+    text("Sub Amt (Rs)", ML + labelW + qtyW + subAmtW - 1,      y + 5, { align: "right" });
+    text("Total Amt (Rs)",ML + labelW + qtyW + subAmtW + totAmtW - 1, y + 5, { align: "right" });
+
     text("MONEY PAID / OUTFLOW", col2X + 2, y + 5);
-    text("Qty",       col2X + labelW + 4,       y + 5, { align: "right" });
-    text("Amount (Rs)",col2X + labelW + qtyW + amtW - 1, y + 5, { align: "right" });
+    text("Qty",           col2X + labelW + qtyW - 1,                y + 5, { align: "right" });
+    text("Sub Amt (Rs)", col2X + labelW + qtyW + subAmtW - 1,      y + 5, { align: "right" });
+    text("Total Amt (Rs)",col2X + labelW + qtyW + subAmtW + totAmtW - 1, y + 5, { align: "right" });
     y += hdrH;
 
     // ── Build data rows ──
@@ -1018,7 +1023,7 @@ function Page() {
 
     // 6. Outstanding (group)
     if (agg.outstandingTotal > 0) {
-      rRows.push({ label: "Outstanding (Loans/Udhari Given)", qty: "", amt: fmt(agg.outstandingTotal) });
+      rRows.push({ label: "Outstanding", qty: "", amt: fmt(agg.outstandingTotal) });
       agg.outstandingEntries.forEach(o => rRows.push({ label: `  - ${o.customer_name}${o.note ? ` (${o.note})` : ""}`, qty: "", amt: fmt(o.amount), sub: true }));
     }
 
@@ -1053,27 +1058,49 @@ function Page() {
     ) => {
       const bg = row.label === "" ? WHITE : row.sub ? LGRAY : alt ? LBLU : WHITE;
       fillRect(xBase, yy, colW, rowH, bg);
-      drawRect( xBase, yy, colW, rowH, [200,200,200]);
+      drawRect( xBase, yy, colW, rowH, [210,210,210]);
 
       if (!row.label) return;
       doc.setFont("helvetica", row.sub ? "italic" : "normal");
-      doc.setFontSize(8); doc.setTextColor(30, 30, 30);
+      doc.setFontSize(7.5); doc.setTextColor(30, 30, 30);
       const lbl = doc.splitTextToSize(row.label, labelW - 2);
       text(lbl[0], xBase + 2, yy + 4);
-      if (row.qty) { doc.setFont("helvetica", "normal"); text(row.qty, xBase + labelW + 4, yy + 4, { align: "right" }); }
-      if (row.amt) { doc.setFont("helvetica", row.sub ? "italic" : "normal"); text(row.amt, xBase + labelW + qtyW + amtW - 1, yy + 4, { align: "right" }); }
+
+      if (row.qty) {
+        doc.setFont("helvetica", "normal");
+        text(row.qty, xBase + labelW + qtyW - 1, yy + 4, { align: "right" });
+      }
+
+      if (row.amt) {
+        if (row.sub) {
+          // Sub-item amount goes in Sub Amt (Rs) column
+          doc.setFont("helvetica", "italic");
+          doc.setTextColor(80, 80, 80);
+          text(row.amt, xBase + labelW + qtyW + subAmtW - 1, yy + 4, { align: "right" });
+        } else {
+          // Category total goes in Total Amt (Rs) column
+          doc.setFont("helvetica", "bold");
+          doc.setTextColor(20, 20, 20);
+          text(row.amt, xBase + labelW + qtyW + subAmtW + totAmtW - 1, yy + 4, { align: "right" });
+        }
+      }
     };
 
     for (let i = 0; i < maxData; i++) {
-      // New page check
       if (y + rowH > PH - 20) {
         doc.addPage();
         y = MT;
-        // re-draw mini headers
         fillRect(ML, y, colW, hdrH, BLUE); fillRect(col2X, y, colW, hdrH, BLUE);
         doc.setFont("helvetica", "bold"); doc.setFontSize(8); doc.setTextColor(...WHITE);
         text("PAYMENT RECEIVED", ML + 2, y + 5);
+        text("Qty",           ML + labelW + qtyW - 1,                y + 5, { align: "right" });
+        text("Sub Amt (Rs)", ML + labelW + qtyW + subAmtW - 1,      y + 5, { align: "right" });
+        text("Total Amt (Rs)",ML + labelW + qtyW + subAmtW + totAmtW - 1, y + 5, { align: "right" });
+
         text("MONEY PAID / OUTFLOW", col2X + 2, y + 5);
+        text("Qty",           col2X + labelW + qtyW - 1,                y + 5, { align: "right" });
+        text("Sub Amt (Rs)", col2X + labelW + qtyW + subAmtW - 1,      y + 5, { align: "right" });
+        text("Total Amt (Rs)",col2X + labelW + qtyW + subAmtW + totAmtW - 1, y + 5, { align: "right" });
         y += hdrH;
       }
       drawRow(lRows[i], ML,    y, i % 2 === 1);
@@ -1085,11 +1112,11 @@ function Page() {
     const totH = 7;
     fillRect(ML,    y, colW, totH, GREEN); drawRect(ML,    y, colW, totH, GREEN);
     fillRect(col2X, y, colW, totH, GREEN); drawRect(col2X, y, colW, totH, GREEN);
-    doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.setTextColor(...WHITE);
+    doc.setFont("helvetica", "bold"); doc.setFontSize(8.5); doc.setTextColor(...WHITE);
     text("TOTAL RECEIVED",  ML + 2,    y + 5);
-    text(fmt(agg.leftGrandTotal), ML + labelW + qtyW + amtW - 1, y + 5, { align: "right" });
+    text(fmt(agg.leftGrandTotal), ML + labelW + qtyW + subAmtW + totAmtW - 1, y + 5, { align: "right" });
     text("TOTAL PAID OUTFLOW", col2X + 2, y + 5);
-    text(fmt(agg.totalOutflows), col2X + labelW + qtyW + amtW - 1, y + 5, { align: "right" });
+    text(fmt(agg.totalOutflows), col2X + labelW + qtyW + subAmtW + totAmtW - 1, y + 5, { align: "right" });
     y += totH + 4;
 
     // ── Summary Section ──

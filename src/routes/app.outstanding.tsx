@@ -192,7 +192,7 @@ function OutstandingPage() {
   return (
     <div className="space-y-6 animate-page-in">
       <PageHeader
-        title="Outstanding"
+        title="Outstanding (उधारी देणे)"
         subtitle="Record money / udhari given to individuals — these appear in the Cashbook paid side"
         actions={
           <Button onClick={() => setIsOpen(true)} className="h-11 gap-2 bg-primary hover:bg-primary/90 text-white font-bold">

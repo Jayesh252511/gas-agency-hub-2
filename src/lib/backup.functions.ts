@@ -446,7 +446,7 @@ export async function compileDailyCashBookWorkbook(admin: any, agencyId: string,
   }
 
   if (outstandingTotal > 0) {
-    right.push({ label: "Outstanding (Loans/Udhari Given)", qty: "", amt: outstandingTotal });
+    right.push({ label: "Outstanding", qty: "", amt: outstandingTotal });
     outstandingEntries.forEach(o => right.push({ label: `  - ${o.customer_name}${o.note ? ` (${o.note})` : ""}`, qty: "", amt: o.amount, sub: true }));
   }
 

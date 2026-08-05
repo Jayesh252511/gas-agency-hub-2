@@ -790,7 +790,7 @@ function ProfilePage() {
           }
 
           if (day.outstandingTotal > 0) {
-            right.push({ label: "Outstanding (Loans/Udhari Given)", qty: "", amt: day.outstandingTotal });
+            right.push({ label: "Outstanding", qty: "", amt: day.outstandingTotal });
             day.outstandingEntries.forEach(o => right.push({ label: `  - ${o.customer_name}${o.note ? ` (${o.note})` : ""}`, qty: "", amt: o.amount, sub: true }));
           }
 

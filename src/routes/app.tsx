@@ -30,14 +30,14 @@ const NAV = [
   { to: "/app/sales", label: "Sales", icon: ShoppingCart },
   { to: "/app/customers", label: "Customers", icon: Users },
   { to: "/app/udhari", label: "Credit Book", icon: IndianRupee },
-  { to: "/app/payments", label: "Payments", icon: Wallet },
+  { to: "/app/payments", label: "Payments (उधारी-जमा)", icon: Wallet },
   { to: "/app/expenses", label: "Expenses", icon: Receipt },
   { to: "/app/products", label: "Products", icon: Package },
   { to: "/app/delivery-boys", label: "Delivery Boys", icon: Truck },
   { to: "/app/cashbook", label: "Cash Book", icon: BookOpen },
-  { to: "/app/payment-inflow", label: "Payment Inflow", icon: ArrowDownToLine },
+  { to: "/app/payment-inflow", label: "Payment Inflow (उधारी-जमा)", icon: ArrowDownToLine },
   { to: "/app/payment-outflow", label: "Payment Outflow", icon: ArrowUpFromLine },
-  { to: "/app/outstanding", label: "Outstanding", icon: Coins },
+  { to: "/app/outstanding", label: "Outstanding (उधारी देणे)", icon: Coins },
   { to: "/app/analytics", label: "Analytics", icon: BarChart2 },
   { to: "/app/reports", label: "Reports", icon: Receipt },
   { to: "/app/profile", label: "Profile", icon: UserCog },
@@ -182,12 +182,12 @@ function AppLayout() {
           <div style={{fontFamily:"'Silkscreen',monospace",fontSize:'8px',color:'#AAAAAA',letterSpacing:'.18em',textTransform:'uppercase',padding:'14px 8px 4px'}}>// Finance</div>
           {[
             {to:"/app/udhari",label:"Credit Book",icon:IndianRupee},
-            {to:"/app/payments",label:"Payments",icon:Wallet},
+            {to:"/app/payments",label:"Payments (उधारी-जमा)",icon:Wallet},
             {to:"/app/expenses",label:"Expenses",icon:Receipt},
             {to:"/app/cashbook",label:"Cash Book",icon:BookOpen},
-            {to:"/app/payment-inflow",label:"Payment Inflow",icon:ArrowDownToLine},
+            {to:"/app/payment-inflow",label:"Payment Inflow (उधारी-जमा)",icon:ArrowDownToLine},
             {to:"/app/payment-outflow",label:"Payment Outflow",icon:ArrowUpFromLine},
-            {to:"/app/outstanding",label:"Outstanding",icon:Coins},
+            {to:"/app/outstanding",label:"Outstanding (उधारी देणे)",icon:Coins},
           ].map(n=>(
             <Link key={n.to} to={n.to}
               style={{fontFamily:"'Inter',sans-serif",fontWeight:500,fontSize:13,color:'var(--sidebar-foreground)',textDecoration:'none'}}
