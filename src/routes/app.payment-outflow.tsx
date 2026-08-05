@@ -143,7 +143,7 @@ function PaymentOutflowPage() {
   return (
     <div className="space-y-6 animate-page-in">
       <PageHeader
-        title="Payment Outflow"
+        title="Payment Outflow (पैसे दिले)"
         subtitle="Miscellaneous cash payments — these appear in the Cashbook paid side"
         actions={
           <Button onClick={() => setIsOpen(true)} className="h-11 gap-2 bg-orange-600 hover:bg-orange-500 text-white font-bold">

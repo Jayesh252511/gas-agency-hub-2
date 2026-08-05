@@ -26,21 +26,21 @@ export const Route = createFileRoute("/app")({
 });
 
 const NAV = [
-  { to: "/app", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { to: "/app/sales", label: "Sales", icon: ShoppingCart },
-  { to: "/app/customers", label: "Customers", icon: Users },
-  { to: "/app/udhari", label: "Credit Book", icon: IndianRupee },
+  { to: "/app", label: "Dashboard (डॅशबोर्ड)", icon: LayoutDashboard, exact: true },
+  { to: "/app/sales", label: "Sales (विक्री)", icon: ShoppingCart },
+  { to: "/app/customers", label: "Customers (ग्राहक)", icon: Users },
+  { to: "/app/udhari", label: "Credit Book (उधारी)", icon: IndianRupee },
   { to: "/app/payments", label: "Payments (उधारी-जमा)", icon: Wallet },
-  { to: "/app/expenses", label: "Expenses", icon: Receipt },
-  { to: "/app/products", label: "Products", icon: Package },
-  { to: "/app/delivery-boys", label: "Delivery Boys", icon: Truck },
-  { to: "/app/cashbook", label: "Cash Book", icon: BookOpen },
-  { to: "/app/payment-inflow", label: "Payment Inflow (उधारी-जमा)", icon: ArrowDownToLine },
-  { to: "/app/payment-outflow", label: "Payment Outflow", icon: ArrowUpFromLine },
+  { to: "/app/expenses", label: "Expenses (खर्च)", icon: Receipt },
+  { to: "/app/products", label: "Products (उत्पादने)", icon: Package },
+  { to: "/app/delivery-boys", label: "Delivery Boys (डिलिव्हरी बॉय)", icon: Truck },
+  { to: "/app/cashbook", label: "Cash Book (रोख वही)", icon: BookOpen },
+  { to: "/app/payment-inflow", label: "Payment Inflow (पैसे जमा)", icon: ArrowDownToLine },
+  { to: "/app/payment-outflow", label: "Payment Outflow (पैसे दिले)", icon: ArrowUpFromLine },
   { to: "/app/outstanding", label: "Outstanding (उधारी देणे)", icon: Coins },
-  { to: "/app/analytics", label: "Analytics", icon: BarChart2 },
-  { to: "/app/reports", label: "Reports", icon: Receipt },
-  { to: "/app/profile", label: "Profile", icon: UserCog },
+  { to: "/app/analytics", label: "Analytics (विश्लेषण)", icon: BarChart2 },
+  { to: "/app/reports", label: "Reports (अहवाल)", icon: Receipt },
+  { to: "/app/profile", label: "Profile (प्रोफाइल)", icon: UserCog },
 ] as const;
 
 function AppLayout() {
@@ -163,9 +163,9 @@ function AppLayout() {
           {/* // MAIN */}
           <div style={{fontFamily:"'Silkscreen',monospace",fontSize:'8px',color:'#AAAAAA',letterSpacing:'.18em',textTransform:'uppercase',padding:'10px 8px 4px'}}>// Main</div>
           {[
-            {to:"/app",label:"Dashboard",icon:LayoutDashboard,exact:true},
-            {to:"/app/sales",label:"Sales",icon:ShoppingCart},
-            {to:"/app/customers",label:"Customers",icon:Users},
+            {to:"/app",label:"Dashboard (डॅशबोर्ड)",icon:LayoutDashboard,exact:true},
+            {to:"/app/sales",label:"Sales (विक्री)",icon:ShoppingCart},
+            {to:"/app/customers",label:"Customers (ग्राहक)",icon:Users},
           ].map(n=>(
             <Link key={n.to} to={n.to}
               className={cn("flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 hover:translate-x-[2px]")}
@@ -181,12 +181,12 @@ function AppLayout() {
           {/* // FINANCE */}
           <div style={{fontFamily:"'Silkscreen',monospace",fontSize:'8px',color:'#AAAAAA',letterSpacing:'.18em',textTransform:'uppercase',padding:'14px 8px 4px'}}>// Finance</div>
           {[
-            {to:"/app/udhari",label:"Credit Book",icon:IndianRupee},
+            {to:"/app/udhari",label:"Credit Book (उधारी)",icon:IndianRupee},
             {to:"/app/payments",label:"Payments (उधारी-जमा)",icon:Wallet},
-            {to:"/app/expenses",label:"Expenses",icon:Receipt},
-            {to:"/app/cashbook",label:"Cash Book",icon:BookOpen},
-            {to:"/app/payment-inflow",label:"Payment Inflow (उधारी-जमा)",icon:ArrowDownToLine},
-            {to:"/app/payment-outflow",label:"Payment Outflow",icon:ArrowUpFromLine},
+            {to:"/app/expenses",label:"Expenses (खर्च)",icon:Receipt},
+            {to:"/app/cashbook",label:"Cash Book (रोख वही)",icon:BookOpen},
+            {to:"/app/payment-inflow",label:"Payment Inflow (पैसे जमा)",icon:ArrowDownToLine},
+            {to:"/app/payment-outflow",label:"Payment Outflow (पैसे दिले)",icon:ArrowUpFromLine},
             {to:"/app/outstanding",label:"Outstanding (उधारी देणे)",icon:Coins},
           ].map(n=>(
             <Link key={n.to} to={n.to}
@@ -202,11 +202,11 @@ function AppLayout() {
           {/* // MANAGE */}
           <div style={{fontFamily:"'Silkscreen',monospace",fontSize:'8px',color:'#AAAAAA',letterSpacing:'.18em',textTransform:'uppercase',padding:'14px 8px 4px'}}>// Manage</div>
           {[
-            {to:"/app/products",label:"Products",icon:Package},
-            {to:"/app/delivery-boys",label:"Delivery Boys",icon:Truck},
-            {to:"/app/analytics",label:"Analytics",icon:BarChart2},
-            {to:"/app/reports",label:"Reports",icon:Receipt},
-            {to:"/app/profile",label:"Profile",icon:UserCog},
+            {to:"/app/products",label:"Products (उत्पादने)",icon:Package},
+            {to:"/app/delivery-boys",label:"Delivery Boys (डिलिव्हरी बॉय)",icon:Truck},
+            {to:"/app/analytics",label:"Analytics (विश्लेषण)",icon:BarChart2},
+            {to:"/app/reports",label:"Reports (अहवाल)",icon:Receipt},
+            {to:"/app/profile",label:"Profile (प्रोफाइल)",icon:UserCog},
             ...(isAdmin?[{to:"/app/users",label:"Users",icon:UserCog}]:[]),
           ].map(n=>(
             <Link key={n.to} to={n.to}
