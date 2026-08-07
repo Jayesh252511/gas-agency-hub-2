@@ -278,12 +278,12 @@ function Dash() {
         alignItems:'center', flexWrap:'wrap', gap:16,
         boxShadow:'0 2px 8px rgba(0,0,0,0.03)', position:'relative', overflow:'hidden'
       }} className="dark:bg-[#1A1A1A] dark:border-white/10">
-        <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:'#FF6B00'}}/>
+        <div style={{position:'absolute',top:0,left:0,right:0,height:3}} className="bg-foreground"/>
         <div style={{display:'flex',alignItems:'center',gap:14,minWidth:0}}>
           {(agency as any)?.logo_url
             ?<img src={(agency as any).logo_url} style={{width:48,height:48,borderRadius:12,objectFit:'cover',border:'1px solid #E8E8E8',flexShrink:0}} alt="Agency Logo"/>
-            :<div style={{width:48,height:48,borderRadius:12,background:'#FF6B00',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,boxShadow:'0 4px 14px rgba(255,107,0,0.3)'}}>
-              <Flame className="w-6 h-6 text-white animate-pulse"/>
+            :<div style={{width:48,height:48,borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,boxShadow:'0 4px 14px rgba(0,0,0,0.15)'}} className="bg-foreground text-background">
+              <Flame className="w-6 h-6 animate-pulse"/>
             </div>
           }
           <div style={{minWidth:0}}>
@@ -291,7 +291,7 @@ function Dash() {
               {agency?.name ?? "LPG Distributorship"}
             </h1>
             <div style={{display:'flex',alignItems:'center',gap:8,marginTop:4}}>
-              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:10,fontWeight:700,color:'#FF6B00',background:'rgba(255,107,0,0.08)',border:'1px solid rgba(255,107,0,0.2)',padding:'2px 8px',borderRadius:4,letterSpacing:'.1em'}}>
+              <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:10,fontWeight:700,padding:'2px 8px',borderRadius:4,letterSpacing:'.1em'}} className="bg-muted text-foreground border border-border">
                 {agency?.code || "LPG"}
               </span>
               <span style={{fontFamily:"'Silkscreen',monospace",fontSize:8,color:'#AAAAAA',letterSpacing:'.18em',textTransform:'uppercase'}}>
@@ -303,7 +303,7 @@ function Dash() {
         <div style={{display:'flex',flexDirection:'column',alignItems:'flex-end'}}>
           <span style={{fontFamily:"'Silkscreen',monospace",fontSize:8,color:'#AAAAAA',letterSpacing:'.14em',textTransform:'uppercase'}}>Today's Date</span>
           <div style={{display:'flex',alignItems:'center',gap:6,marginTop:4}}>
-            <Calendar className="h-4 w-4" style={{color:'#FF6B00',flexShrink:0}}/>
+            <Calendar className="h-4 w-4 text-foreground" style={{flexShrink:0}}/>
             <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:700,fontSize:14,color:'#111111',letterSpacing:'-0.01em'}} className="dark:text-[#F0F0F0]">
               {fmtDate(todayISO())}
             </span>
@@ -426,9 +426,9 @@ function Dash() {
         <div className="ed-panel">
           <div className="ed-panel-header">
             <span className="ed-panel-title">
-              <Flame className="h-3.5 w-3.5" style={{color:'#FF6B00'}}/> Today's Top Products
+              <Flame className="h-3.5 w-3.5 text-foreground"/> Today's Top Products
             </span>
-            <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:9,fontWeight:600,color:'#FF6B00',letterSpacing:'.08em'}}>Volume</span>
+            <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:9,fontWeight:600,letterSpacing:'.08em'}} className="text-foreground">Volume</span>
           </div>
           <div>
             {busy
@@ -438,12 +438,12 @@ function Dash() {
                 :topProducts.map((p,idx)=>(
                 <div key={p.name} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'13px 20px',borderBottom:'1px solid #F0F0F0'}} className="dark:border-white/5 hover:bg-[#FAFAFA] dark:hover:bg-white/[0.02] transition-colors">
                   <div style={{display:'flex',alignItems:'center',gap:10,minWidth:0}}>
-                    <span style={{fontFamily:"'Silkscreen',monospace",fontSize:9,color:'#FF6B00',width:16}}>#{idx+1}</span>
+                    <span style={{fontFamily:"'Silkscreen',monospace",fontSize:9,width:16}} className="text-foreground">#{idx+1}</span>
                     <p style={{fontFamily:"'Inter',sans-serif",fontWeight:600,fontSize:14,color:'#111111',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}} className="dark:text-[#E0E0E0]">
                       {p.name}
                     </p>
                   </div>
-                  <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:700,fontSize:13,color:'#FF6B00',background:'rgba(255,107,0,0.08)',border:'1px solid rgba(255,107,0,0.15)',padding:'3px 10px',borderRadius:6,flexShrink:0}}>
+                  <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:700,fontSize:13,padding:'3px 10px',borderRadius:6,flexShrink:0}} className="bg-muted text-foreground border border-border">
                     {p.qty} unit{p.qty!==1?'s':''}
                   </span>
                 </div>
@@ -459,7 +459,7 @@ function Dash() {
 }
 
 function KpiCard({label,value,desc,accent,icon}:{label:string;value:string;desc:string;accent:'orange'|'green'|'red'|'amber';icon:React.ReactNode}) {
-  const accentColor = {orange:'#FF6B00',green:'#10B981',red:'#EF4444',amber:'#F59E0B'}[accent];
+  const accentColor = {orange:'var(--foreground)',green:'#10B981',red:'#EF4444',amber:'#F59E0B'}[accent];
   return (
     <div className={`kpi-card kpi-${accent}`}>
       <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:10}}>
@@ -468,7 +468,7 @@ function KpiCard({label,value,desc,accent,icon}:{label:string;value:string;desc:
           <div className="kpi-value" style={{color:accentColor}}>{value}</div>
           <div className="kpi-desc">{desc}</div>
         </div>
-        <div className="kpi-icon" style={{background:`${accentColor}14`,color:accentColor}}>
+        <div className="kpi-icon" style={{background:accent==='orange'?'rgba(0,0,0,0.06)':`${accentColor}14`,color:accentColor}}>
           {icon}
         </div>
       </div>

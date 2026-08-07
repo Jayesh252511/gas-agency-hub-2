@@ -233,7 +233,7 @@ function PaymentInflowPage() {
   return (
     <div className="space-y-6 animate-page-in">
       <PageHeader
-        title="Payment Inflow (पैसे जमा)"
+        title="Payment Inflow"
         subtitle="Miscellaneous cash receipts — these appear in the Cashbook received side"
         actions={
           <Button onClick={() => setIsOpen(true)} className="h-11 gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold">

@@ -26,21 +26,21 @@ export const Route = createFileRoute("/app")({
 });
 
 const NAV = [
-  { to: "/app", label: "Dashboard (डॅशबोर्ड)", icon: LayoutDashboard, exact: true },
-  { to: "/app/sales", label: "Sales (विक्री)", icon: ShoppingCart },
-  { to: "/app/customers", label: "Customers (ग्राहक)", icon: Users },
+  { to: "/app", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { to: "/app/sales", label: "Sales", icon: ShoppingCart },
+  { to: "/app/customers", label: "Customers", icon: Users },
   { to: "/app/udhari", label: "Credit Book (उधारी)", icon: IndianRupee },
   { to: "/app/payments", label: "Payments (उधारी-जमा)", icon: Wallet },
-  { to: "/app/expenses", label: "Expenses (खर्च)", icon: Receipt },
-  { to: "/app/products", label: "Products (उत्पादने)", icon: Package },
-  { to: "/app/delivery-boys", label: "Delivery Boys (डिलिव्हरी बॉय)", icon: Truck },
-  { to: "/app/cashbook", label: "Cash Book (रोख वही)", icon: BookOpen },
-  { to: "/app/payment-inflow", label: "Payment Inflow (पैसे जमा)", icon: ArrowDownToLine },
-  { to: "/app/payment-outflow", label: "Payment Outflow (पैसे दिले)", icon: ArrowUpFromLine },
+  { to: "/app/expenses", label: "Expenses", icon: Receipt },
+  { to: "/app/products", label: "Products", icon: Package },
+  { to: "/app/delivery-boys", label: "Delivery Boys", icon: Truck },
+  { to: "/app/cashbook", label: "Cash Book", icon: BookOpen },
+  { to: "/app/payment-inflow", label: "Payment Inflow", icon: ArrowDownToLine },
+  { to: "/app/payment-outflow", label: "Payment Outflow", icon: ArrowUpFromLine },
   { to: "/app/outstanding", label: "Outstanding (उधारी देणे)", icon: Coins },
-  { to: "/app/analytics", label: "Analytics (विश्लेषण)", icon: BarChart2 },
-  { to: "/app/reports", label: "Reports (अहवाल)", icon: Receipt },
-  { to: "/app/profile", label: "Profile (प्रोफाइल)", icon: UserCog },
+  { to: "/app/analytics", label: "Analytics", icon: BarChart2 },
+  { to: "/app/reports", label: "Reports", icon: Receipt },
+  { to: "/app/profile", label: "Profile", icon: UserCog },
 ] as const;
 
 function AppLayout() {
@@ -58,7 +58,7 @@ function AppLayout() {
   useEffect(() => {
     // Initial theme setup
     const isDark = localStorage.getItem("theme") === "dark" ||
-      (!localStorage.getItem("theme") && window.matchMedia("(prefers-color-scheme: dark)").matches);
+      (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches);
     if (isDark) {
       document.documentElement.classList.add("dark");
       setTheme("dark");
@@ -76,14 +76,14 @@ function AppLayout() {
   }, []);
 
   const toggleTheme = () => {
-    const nextTheme = theme === "dark" ? "light" : "dark";
-    setTheme(nextTheme);
-    if (nextTheme === "dark") {
+    if (theme === "light") {
       document.documentElement.classList.add("dark");
       localStorage.setItem("theme", "dark");
+      setTheme("dark");
     } else {
       document.documentElement.classList.remove("dark");
       localStorage.setItem("theme", "light");
+      setTheme("light");
     }
   };
 
@@ -104,11 +104,10 @@ function AppLayout() {
   }, [roles]);
 
   const navItems = useMemo(() => {
-    const items = [...NAV] as any[];
-    if (isAdmin) {
-      items.push({ to: "/app/users", label: "Users", icon: UserCog });
-    }
-    return items;
+    return NAV.filter((item) => {
+      if (item.to === "/app/users" && !isAdmin) return false;
+      return true;
+    });
   }, [isAdmin]);
 
   async function signOut() {
@@ -128,7 +127,7 @@ function AppLayout() {
               {me?.agency?.logo_url ? (
                 <img src={me.agency.logo_url} style={{width:36,height:36,borderRadius:10,objectFit:'cover',border:'1px solid var(--sidebar-border)',flexShrink:0}} alt="Agency Logo"/>
               ) : (
-                <div style={{width:36,height:36,borderRadius:10,background:'#FF6B00',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,boxShadow:'0 2px 8px rgba(255,107,0,0.3)'}}>
+                <div style={{width:36,height:36,borderRadius:10,background:'var(--foreground)',color:'var(--background)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,boxShadow:'0 2px 8px rgba(0,0,0,0.15)'}}>
                   <Flame className="w-4 h-4"/>
                 </div>
               )}
@@ -136,7 +135,7 @@ function AppLayout() {
                 <div style={{fontFamily:"'Space Grotesk','Inter',sans-serif",fontWeight:700,fontSize:14,letterSpacing:'-0.01em',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',color:'var(--sidebar-foreground)'}}>
                   {me?.agency?.name ?? "LPG Agency"}
                 </div>
-                <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:10,color:'#FF6B00',letterSpacing:'.1em',marginTop:2}}>
+                <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:10,color:'var(--foreground)',letterSpacing:'.1em',marginTop:2}}>
                   {me?.agency?.code ?? ""}
                 </div>
               </div>
@@ -145,15 +144,15 @@ function AppLayout() {
               <NotificationCenter align="left"/>
               <button onClick={toggleTheme} style={{padding:'6px',borderRadius:8,background:'transparent',border:'none',cursor:'pointer',color:'var(--muted-foreground)',transition:'color .2s'}} title={theme==="dark"?"Switch to Light":"Switch to Dark"}>
                 <div className={cn("transition-transform duration-500",theme==="dark"?"rotate-[360deg] scale-110":"rotate-0")}>
-                  {theme==="dark"?<Sun className="w-4 h-4" style={{color:'#F59E0B'}}/>:<Moon className="w-4 h-4"/>}
+                  {theme==="dark"?<Sun className="w-4 h-4"/>:<Moon className="w-4 h-4"/>}
                 </div>
               </button>
             </div>
           </div>
         </div>
 
-        {/* Search */}
-        <div style={{padding:'12px 14px 4px'}}>
+        {/* Global Search */}
+        <div style={{padding:'12px 14px 6px'}}>
           <GlobalSearch/>
         </div>
 
@@ -163,14 +162,14 @@ function AppLayout() {
           {/* // MAIN */}
           <div style={{fontFamily:"'Silkscreen',monospace",fontSize:'8px',color:'#AAAAAA',letterSpacing:'.18em',textTransform:'uppercase',padding:'10px 8px 4px'}}>// Main</div>
           {[
-            {to:"/app",label:"Dashboard (डॅशबोर्ड)",icon:LayoutDashboard,exact:true},
-            {to:"/app/sales",label:"Sales (विक्री)",icon:ShoppingCart},
-            {to:"/app/customers",label:"Customers (ग्राहक)",icon:Users},
+            {to:"/app",label:"Dashboard",icon:LayoutDashboard,exact:true},
+            {to:"/app/sales",label:"Sales",icon:ShoppingCart},
+            {to:"/app/customers",label:"Customers",icon:Users},
           ].map(n=>(
             <Link key={n.to} to={n.to}
               className={cn("flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 hover:translate-x-[2px]")}
               style={{fontFamily:"'Inter',sans-serif",fontWeight:500,fontSize:13,color:'var(--sidebar-foreground)',textDecoration:'none'}}
-              activeProps={{className:"nav-item-active",style:{fontFamily:"'Inter',sans-serif",fontWeight:600,fontSize:13,color:'#FF6B00',textDecoration:'none',background:'rgba(255,107,0,0.08)',borderLeft:'3px solid #FF6B00',paddingLeft:9}}}
+              activeProps={{className:"nav-item-active",style:{fontFamily:"'Inter',sans-serif",fontWeight:600,fontSize:13,color:'var(--foreground)',textDecoration:'none',background:'var(--muted)',borderLeft:'3px solid var(--foreground)',paddingLeft:9}}}
               activeOptions={{exact:(n as any).exact}}
             >
               <n.icon className="w-4 h-4 shrink-0"/>
@@ -183,16 +182,16 @@ function AppLayout() {
           {[
             {to:"/app/udhari",label:"Credit Book (उधारी)",icon:IndianRupee},
             {to:"/app/payments",label:"Payments (उधारी-जमा)",icon:Wallet},
-            {to:"/app/expenses",label:"Expenses (खर्च)",icon:Receipt},
-            {to:"/app/cashbook",label:"Cash Book (रोख वही)",icon:BookOpen},
-            {to:"/app/payment-inflow",label:"Payment Inflow (पैसे जमा)",icon:ArrowDownToLine},
-            {to:"/app/payment-outflow",label:"Payment Outflow (पैसे दिले)",icon:ArrowUpFromLine},
+            {to:"/app/expenses",label:"Expenses",icon:Receipt},
+            {to:"/app/cashbook",label:"Cash Book",icon:BookOpen},
+            {to:"/app/payment-inflow",label:"Payment Inflow",icon:ArrowDownToLine},
+            {to:"/app/payment-outflow",label:"Payment Outflow",icon:ArrowUpFromLine},
             {to:"/app/outstanding",label:"Outstanding (उधारी देणे)",icon:Coins},
           ].map(n=>(
             <Link key={n.to} to={n.to}
               style={{fontFamily:"'Inter',sans-serif",fontWeight:500,fontSize:13,color:'var(--sidebar-foreground)',textDecoration:'none'}}
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 hover:translate-x-[2px]"
-              activeProps={{className:"nav-item-active",style:{fontFamily:"'Inter',sans-serif",fontWeight:600,fontSize:13,color:'#FF6B00',textDecoration:'none',background:'rgba(255,107,0,0.08)',borderLeft:'3px solid #FF6B00',paddingLeft:9}}}
+              activeProps={{className:"nav-item-active",style:{fontFamily:"'Inter',sans-serif",fontWeight:600,fontSize:13,color:'var(--foreground)',textDecoration:'none',background:'var(--muted)',borderLeft:'3px solid var(--foreground)',paddingLeft:9}}}
             >
               <n.icon className="w-4 h-4 shrink-0"/>
               <span>{n.label}</span>
@@ -202,17 +201,17 @@ function AppLayout() {
           {/* // MANAGE */}
           <div style={{fontFamily:"'Silkscreen',monospace",fontSize:'8px',color:'#AAAAAA',letterSpacing:'.18em',textTransform:'uppercase',padding:'14px 8px 4px'}}>// Manage</div>
           {[
-            {to:"/app/products",label:"Products (उत्पादने)",icon:Package},
-            {to:"/app/delivery-boys",label:"Delivery Boys (डिलिव्हरी बॉय)",icon:Truck},
-            {to:"/app/analytics",label:"Analytics (विश्लेषण)",icon:BarChart2},
-            {to:"/app/reports",label:"Reports (अहवाल)",icon:Receipt},
-            {to:"/app/profile",label:"Profile (प्रोफाइल)",icon:UserCog},
+            {to:"/app/products",label:"Products",icon:Package},
+            {to:"/app/delivery-boys",label:"Delivery Boys",icon:Truck},
+            {to:"/app/analytics",label:"Analytics",icon:BarChart2},
+            {to:"/app/reports",label:"Reports",icon:Receipt},
+            {to:"/app/profile",label:"Profile",icon:UserCog},
             ...(isAdmin?[{to:"/app/users",label:"Users",icon:UserCog}]:[]),
           ].map(n=>(
             <Link key={n.to} to={n.to}
               style={{fontFamily:"'Inter',sans-serif",fontWeight:500,fontSize:13,color:'var(--sidebar-foreground)',textDecoration:'none'}}
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 hover:translate-x-[2px]"
-              activeProps={{className:"nav-item-active",style:{fontFamily:"'Inter',sans-serif",fontWeight:600,fontSize:13,color:'#FF6B00',textDecoration:'none',background:'rgba(255,107,0,0.08)',borderLeft:'3px solid #FF6B00',paddingLeft:9}}}
+              activeProps={{className:"nav-item-active",style:{fontFamily:"'Inter',sans-serif",fontWeight:600,fontSize:13,color:'var(--foreground)',textDecoration:'none',background:'var(--muted)',borderLeft:'3px solid var(--foreground)',paddingLeft:9}}}
             >
               <n.icon className="w-4 h-4 shrink-0"/>
               <span>{n.label}</span>
@@ -224,14 +223,14 @@ function AppLayout() {
         <div style={{padding:'12px 14px',borderTop:'1px solid var(--sidebar-border)'}}>
           <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}}>
             <div style={{display:'flex',alignItems:'center',gap:6}}>
-              <span style={{width:6,height:6,borderRadius:2,background:'#10B981',display:'inline-block'}} className="pixel-blink"/>
+              <span style={{width:6,height:6,borderRadius:2,background:'var(--foreground)',display:'inline-block'}} className="pixel-blink"/>
               <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:10,color:'var(--muted-foreground)'}}>
                 {me?.user?.full_name ?? me?.user?.username}
               </span>
             </div>
           </div>
           <button onClick={signOut} style={{width:'100%',display:'flex',alignItems:'center',gap:8,padding:'8px 12px',borderRadius:10,border:'1px solid var(--sidebar-border)',background:'transparent',cursor:'pointer',color:'var(--muted-foreground)',fontFamily:"'Inter',sans-serif",fontSize:13,transition:'all .2s'}}
-            onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='#FF6B00';(e.currentTarget as HTMLButtonElement).style.color='#FF6B00';}}
+            onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='var(--foreground)';(e.currentTarget as HTMLButtonElement).style.color='var(--foreground)';}}
             onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='var(--sidebar-border)';(e.currentTarget as HTMLButtonElement).style.color='var(--muted-foreground)';}}>
             <LogOut className="w-4 h-4"/> Sign Out
           </button>
@@ -249,7 +248,7 @@ function AppLayout() {
           <div style={{display:'flex',alignItems:'center',gap:8}}>
             {me?.agency?.logo_url
               ?<img src={me.agency.logo_url} style={{width:28,height:28,borderRadius:8,objectFit:'cover'}} alt="Agency Logo"/>
-              :<div style={{width:28,height:28,borderRadius:8,background:'#FF6B00',display:'flex',alignItems:'center',justifyContent:'center'}}><Flame className="w-3.5 h-3.5 text-white"/></div>
+              :<div style={{width:28,height:28,borderRadius:8,background:'var(--foreground)',color:'var(--background)',display:'flex',alignItems:'center',justifyContent:'center'}}><Flame className="w-3.5 h-3.5"/></div>
             }
             <span style={{fontFamily:"'Space Grotesk','Inter',sans-serif",fontWeight:700,fontSize:14,letterSpacing:'-0.01em',maxWidth:140,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
               {me?.agency?.name ?? "LPG Agency"}
@@ -259,7 +258,7 @@ function AppLayout() {
             <NotificationCenter/>
             <button onClick={toggleTheme} style={{padding:8,background:'none',border:'none',cursor:'pointer',color:'var(--muted-foreground)'}}>
               <div className={cn("transition-transform duration-500",theme==="dark"?"rotate-[360deg]":"")}>
-                {theme==="dark"?<Sun className="w-5 h-5" style={{color:'#F59E0B'}}/>:<Moon className="w-5 h-5"/>}
+                {theme==="dark"?<Sun className="w-5 h-5"/>:<Moon className="w-5 h-5"/>}
               </div>
             </button>
             <button onClick={signOut} style={{padding:8,marginRight:-8,background:'none',border:'none',cursor:'pointer',color:'var(--muted-foreground)'}}>
@@ -276,11 +275,11 @@ function AppLayout() {
             <div style={{marginBottom:12,padding:'12px 8px 14px',borderBottom:'1px solid var(--sidebar-border)',display:'flex',alignItems:'center',gap:10}}>
               {me?.agency?.logo_url
                 ?<img src={me.agency.logo_url} style={{width:36,height:36,borderRadius:10,objectFit:'cover'}} alt="Agency Logo"/>
-                :<div style={{width:36,height:36,borderRadius:10,background:'#FF6B00',display:'flex',alignItems:'center',justifyContent:'center'}}><Flame className="w-4 h-4 text-white"/></div>
+                :<div style={{width:36,height:36,borderRadius:10,background:'var(--foreground)',color:'var(--background)',display:'flex',alignItems:'center',justifyContent:'center'}}><Flame className="w-4 h-4"/></div>
               }
               <div>
                 <div style={{fontFamily:"'Space Grotesk','Inter',sans-serif",fontWeight:700,fontSize:14,letterSpacing:'-0.01em'}}>{me?.agency?.name}</div>
-                <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:10,color:'#FF6B00',letterSpacing:'.1em'}}>{me?.agency?.code}</div>
+                <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:10,color:'var(--foreground)',letterSpacing:'.1em'}}>{me?.agency?.code}</div>
               </div>
             </div>
             <div style={{marginBottom:12}}><GlobalSearch/></div>
@@ -288,7 +287,7 @@ function AppLayout() {
               {navItems.map(n=>(
                 <Link key={n.to} to={n.to} onClick={()=>setOpen(false)}
                   style={{display:'flex',alignItems:'center',gap:12,padding:'11px 12px',borderRadius:10,fontFamily:"'Inter',sans-serif",fontWeight:500,fontSize:14,color:'var(--sidebar-foreground)',textDecoration:'none',transition:'all .15s'}}
-                  activeProps={{style:{display:'flex',alignItems:'center',gap:12,padding:'11px 9px',borderRadius:10,fontFamily:"'Inter',sans-serif",fontWeight:600,fontSize:14,color:'#FF6B00',textDecoration:'none',background:'rgba(255,107,0,0.08)',borderLeft:'3px solid #FF6B00'}}}
+                  activeProps={{style:{display:'flex',alignItems:'center',gap:12,padding:'11px 9px',borderRadius:10,fontFamily:"'Inter',sans-serif",fontWeight:600,fontSize:14,color:'var(--foreground)',textDecoration:'none',background:'var(--muted)',borderLeft:'3px solid var(--foreground)'}}}
                   activeOptions={{exact:(n as any).exact}}
                 >
                   <n.icon className="w-5 h-5 shrink-0"/>{n.label}
@@ -316,7 +315,7 @@ function AppLayout() {
             <Link key={n.to} to={n.to}
               activeOptions={{exact:(n as any).exact}}
               style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',flex:1,height:'100%',textDecoration:'none',color:'var(--muted-foreground)',gap:3,fontFamily:"'Inter',sans-serif",fontSize:10,fontWeight:500,transition:'color .2s'}}
-              activeProps={{style:{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',flex:1,height:'100%',textDecoration:'none',color:'#FF6B00',gap:3,fontFamily:"'Inter',sans-serif",fontSize:10,fontWeight:700}}}
+              activeProps={{style:{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',flex:1,height:'100%',textDecoration:'none',color:'var(--foreground)',gap:3,fontFamily:"'Inter',sans-serif",fontSize:10,fontWeight:700}}}
             >
               <n.icon className="w-5 h-5"/>
               <span>{n.label}</span>

@@ -454,7 +454,8 @@
   content: '';
   position: absolute; top: 0; left: 0; right: 0; height: 3px;
 }
-.kpi-orange::before  { background: #FF6B00; }
+.kpi-orange::before  { background: #000000; }
+.dark .kpi-orange::before { background: #FFFFFF; }
 .kpi-green::before   { background: #10B981; }
 .kpi-red::before     { background: #EF4444; }
 .kpi-amber::before   { background: #F59E0B; }
@@ -491,10 +492,14 @@
 .kpi-icon {
   width: 36px; height: 36px;
   border-radius: 10px;
-  background: rgba(255,107,0,0.08);
-  color: #FF6B00;
+  background: rgba(0,0,0,0.06);
+  color: #111111;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
+}
+.dark .kpi-icon {
+  background: rgba(255,255,255,0.1);
+  color: #FFFFFF;
 }
 
 /* ── EDITORIAL SECTION PANEL ── */
@@ -531,11 +536,16 @@
 .ed-live-badge {
   font-family: 'JetBrains Mono', monospace;
   font-size: 9px; font-weight: 600;
-  color: #FF6B00;
-  background: rgba(255,107,0,0.08);
-  border: 1px solid rgba(255,107,0,0.2);
+  color: #111111;
+  background: rgba(0,0,0,0.06);
+  border: 1px solid rgba(0,0,0,0.15);
   padding: 2px 8px; border-radius: 99px;
   letter-spacing: 0.08em;
+}
+.dark .ed-live-badge {
+  color: #FFFFFF;
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.2);
 }
 .ed-alert-badge {
   font-family: 'JetBrains Mono', monospace;
@@ -560,9 +570,13 @@
   border-color: rgba(255,255,255,0.07);
 }
 .qa-card:hover {
-  border-color: #FF6B00;
+  border-color: #000000;
   transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(255,107,0,0.12);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+.dark .qa-card:hover {
+  border-color: #FFFFFF;
+  box-shadow: 0 8px 20px rgba(255,255,255,0.08);
 }
 .qa-icon {
   width: 40px; height: 40px;
@@ -574,8 +588,12 @@
 }
 .dark .qa-icon { background: #252525; color: #888888; }
 .qa-card:hover .qa-icon {
-  background: rgba(255,107,0,0.1);
-  color: #FF6B00;
+  background: #000000;
+  color: #FFFFFF;
+}
+.dark .qa-card:hover .qa-icon {
+  background: #FFFFFF;
+  color: #000000;
 }
 .qa-label {
   font-family: 'Inter', sans-serif;
@@ -646,31 +664,47 @@
 .app-editorial input:focus,
 .app-editorial select:focus,
 .app-editorial textarea:focus {
-  border-color: #FF6B00 !important;
-  box-shadow: 0 0 0 3px rgba(255,107,0,0.1) !important;
+  border-color: #000000 !important;
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.08) !important;
   outline: none !important;
+}
+.dark .app-editorial input:focus,
+.dark .app-editorial select:focus,
+.dark .app-editorial textarea:focus {
+  border-color: #FFFFFF !important;
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.15) !important;
 }
 
 /* ── SIDEBAR NAV ACTIVE INDICATOR ── */
 .nav-item-active {
-  background: rgba(255,107,0,0.08) !important;
-  color: #FF6B00 !important;
-  border-left: 3px solid #FF6B00 !important;
+  background: rgba(0,0,0,0.06) !important;
+  color: #000000 !important;
+  border-left: 3px solid #000000 !important;
+}
+.dark .nav-item-active {
+  background: rgba(255,255,255,0.1) !important;
+  color: #FFFFFF !important;
+  border-left: 3px solid #FFFFFF !important;
 }
 .nav-item-active svg {
-  color: #FF6B00 !important;
+  color: currentColor !important;
 }
 
-/* ── SECTION NUMBER BADGE (like landing) ── */
+/* ── SECTION NUMBER BADGE ── */
 .sec-badge {
   display: inline-flex; align-items: center; gap: 8px;
   font-family: 'Silkscreen', monospace;
   font-size: 9px; font-weight: 700;
-  color: #FF6B00; letter-spacing: 0.16em; text-transform: uppercase;
-  background: rgba(255,107,0,0.08);
-  border: 1px solid rgba(255,107,0,0.18);
+  color: #111111; letter-spacing: 0.16em; text-transform: uppercase;
+  background: rgba(0,0,0,0.05);
+  border: 1px solid rgba(0,0,0,0.15);
   padding: 4px 12px; border-radius: 9999px;
   width: fit-content; margin-bottom: 8px;
+}
+.dark .sec-badge {
+  color: #FFFFFF;
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.2);
 }
 
 /* ── AMOUNT TEXT ── */
