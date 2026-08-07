@@ -45,19 +45,12 @@ export function NotificationCenter({ align = "right" }: NotificationCenterProps)
     const notifs: Notification[] = [];
 
     try {
-      // Outstanding customers — compute balance per customer
-      const { data: ledger } = await (supabase.from("customer_ledger") as any)
-        .select("customer_id, debit, credit").eq("agency_id", agency.id);
-      const { data: customers } = await supabase.from("customers")
-        .select("id, name, mobile").eq("agency_id", agency.id).eq("is_deleted", false);
-
-      const balMap: Record<string, number> = {};
-      (ledger ?? []).forEach((r: any) => {
-        balMap[r.customer_id] = (balMap[r.customer_id] ?? 0) + Number(r.debit || 0) - Number(r.credit || 0);
-      });
+      // Outstanding customers — read balance directly from active customers
+      const { data: customers } = await (supabase.from("customers") as any)
+        .select("id, name, mobile, outstanding:outstanding_balance").eq("agency_id", agency.id).eq("is_deleted", false);
 
       (customers ?? []).forEach((c: any) => {
-        const bal = balMap[c.id] ?? 0;
+        const bal = Number(c.outstanding || 0);
         if (bal >= 5000) {
           notifs.push({
             id: `overdue-high-${c.id}`,

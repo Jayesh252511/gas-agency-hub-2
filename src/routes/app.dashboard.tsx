@@ -91,8 +91,8 @@ function Dash() {
       const commissionPaid = ((salesQ.data ?? []) as any[]).reduce((a, r) => a + Number(r.commission_amount), 0);
       const expenses = ((expQ.data ?? []) as any[]).reduce((a, r) => a + Number(r.amount), 0);
       
-      // Calculate Outstanding Udhari dynamically and authoritatively from the ledger
-      const outstanding = ((ledgerQ.data ?? []) as any[]).reduce((a, r) => a + Number(r.debit || 0) - Number(r.credit || 0), 0);
+      // Calculate Outstanding Udhari dynamically and authoritatively from active customer balances
+      const outstanding = ((custQ.data ?? []) as any[]).reduce((a, r) => a + Number(r.outstanding || 0), 0);
       const openingCash = Number(cashQ.data?.opening_cash ?? 0);
 
       // Parse Other Cash Receipts today
