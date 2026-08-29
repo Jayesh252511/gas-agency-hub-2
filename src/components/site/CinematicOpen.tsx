@@ -60,14 +60,18 @@ export function CinematicOpen() {
           ))}
         </div>
 
-        {/* ── Dark City Night Image (Parallax) ── */}
+        {/* ── Updated Digital Transformation Video Background ── */}
         <motion.div className="absolute inset-0 z-[2]" style={{ y: parallaxCity }}>
-          <img
-            src="/pixel-city-night.png"
-            alt="Pixel art Indian LPG agency city at night"
-            className="absolute bottom-0 left-0 w-full pixelated"
-            style={{ height: "76%", objectFit: "cover", objectPosition: "bottom" }}
-          />
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="h-full w-full object-cover opacity-60"
+            poster="/pixel-city-night.png"
+          >
+            <source src="/lpg-ledger-digital-transformation.mp4" type="video/mp4" />
+          </video>
         </motion.div>
 
         {/* ── Subtle horizon ember ambient glow ── */}
