@@ -53,7 +53,7 @@ export function OldWay() {
             />
             <ul className="mt-6 space-y-2">
               {PAINS.map((t, i) => {
-                const start = 0.08 + i * 0.13;
+                const start = 0.02 + i * 0.10;
                 return (
                   <PainLine key={t} text={t} progress={p} start={start} reduced={reduced} />
                 );
@@ -75,12 +75,12 @@ export function OldWay() {
             className="absolute inset-x-5 top-1/2 mx-auto max-w-md -translate-y-1/2 rounded-2xl border border-primary/40 bg-charcoal-soft p-5 text-left shadow-glow"
           >
             <div className="font-pixel text-[8px] tracking-tight text-primary">LEDGER.LIVE</div>
-            <div className="mt-2 font-mono text-3xl font-bold text-secondary">₹24,580</div>
-            <div className="mt-1 font-mono text-xs text-success">▲ 12% · all entries synced</div>
+            <div className="mt-2 font-mono text-3xl font-bold text-white">₹24,580</div>
+            <div className="mt-1 font-mono text-xs text-success font-semibold">▲ 12% · all entries synced</div>
             <div className="mt-4 grid grid-cols-3 gap-2">
               {["SALES", "UDHARI", "STOCK"].map((k) => (
-                <div key={k} className="rounded-md border border-white/10 px-2 py-2 text-center">
-                  <span className="font-pixel text-[7px] text-secondary/60">{k}</span>
+                <div key={k} className="rounded-md border border-white/15 px-2 py-2 text-center bg-black/40">
+                  <span className="font-pixel text-[7px] text-gray-300">{k}</span>
                 </div>
               ))}
             </div>
@@ -88,7 +88,7 @@ export function OldWay() {
 
           <motion.h2
             style={reduced ? undefined : { opacity: headOpacity }}
-            className="relative mt-12 font-display text-2xl font-bold leading-tight tracking-tight text-secondary sm:text-4xl"
+            className="relative mt-12 font-display text-2xl font-bold leading-tight tracking-tight text-white sm:text-4xl"
           >
             THE REGISTER IS DEAD.
             <br />
@@ -111,12 +111,13 @@ function PainLine({
   start: number;
   reduced: boolean;
 }) {
-  const opacity = useTransform(progress, [start, start + 0.08], [0, 1]);
-  const y = useTransform(progress, [start, start + 0.08], [14, 0]);
+  const opacity = useTransform(progress, [start, start + 0.06], [0.35, 1]);
+  const y = useTransform(progress, [start, start + 0.06], [10, 0]);
   return (
     <motion.li
       style={reduced ? undefined : { opacity, y }}
-      className="font-pixel text-[10px] leading-relaxed tracking-tight text-secondary/80 sm:text-xs"
+      className="font-pixel text-xs leading-relaxed tracking-tight text-amber-200 sm:text-sm font-semibold"
+      style={{ textShadow: "0 1px 8px rgba(0,0,0,0.9)" }}
     >
       &gt; {text}
     </motion.li>

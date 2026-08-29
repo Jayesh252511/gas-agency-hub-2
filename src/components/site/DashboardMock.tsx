@@ -11,7 +11,7 @@ export function DashboardMock({ compact = false }: { compact?: boolean }) {
         <span className="font-pixel text-[8px] tracking-tight text-primary sm:text-[10px]">
           AGENCY.OS / LIVE
         </span>
-        <span className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-widest text-secondary/70">
+        <span className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-widest text-gray-300">
           <span className="h-1.5 w-1.5 rounded-full bg-success animate-ember" /> synced
         </span>
       </div>
@@ -30,7 +30,7 @@ export function DashboardMock({ compact = false }: { compact?: boolean }) {
             transition={{ delay: i * 0.08 }}
             className="rounded-lg border border-white/10 bg-charcoal-soft p-2 sm:p-3"
           >
-            <div className="font-pixel text-[7px] tracking-tight text-secondary/50 sm:text-[8px]">
+            <div className="font-pixel text-[7px] tracking-tight text-gray-400 sm:text-[8px]">
               {m.k}
             </div>
             <div className={`mt-1 font-mono text-xs font-bold sm:text-base ${m.c}`}>{m.v}</div>
@@ -67,12 +67,12 @@ export function DashboardMock({ compact = false }: { compact?: boolean }) {
           ].map(([n, d, a, c]) => (
             <div
               key={n}
-              className="flex items-center justify-between rounded-md border border-white/5 bg-charcoal-soft/60 px-2.5 py-1.5"
+              className="flex items-center justify-between rounded-md border border-white/10 bg-charcoal-soft/80 px-2.5 py-1.5"
             >
-              <span className="truncate font-sans text-[10px] text-secondary/80 sm:text-xs">
-                {n} · <span className="text-secondary/50">{d}</span>
+              <span className="truncate font-sans text-[10px] text-white sm:text-xs font-medium">
+                {n} · <span className="text-gray-400">{d}</span>
               </span>
-              <span className={`font-mono text-[10px] sm:text-xs ${c}`}>{a}</span>
+              <span className={`font-mono text-[10px] sm:text-xs font-bold ${c}`}>{a}</span>
             </div>
           ))}
         </div>

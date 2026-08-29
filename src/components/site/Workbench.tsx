@@ -53,7 +53,7 @@ function CountUp({ to, className }: { to: number; className?: string }) {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block font-pixel text-[8px] tracking-tight text-muted-foreground">
+      <span className="mb-1.5 block font-pixel text-[8px] tracking-tight text-gray-400">
         {label}
       </span>
       {children}
@@ -62,7 +62,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 const selectCls =
-  "w-full rounded-md border border-hairline bg-card px-3 py-2 font-mono text-xs text-foreground";
+  "w-full rounded-md border border-white/15 bg-[#161616] px-3 py-2 font-mono text-xs text-white";
 
 /* ---------------- 1. Sales ---------------- */
 
@@ -673,7 +673,7 @@ export function Workbench() {
                 }`}
               />
             ))}
-            <span className="ml-auto font-pixel text-[8px] text-secondary/50">
+            <span className="ml-auto font-pixel text-[8px] text-gray-400">
               SYS.ACTIVE
             </span>
           </div>
@@ -693,8 +693,8 @@ export function Workbench() {
                   onClick={() => setActive(i)}
                   className={`shrink-0 rounded-lg px-3 py-2.5 text-left font-display text-[11px] font-bold uppercase tracking-wide transition-all duration-150 lg:w-full ${
                     i === active
-                      ? "translate-y-px bg-primary text-primary-foreground shadow-none"
-                      : "border border-white/10 bg-charcoal-soft text-secondary/70 shadow-[0_3px_0_0_rgba(0,0,0,0.5)] hover:text-secondary"
+                      ? "translate-y-px bg-primary text-white shadow-none"
+                      : "border border-white/15 bg-charcoal-soft text-gray-300 shadow-[0_3px_0_0_rgba(0,0,0,0.5)] hover:text-white hover:bg-white/10"
                   }`}
                 >
                   <span className="mr-2 font-pixel text-[8px] opacity-70">
@@ -705,12 +705,12 @@ export function Workbench() {
               ))}
             </div>
 
-            <div className="overflow-hidden rounded-xl bg-background">
-              <div className="flex items-center gap-2 border-b border-hairline bg-surface-2 px-3 py-2">
+            <div className="overflow-hidden rounded-xl bg-[#141414] border border-white/10">
+              <div className="flex items-center gap-2 border-b border-white/10 bg-[#1A1A1A] px-3 py-2">
                 <span className="h-2.5 w-2.5 rounded-full bg-danger" />
                 <span className="h-2.5 w-2.5 rounded-full bg-warn" />
                 <span className="h-2.5 w-2.5 rounded-full bg-success" />
-                <span className="ml-2 truncate rounded bg-card px-2 py-1 font-mono text-[10px] text-muted-foreground">
+                <span className="ml-2 truncate rounded bg-black/50 px-2 py-1 font-mono text-[10px] text-gray-400">
                   {tab.url}
                 </span>
               </div>
@@ -721,10 +721,10 @@ export function Workbench() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.99 }}
                   transition={{ duration: 0.25 }}
-                  className="p-4 sm:p-6"
+                  className="p-4 sm:p-6 text-white"
                 >
-                  <h3 className="font-display text-lg font-bold tracking-tight">{tab.label}</h3>
-                  <p className="mb-5 mt-1.5 max-w-2xl text-xs leading-relaxed text-muted-foreground">
+                  <h3 className="font-display text-lg font-bold tracking-tight text-white">{tab.label}</h3>
+                  <p className="mb-5 mt-1.5 max-w-2xl text-xs leading-relaxed text-gray-300">
                     {tab.desc}
                   </p>
                   <Active />

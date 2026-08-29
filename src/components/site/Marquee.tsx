@@ -23,7 +23,7 @@ function Row({ dir }: { dir: "left" | "right" }) {
         {items.map((t, i) => (
           <span
             key={`${t}-${i}`}
-            className="flex items-center whitespace-nowrap px-5 py-3 font-mono text-xs uppercase tracking-[0.2em] text-secondary sm:text-sm"
+            className="flex items-center whitespace-nowrap px-5 py-3 font-mono text-xs uppercase tracking-[0.2em] text-white font-medium sm:text-sm"
           >
             {t}
             <span className="ml-5 text-primary">•</span>

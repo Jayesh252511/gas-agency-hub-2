@@ -1,5 +1,6 @@
 import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import { DashboardMock } from "./DashboardMock";
 
 function Odometer({ value, suffix, prefix }: { value: number; suffix?: string; prefix?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -37,10 +38,10 @@ export function Showcase() {
         <span className="font-pixel text-[10px] tracking-tight text-primary">
           ▶ POWERFUL FEATURES
         </span>
-        <h2 className="mt-3 max-w-3xl font-display text-3xl font-bold leading-tight tracking-tight text-secondary sm:text-4xl lg:text-5xl">
+        <h2 className="mt-3 max-w-3xl font-display text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl">
           ALL THE TOOLS YOU NEED, ONE POWERFUL PLATFORM
         </h2>
-        <p className="mt-4 max-w-2xl text-sm leading-relaxed text-secondary/60">
+        <p className="mt-4 max-w-2xl text-sm leading-relaxed text-gray-300">
           Designed pixel-perfect for India's LPG distributors. Web, Mobile &amp; Tablet — all
           synced in real time. Works offline. Start your agency running same day.
         </p>
@@ -57,10 +58,10 @@ export function Showcase() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.12, type: "spring", stiffness: 90, damping: 18 }}
-              className="rounded-2xl border border-white/10 bg-charcoal-soft p-6"
+              className="rounded-2xl border border-white/15 bg-charcoal-soft p-6"
             >
               <Odometer value={s.v} suffix={s.suffix} prefix={s.prefix} />
-              <p className="mt-2 font-mono text-[11px] uppercase tracking-widest text-secondary/50">
+              <p className="mt-2 font-mono text-[11px] uppercase tracking-widest text-gray-400">
                 {s.label}
               </p>
             </motion.div>
@@ -72,17 +73,19 @@ export function Showcase() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
           transition={{ type: "spring", stiffness: 60, damping: 20 }}
-          className="relative mt-14"
+          className="relative mt-14 rounded-2xl border border-white/15 bg-charcoal-soft p-2 sm:p-4 shadow-panel overflow-hidden"
         >
-          <div className="absolute inset-x-10 bottom-0 h-24 rounded-full bg-primary/30 blur-3xl animate-breathe" />
-          <img
-            src="/pixel-dashboard.png"
-            alt="Retro pixel art preview of the GasAgency Hub ERP dashboard"
-            loading="lazy"
-            width={1536}
-            height={896}
-            className="relative w-full rounded-xl border border-white/10 object-cover pixelated animate-bob"
-          />
+          <div className="flex items-center gap-2 border-b border-white/10 px-3 py-2">
+            <span className="h-2.5 w-2.5 rounded-full bg-danger" />
+            <span className="h-2.5 w-2.5 rounded-full bg-warn" />
+            <span className="h-2.5 w-2.5 rounded-full bg-success" />
+            <span className="ml-2 truncate rounded bg-black/40 px-2 py-1 font-mono text-[10px] text-gray-400">
+              gasagency.app/dashboard
+            </span>
+          </div>
+          <div className="aspect-[16/9] min-h-[320px]">
+            <DashboardMock />
+          </div>
         </motion.div>
       </div>
     </section>
