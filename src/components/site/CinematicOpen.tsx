@@ -128,32 +128,7 @@ export function CinematicOpen() {
             </span>
           </motion.div>
 
-          {/* Main headline */}
-          <motion.h1
-            className="mt-6 max-w-5xl font-display font-black leading-[1] tracking-tight text-white"
-            style={{ fontSize: "clamp(2.4rem, 7vw, 6rem)", textShadow: "0 4px 30px rgba(0,0,0,0.9), 0 0 50px rgba(0,0,0,0.7)" }}
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35, type: "spring", stiffness: 80, damping: 22 }}
-          >
-            YOUR CITY.{" "}
-            <span className="text-primary" style={{ textShadow: "0 0 50px rgba(255,107,0,0.7), 0 4px 20px rgba(0,0,0,0.9)" }}>
-              YOUR AGENCY.
-            </span>{" "}
-            YOUR GROWTH.
-          </motion.h1>
 
-          {/* Sub-text */}
-          <motion.p
-            className="mt-6 max-w-2xl text-base leading-relaxed sm:text-xl font-medium text-gray-200"
-            style={{ textShadow: "0 2px 14px rgba(0,0,0,0.95)" }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, type: "spring", stiffness: 80, damping: 22 }}
-          >
-            Manage every cylinder, every customer, every rupee —
-            from one powerful platform built for India's LPG agencies.
-          </motion.p>
 
           {/* CTA Buttons */}
           <motion.div
