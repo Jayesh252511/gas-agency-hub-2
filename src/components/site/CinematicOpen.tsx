@@ -70,6 +70,7 @@ export function CinematicOpen() {
             className="h-full w-full object-cover opacity-65"
             poster="/pixel-city-night.png"
           >
+            <source src="/__l5e/assets-v1/7e543f9f-f073-4368-b5d7-8ea049310ebb/lpg-ledger-digital-transformation.mp4" type="video/mp4" />
             <source src="/lpg-ledger-digital-transformation.mp4" type="video/mp4" />
             <source src="/promo-video.mp4" type="video/mp4" />
           </video>
