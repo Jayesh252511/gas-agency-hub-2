@@ -13,6 +13,7 @@ import { CtaFooter } from "@/components/site/CtaFooter";
 import { EmberCursor } from "@/components/site/EmberCursor";
 import { SectionPill } from "@/components/site/SectionPill";
 import { WhatsAppFAB } from "@/components/site/WhatsAppFAB";
+import { CinematicOpen } from "@/components/site/CinematicOpen";
 
 export const Route = createFileRoute("/landing")({ component: LandingPage });
 
@@ -34,6 +35,9 @@ export default function LandingPage() {
 
       {/* ── Page Shell ── */}
       <div className="relative min-h-screen antialiased">
+        {/* ACT −1 — Fullscreen Cinematic City (Night → Dawn) */}
+        <CinematicOpen />
+
         {/* ACT 0 — Nav with dark/light toggle */}
         <Nav />
 
