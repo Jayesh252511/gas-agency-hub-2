@@ -2,7 +2,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { scrollToId, WHATSAPP } from "@/lib/gas";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Play } from "lucide-react";
 
 // Deterministic star positions
 const STARS = Array.from({ length: 90 }, (_, i) => ({
@@ -26,8 +26,8 @@ export function CinematicOpen() {
   const ref = useRef<HTMLDivElement>(null);
 
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const parallaxCity = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
-  const scrollOverlay = useTransform(scrollYProgress, [0, 0.55], [0, 0.85]);
+  const parallaxVideo = useTransform(scrollYProgress, [0, 1], ["0%", "15%"]);
+  const scrollOverlay = useTransform(scrollYProgress, [0, 0.55], [0, 0.9]);
   const textY = useTransform(scrollYProgress, [0, 1], ["0%", "-25%"]);
   const textOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
@@ -60,14 +60,19 @@ export function CinematicOpen() {
           ))}
         </div>
 
-        {/* ── Dark City Night Image (Parallax) ── */}
-        <motion.div className="absolute inset-0 z-[2]" style={{ y: parallaxCity }}>
-          <img
-            src="/pixel-city-night.png"
-            alt="Pixel art Indian LPG agency city at night"
-            className="absolute bottom-0 left-0 w-full pixelated"
-            style={{ height: "74%", objectFit: "cover", objectPosition: "bottom" }}
-          />
+        {/* ── Cinematic Dark Video Background (Ledger Digital Transformation) ── */}
+        <motion.div className="absolute inset-0 z-[2]" style={{ y: parallaxVideo }}>
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="h-full w-full object-cover opacity-65"
+            poster="/pixel-city-night.png"
+          >
+            <source src="/lpg-ledger-digital-transformation.mp4" type="video/mp4" />
+            <source src="/promo-video.mp4" type="video/mp4" />
+          </video>
         </motion.div>
 
         {/* ── Subtle horizon ember ambient glow ── */}
@@ -78,17 +83,17 @@ export function CinematicOpen() {
           }}
         />
 
-        {/* ── Ground atmosphere ── */}
+        {/* ── Ground atmosphere vignette ── */}
         <div
-          className="pointer-events-none absolute bottom-0 left-0 right-0 z-[4] h-56"
-          style={{ background: "linear-gradient(to top, rgba(5,5,18,0.95) 0%, transparent 100%)" }}
+          className="pointer-events-none absolute bottom-0 left-0 right-0 z-[4] h-64"
+          style={{ background: "linear-gradient(to top, rgba(5,5,18,0.98) 0%, transparent 100%)" }}
         />
 
         {/* ── Dark Scrim behind text for 100% legibility ── */}
         <div
           className="pointer-events-none absolute inset-0 z-[5]"
           style={{
-            background: "radial-gradient(ellipse 85% 65% at 50% 50%, rgba(0,0,0,0.70) 0%, transparent 80%)",
+            background: "radial-gradient(ellipse 85% 65% at 50% 50%, rgba(0,0,0,0.75) 0%, transparent 85%)",
           }}
         />
 
@@ -118,7 +123,7 @@ export function CinematicOpen() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, type: "spring", stiffness: 120, damping: 22 }}
           >
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/60 px-4 py-2 font-pixel text-[10px] uppercase tracking-widest text-primary backdrop-blur-md shadow-lg">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/70 px-4 py-2 font-pixel text-[10px] uppercase tracking-widest text-primary backdrop-blur-md shadow-lg">
               <span className="h-1.5 w-1.5 rounded-full bg-primary animate-ember" />
               LPG AGENCY ERP FOR INDIA
             </span>
@@ -171,8 +176,9 @@ export function CinematicOpen() {
             <button
               type="button"
               onClick={() => scrollToId("workbench")}
-              className="inline-flex items-center gap-2 rounded-lg border border-white/30 bg-black/50 px-8 py-4 font-display text-sm font-bold uppercase tracking-wide text-white backdrop-blur-md transition-colors hover:bg-white/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              className="inline-flex items-center gap-2.5 rounded-lg border border-white/30 bg-black/60 px-8 py-4 font-display text-sm font-bold uppercase tracking-wide text-white backdrop-blur-md transition-colors hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
+              <Play className="h-4 w-4 text-primary fill-primary" />
               Try Live Demo
             </button>
           </motion.div>
