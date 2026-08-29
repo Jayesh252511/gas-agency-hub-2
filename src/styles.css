@@ -90,76 +90,76 @@
 :root {
   --radius: 0.75rem;
 
-  /* App light theme */
-  --background: oklch(0.99 0.002 60);
-  --foreground: oklch(0.12 0.01 60);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.12 0.01 60);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.12 0.01 60);
+  /* App dark theme default */
+  --background: oklch(0.12 0.008 60);
+  --foreground: oklch(0.97 0.004 60);
+  --card: oklch(0.16 0.010 60);
+  --card-foreground: oklch(0.97 0.004 60);
+  --popover: oklch(0.16 0.010 60);
+  --popover-foreground: oklch(0.97 0.004 60);
 
   /* Industrial Orange — #FF6B00 */
-  --primary: oklch(0.62 0.20 40);
-  --primary-foreground: oklch(1 0 0);
+  --primary: oklch(0.65 0.20 40);
+  --primary-foreground: oklch(0.10 0.005 60);
 
-  --secondary: oklch(0.96 0.004 60);
-  --secondary-foreground: oklch(0.20 0.01 60);
-  --muted: oklch(0.96 0.004 60);
-  --muted-foreground: oklch(0.48 0.01 60);
-  --accent: oklch(0.97 0.015 40);
-  --accent-foreground: oklch(0.40 0.12 40);
-  --destructive: oklch(0.60 0.22 25);
-  --destructive-foreground: oklch(0.99 0.005 60);
-  --success: oklch(0.62 0.16 155);
-  --success-foreground: oklch(0.99 0.005 60);
-  --warning: oklch(0.78 0.16 75);
+  --secondary: oklch(0.22 0.008 60);
+  --secondary-foreground: oklch(0.97 0.004 60);
+  --muted: oklch(0.22 0.008 60);
+  --muted-foreground: oklch(0.65 0.008 60);
+  --accent: oklch(0.24 0.020 40);
+  --accent-foreground: oklch(0.90 0.020 40);
+  --destructive: oklch(0.65 0.22 25);
+  --destructive-foreground: oklch(0.97 0.004 60);
+  --success: oklch(0.70 0.16 155);
+  --success-foreground: oklch(0.12 0.008 60);
+  --warning: oklch(0.80 0.16 75);
   --warning-foreground: oklch(0.20 0.06 75);
-  --border: oklch(0.91 0.005 60);
-  --input: oklch(0.91 0.005 60);
-  --ring: oklch(0.62 0.20 40);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 12%);
+  --ring: oklch(0.65 0.20 40);
 
-  --chart-1: oklch(0.62 0.20 40);
-  --chart-2: oklch(0.65 0.15 155);
-  --chart-3: oklch(0.70 0.15 75);
-  --chart-4: oklch(0.60 0.20 25);
+  --chart-1: oklch(0.65 0.20 40);
+  --chart-2: oklch(0.70 0.16 155);
+  --chart-3: oklch(0.80 0.16 75);
+  --chart-4: oklch(0.65 0.22 25);
   --chart-5: oklch(0.55 0.18 305);
 
-  --sidebar: oklch(1 0 0);
-  --sidebar-foreground: oklch(0.20 0.01 60);
-  --sidebar-primary: oklch(0.62 0.20 40);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.97 0.015 40);
-  --sidebar-accent-foreground: oklch(0.20 0.01 60);
-  --sidebar-border: oklch(0.91 0.005 60);
-  --sidebar-ring: oklch(0.62 0.20 40);
+  --sidebar: oklch(0.14 0.010 60);
+  --sidebar-foreground: oklch(0.97 0.004 60);
+  --sidebar-primary: oklch(0.65 0.20 40);
+  --sidebar-primary-foreground: oklch(0.10 0.005 60);
+  --sidebar-accent: oklch(0.22 0.015 40);
+  --sidebar-accent-foreground: oklch(0.97 0.004 60);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.65 0.20 40);
 
   /* ── Landing / Pixel Canvas Brand Tokens ── */
   --ink:            #111111;
-  --ink-2:          #1A1A1A;
-  --ink-3:          #2D2D2D;
-  --paper:          #FAFAFA;
-  --paper-2:        #F3F3F3;
+  --ink-2:          #161616;
+  --ink-3:          #222222;
+  --paper:          #111111;
+  --paper-2:        #161616;
   --ember:          #FF6B00;
   --ember-warm:     #E85D3A;
   --cream:          #F5F3EE;
   --warm-grey:      #A8A29E;
-  --on-light:       #1A1A1A;
-  --on-light-muted: #57534E;
+  --on-light:       #F5F5F5;
+  --on-light-muted: #A0A0A0;
   --charcoal:       #111111;
   --charcoal-soft:  #1A1A1A;
-  --hairline:       #E4E2DE;
-  --surface-2:      #F3F3F3;
+  --hairline:       #333333;
+  --surface-2:      #181818;
   --dim:            #888888;
   --danger:         #EF4444;
   --warn:           #F59E0B;
   --orange:         #FF6B00;
-  --orange-light:   rgba(255,107,0,0.08);
-  --orange-glow:    rgba(255,107,0,0.18);
+  --orange-light:   rgba(255,107,0,0.12);
+  --orange-glow:    rgba(255,107,0,0.25);
 
   --panel-shadow:
-    0 1px 0 0 rgba(255,255,255,0.6) inset,
-    0 10px 30px -12px rgba(0,0,0,0.22),
-    0 2px 6px -2px rgba(0,0,0,0.1);
+    0 1px 0 0 rgba(255,255,255,0.08) inset,
+    0 10px 30px -12px rgba(0,0,0,0.5),
+    0 2px 6px -2px rgba(0,0,0,0.3);
   --glow-shadow: 0 0 34px -6px rgba(255,107,0,0.45);
 }
 

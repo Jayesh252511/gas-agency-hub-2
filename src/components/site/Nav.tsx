@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { AnimatePresence, motion, useScroll } from "framer-motion";
-import { Flame, Menu, Moon, Sun, X } from "lucide-react";
+import { Flame, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { WHATSAPP, scrollToId } from "@/lib/gas";
 
@@ -14,18 +14,8 @@ export function Nav() {
   const { scrollY } = useScroll();
   const [solid, setSolid] = useState(false);
   const [open, setOpen] = useState(false);
-  const [dark, setDark] = useState(false);
 
   useEffect(() => scrollY.on("change", (v) => setSolid(v > 40)), [scrollY]);
-
-  // Dark/light toggle
-  useEffect(() => {
-    if (dark) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [dark]);
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => {
@@ -42,7 +32,7 @@ export function Nav() {
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,border-color,backdrop-filter] duration-500 ${
         solid
-          ? "border-b border-hairline bg-background/75 shadow-sm backdrop-blur-xl"
+          ? "border-b border-white/10 bg-charcoal/85 shadow-lg backdrop-blur-xl"
           : "border-b border-transparent bg-transparent"
       }`}
     >
@@ -54,13 +44,13 @@ export function Nav() {
           aria-label="GasAgency Hub home"
         >
           <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary shadow-glow">
-            <Flame className="h-5 w-5 text-primary-foreground" strokeWidth={2.4} />
+            <Flame className="h-5 w-5 text-white" strokeWidth={2.4} />
           </span>
           <span className="min-w-0">
-            <span className="block truncate font-display text-[15px] font-bold tracking-tight">
+            <span className="block truncate font-display text-[15px] font-bold tracking-tight text-white">
               GasAgency Hub
             </span>
-            <span className="block truncate font-mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">
+            <span className="block truncate font-mono text-[9px] uppercase tracking-[0.18em] text-gray-400">
               Smart. Simple. Secure.
             </span>
           </span>
@@ -72,7 +62,7 @@ export function Nav() {
               key={l.id}
               type="button"
               onClick={() => go(l.id)}
-              className="rounded-md px-3 py-2 font-mono text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              className="rounded-md px-3.5 py-2 font-mono text-xs uppercase tracking-wider text-gray-300 transition-colors hover:bg-white/10 hover:text-white"
             >
               {l.label}
             </button>
@@ -82,7 +72,7 @@ export function Nav() {
         <div className="ml-auto flex shrink-0 items-center gap-2 md:ml-0">
           <Link
             to="/login"
-            className="hidden rounded-md px-3 py-2 font-mono text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
+            className="hidden rounded-md px-3.5 py-2 font-mono text-xs uppercase tracking-wider text-gray-300 transition-colors hover:text-white sm:inline-flex"
           >
             Login
           </Link>
@@ -90,35 +80,16 @@ export function Nav() {
             href={WHATSAPP}
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden items-center gap-2 rounded-md bg-primary px-4 py-2.5 font-display text-xs font-bold uppercase tracking-wide text-primary-foreground shadow-glow transition-transform duration-200 hover:-translate-y-0.5 sm:inline-flex"
+            className="hidden items-center gap-2 rounded-md bg-primary px-4 py-2.5 font-display text-xs font-bold uppercase tracking-wide text-white shadow-glow transition-transform duration-200 hover:-translate-y-0.5 sm:inline-flex"
           >
             Start Free Trial
           </a>
-          {/* Dark/Light Toggle */}
-          <button
-            type="button"
-            aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
-            onClick={() => setDark((d) => !d)}
-            className="grid h-9 w-9 place-items-center rounded-md border border-hairline text-muted-foreground transition-colors hover:bg-secondary"
-          >
-            <AnimatePresence mode="wait" initial={false}>
-              {dark ? (
-                <motion.span key="sun" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                  <Sun className="h-4 w-4" />
-                </motion.span>
-              ) : (
-                <motion.span key="moon" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                  <Moon className="h-4 w-4" />
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </button>
           <button
             type="button"
             aria-label="Open menu"
             aria-expanded={open}
             onClick={() => setOpen(true)}
-            className="grid h-10 w-10 place-items-center rounded-md border border-hairline md:hidden"
+            className="grid h-10 w-10 place-items-center rounded-md border border-white/15 text-white md:hidden"
           >
             <Menu className="h-5 w-5" />
           </button>
@@ -139,7 +110,7 @@ export function Nav() {
                 type="button"
                 aria-label="Close menu"
                 onClick={() => setOpen(false)}
-                className="grid h-10 w-10 place-items-center rounded-md border border-white/15 text-background"
+                className="grid h-10 w-10 place-items-center rounded-md border border-white/15 text-white"
               >
                 <X className="h-5 w-5 text-primary" />
               </button>
@@ -153,7 +124,7 @@ export function Nav() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.06 * i + 0.05 }}
                   onClick={() => go(l.id)}
-                  className="py-3 text-left font-display text-3xl font-bold tracking-tight text-secondary"
+                  className="py-3 text-left font-display text-3xl font-bold tracking-tight text-white"
                 >
                   {l.label}
                 </motion.button>
@@ -164,14 +135,14 @@ export function Nav() {
                 href={WHATSAPP}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-md bg-primary px-4 py-4 text-center font-display text-sm font-bold uppercase tracking-wide text-primary-foreground"
+                className="rounded-md bg-primary px-4 py-4 text-center font-display text-sm font-bold uppercase tracking-wide text-white"
               >
                 Start Free Trial
               </a>
               <Link
                 to="/login"
                 onClick={() => setOpen(false)}
-                className="rounded-md border border-white/20 px-4 py-4 text-center font-mono text-xs uppercase tracking-widest text-secondary"
+                className="rounded-md border border-white/20 px-4 py-4 text-center font-mono text-xs uppercase tracking-widest text-white"
               >
                 Agency Login
               </Link>

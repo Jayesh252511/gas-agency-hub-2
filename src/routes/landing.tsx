@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { Nav } from "@/components/site/Nav";
 import { Marquee } from "@/components/site/Marquee";
 import { OldWay } from "@/components/site/OldWay";
@@ -17,6 +18,10 @@ import { CinematicOpen } from "@/components/site/CinematicOpen";
 export const Route = createFileRoute("/landing")({ component: LandingPage });
 
 export default function LandingPage() {
+  useEffect(() => {
+    document.documentElement.classList.add("dark");
+  }, []);
+
   return (
     <>
       {/* SEO */}
@@ -33,11 +38,11 @@ export default function LandingPage() {
       <WhatsAppFAB />
 
       {/* ── Page Shell ── */}
-      <div className="relative min-h-screen antialiased">
-        {/* ACT −1 — Fullscreen Cinematic City (Night → Dawn) */}
+      <div className="relative min-h-screen bg-charcoal text-white antialiased">
+        {/* ACT −1 — Fullscreen Cinematic City Night */}
         <CinematicOpen />
 
-        {/* ACT 0 — Nav with dark/light toggle */}
+        {/* ACT 0 — Nav */}
         <Nav />
 
         {/* ACT 2 — Infinite Marquee Ticker */}

@@ -640,12 +640,12 @@ export function Workbench() {
   const Active = tab.Comp;
 
   return (
-    <section id="workbench" className="scroll-mt-24 bg-surface px-4 py-20 sm:px-6 lg:px-14">
+    <section id="workbench" className="scroll-mt-24 bg-charcoal border-t border-white/10 px-4 py-20 sm:px-6 lg:px-14">
       <div id="features" className="mx-auto max-w-7xl scroll-mt-24">
         <span className="font-pixel text-[10px] tracking-tight text-primary">
           ▶ // APP WORKBENCH
         </span>
-        <h2 className="mt-3 max-w-2xl font-display text-3xl font-bold tracking-tight sm:text-4xl">
+        <h2 className="mt-3 max-w-2xl font-display text-3xl font-bold tracking-tight text-white sm:text-4xl">
           NINE MODULES. ONE CONSOLE. TRY THEM ALL.
         </h2>
 

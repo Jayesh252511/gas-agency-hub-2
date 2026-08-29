@@ -15,17 +15,17 @@ export function VideoDemo() {
     <section
       id="demo"
       ref={ref}
-      className="relative h-[240vh] scroll-mt-24 bg-surface-2 md:h-[280vh]"
+      className="relative h-[240vh] scroll-mt-24 bg-charcoal border-t border-white/10 md:h-[280vh]"
     >
       <div className="sticky top-0 flex h-screen flex-col items-center justify-center overflow-hidden px-4">
         <div className="mb-6 text-center">
           <span className="font-pixel text-[10px] tracking-tight text-primary">
             ▶ // PRODUCT DEMO
           </span>
-          <h2 className="mt-2 font-display text-2xl font-bold tracking-tight sm:text-4xl">
+          <h2 className="mt-2 font-display text-2xl font-bold tracking-tight text-white sm:text-4xl">
             See GasAgency Hub In Action.
           </h2>
-          <p className="mx-auto mt-3 max-w-xl text-xs leading-relaxed text-muted-foreground sm:text-sm">
+          <p className="mx-auto mt-3 max-w-xl text-xs leading-relaxed text-gray-400 sm:text-sm">
             Watch how your agency operations transform — from billing and udhari tracking to
             delivery management and reports. All in one dashboard, built for India.
           </p>

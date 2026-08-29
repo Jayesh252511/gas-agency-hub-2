@@ -17,19 +17,19 @@ export const STATIONS = [
 function Panel({ i }: { i: number }) {
   const s = STATIONS[i];
   return (
-    <article className="flex h-[300px] w-[280px] shrink-0 flex-col rounded-2xl border border-hairline bg-card p-4 shadow-panel sm:h-[330px] sm:w-[330px]">
+    <article className="flex h-[300px] w-[280px] shrink-0 flex-col rounded-2xl border border-white/10 bg-charcoal-soft p-4 shadow-panel sm:h-[330px] sm:w-[330px]">
       <div className="flex items-center justify-between">
         <span className="font-pixel text-[9px] tracking-tight text-primary">
           {String(i + 1).padStart(2, "0")} / 09
         </span>
         <span className="h-2 w-2 rounded-full bg-primary shadow-glow" />
       </div>
-      <h3 className="mt-3 font-display text-lg font-bold leading-tight tracking-tight">
+      <h3 className="mt-3 font-display text-lg font-bold leading-tight tracking-tight text-white">
         {s.title}
       </h3>
-      <div className="mt-4 flex-1 rounded-lg bg-charcoal p-3">
-        <div className="font-pixel text-[7px] text-secondary/40">INSET SCREEN</div>
-        <div className="mt-3 font-mono text-sm text-primary">{s.screen}</div>
+      <div className="mt-4 flex-1 rounded-lg bg-[#090909] border border-white/5 p-3">
+        <div className="font-pixel text-[7px] text-gray-500">INSET SCREEN</div>
+        <div className="mt-3 font-mono text-sm font-bold text-primary">{s.screen}</div>
         <div className="mt-4 flex h-14 items-end gap-1">
           {[40, 66, 52, 88, 60, 96, 72].map((h, k) => (
             <motion.span
@@ -38,7 +38,7 @@ function Panel({ i }: { i: number }) {
               whileInView={{ height: `${h}%` }}
               viewport={{ once: true }}
               transition={{ delay: k * 0.05, type: "spring", stiffness: 120, damping: 16 }}
-              className="flex-1 rounded-sm bg-primary/70"
+              className="flex-1 rounded-sm bg-primary/80"
             />
           ))}
         </div>
@@ -46,10 +46,10 @@ function Panel({ i }: { i: number }) {
       <div className="mt-4 flex items-center gap-4">
         {s.knobs.map((k) => (
           <span key={k} className="flex items-center gap-2">
-            <span className="grid h-7 w-7 place-items-center rounded-full border-2 border-hairline bg-secondary">
-              <span className="h-2 w-0.5 -translate-y-1 bg-foreground" />
+            <span className="grid h-7 w-7 place-items-center rounded-full border border-white/20 bg-black/40">
+              <span className="h-2 w-0.5 -translate-y-1 bg-white" />
             </span>
-            <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+            <span className="font-mono text-[10px] uppercase tracking-widest text-gray-400">
               {k}
             </span>
           </span>
@@ -73,14 +73,14 @@ export function AssemblyLine() {
         id="assembly"
         ref={ref}
         aria-label="The assembly line of modules"
-        className="relative hidden h-[420vh] bg-surface-2 md:block"
+        className="relative hidden h-[420vh] bg-[#111111] md:block border-t border-white/10"
       >
         <div className="sticky top-0 flex h-screen flex-col justify-center overflow-hidden">
           <div className="mx-auto mb-8 w-full max-w-7xl px-10">
             <span className="font-pixel text-[10px] tracking-tight text-primary">
               02 // THE ASSEMBLY LINE
             </span>
-            <h2 className="mt-3 max-w-2xl font-display text-3xl font-bold tracking-tight lg:text-4xl">
+            <h2 className="mt-3 max-w-2xl font-display text-3xl font-bold tracking-tight text-white lg:text-4xl">
               NINE MODULES BOLT ONTO YOUR AGENCY.
             </h2>
           </div>
@@ -92,7 +92,7 @@ export function AssemblyLine() {
           </motion.div>
 
           <div className="relative mt-8 px-10">
-            <div className="h-1 w-full rounded-full bg-hairline" />
+            <div className="h-1 w-full rounded-full bg-white/10" />
             <motion.img
               src="/pixel-cylinder.png"
               alt=""
@@ -107,11 +107,11 @@ export function AssemblyLine() {
       </section>
 
       {/* Mobile: vertical stack */}
-      <section aria-label="Modules" className="bg-surface-2 px-4 py-16 md:hidden">
+      <section aria-label="Modules" className="bg-[#111111] px-4 py-16 md:hidden border-t border-white/10">
         <span className="font-pixel text-[10px] tracking-tight text-primary">
           02 // THE ASSEMBLY LINE
         </span>
-        <h2 className="mt-3 font-display text-2xl font-bold tracking-tight">
+        <h2 className="mt-3 font-display text-2xl font-bold tracking-tight text-white">
           NINE MODULES BOLT ONTO YOUR AGENCY.
         </h2>
         <div className="mt-8 flex flex-col items-center gap-5">

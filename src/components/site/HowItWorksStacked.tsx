@@ -51,12 +51,12 @@ function StackCard({ step, index }: { step: typeof STEPS[0]; index: number }) {
           opacity: inView ? 1 : 0.75,
         }}
         transition={{ type: "spring", stiffness: 120, damping: 22 }}
-        className={`relative mb-6 overflow-hidden rounded-2xl border border-hairline border-l-4 ${step.accent} bg-card p-6 shadow-panel sm:p-10`}
+        className={`relative mb-6 overflow-hidden rounded-2xl border border-white/10 border-l-4 ${step.accent} bg-charcoal-soft p-6 shadow-panel sm:p-10`}
       >
         {/* Ghost numeral watermark */}
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute -right-3 -top-4 select-none font-pixel text-[110px] leading-none text-foreground/[0.04] sm:text-[150px]"
+          className="pointer-events-none absolute -right-3 -top-4 select-none font-pixel text-[110px] leading-none text-white/[0.04] sm:text-[150px]"
         >
           {String(index + 1).padStart(2, "0")}
         </span>
@@ -73,10 +73,10 @@ function StackCard({ step, index }: { step: typeof STEPS[0]; index: number }) {
         <span className="font-pixel text-[9px] tracking-widest text-primary">
           {step.tag}
         </span>
-        <h3 className="mt-3 font-display text-xl font-bold tracking-tight sm:text-3xl">
+        <h3 className="mt-3 font-display text-xl font-bold tracking-tight text-white sm:text-3xl">
           {step.title}
         </h3>
-        <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+        <p className="mt-3 max-w-xl text-sm leading-relaxed text-gray-300 sm:text-base">
           {step.body}
         </p>
 
@@ -96,7 +96,7 @@ export function HowItWorksStacked() {
   return (
     <section
       id="how"
-      className="scroll-mt-24 bg-paper px-4 py-20 sm:px-6 lg:px-14"
+      className="scroll-mt-24 bg-[#0D0D0D] px-4 py-20 sm:px-6 lg:px-14 border-t border-white/10"
     >
       <div className="mx-auto max-w-4xl">
         {/* Header */}
@@ -109,11 +109,11 @@ export function HowItWorksStacked() {
           <span className="font-pixel text-[10px] tracking-widest text-primary">
             02 // SIMPLE PROCESS
           </span>
-          <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-on-light sm:text-4xl lg:text-5xl">
+          <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
             Up &amp; Running In{" "}
             <span className="text-primary">4 Easy Steps.</span>
           </h2>
-          <p className="mt-4 max-w-xl text-sm leading-relaxed text-on-light-muted sm:text-base">
+          <p className="mt-4 max-w-xl text-sm leading-relaxed text-gray-400 sm:text-base">
             We built GasAgency Hub so you can go from zero to fully digital in
             one afternoon. No IT skills needed. No expensive setup.
           </p>
@@ -143,7 +143,7 @@ export function HowItWorksStacked() {
             loading="lazy"
             width={1536}
             height={512}
-            className="w-full rounded-xl border border-hairline object-cover pixelated"
+            className="w-full rounded-xl border border-white/10 object-cover pixelated"
           />
         </motion.div>
       </div>
