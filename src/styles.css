@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Silkscreen:wght@400;700&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
@@ -12,9 +12,34 @@
  */
 
 @theme inline {
-  --font-sans: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-sans: "IBM Plex Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-pixel: "Silkscreen", ui-monospace, monospace;
+  --font-serif: "Libre Baskerville", ui-serif, Georgia, serif;
+
+  /* Landing page / pixel canvas colors */
+  --color-charcoal: var(--charcoal);
+  --color-charcoal-soft: var(--charcoal-soft);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-ember: var(--ember);
+  --color-ember-warm: var(--ember-warm);
+  --color-cream: var(--cream);
+  --color-warm-grey: var(--warm-grey);
+  --color-on-light: var(--on-light);
+  --color-on-light-muted: var(--on-light-muted);
+  --color-hairline: var(--hairline);
+  --color-dim: var(--dim);
+  --color-surface-2: var(--surface-2);
+  --color-danger: var(--danger);
+  --color-warn: var(--warn);
+
+  --shadow-panel: var(--panel-shadow);
+  --shadow-glow: var(--glow-shadow);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -65,38 +90,30 @@
 :root {
   --radius: 0.75rem;
 
-  /* Editorial white background */
+  /* App light theme */
   --background: oklch(0.99 0.002 60);
   --foreground: oklch(0.12 0.01 60);
-
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.12 0.01 60);
-
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.12 0.01 60);
 
-  /* Industrial Orange — FF6B00 */
+  /* Industrial Orange — #FF6B00 */
   --primary: oklch(0.62 0.20 40);
   --primary-foreground: oklch(1 0 0);
 
   --secondary: oklch(0.96 0.004 60);
   --secondary-foreground: oklch(0.20 0.01 60);
-
   --muted: oklch(0.96 0.004 60);
   --muted-foreground: oklch(0.48 0.01 60);
-
   --accent: oklch(0.97 0.015 40);
   --accent-foreground: oklch(0.40 0.12 40);
-
   --destructive: oklch(0.60 0.22 25);
   --destructive-foreground: oklch(0.99 0.005 60);
-
   --success: oklch(0.62 0.16 155);
   --success-foreground: oklch(0.99 0.005 60);
-
   --warning: oklch(0.78 0.16 75);
   --warning-foreground: oklch(0.20 0.06 75);
-
   --border: oklch(0.91 0.005 60);
   --input: oklch(0.91 0.005 60);
   --ring: oklch(0.62 0.20 40);
@@ -107,7 +124,6 @@
   --chart-4: oklch(0.60 0.20 25);
   --chart-5: oklch(0.55 0.18 305);
 
-  /* White editorial sidebar */
   --sidebar: oklch(1 0 0);
   --sidebar-foreground: oklch(0.20 0.01 60);
   --sidebar-primary: oklch(0.62 0.20 40);
@@ -117,14 +133,34 @@
   --sidebar-border: oklch(0.91 0.005 60);
   --sidebar-ring: oklch(0.62 0.20 40);
 
-  /* Editorial font vars */
-  --font-pixel:  'Silkscreen', monospace;
-  --font-head:   'Space Grotesk', 'Inter', sans-serif;
-  --font-body:   'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono:   'JetBrains Mono', ui-monospace, monospace;
-  --orange:      #FF6B00;
-  --orange-light: rgba(255,107,0,0.08);
-  --orange-glow:  rgba(255,107,0,0.18);
+  /* ── Landing / Pixel Canvas Brand Tokens ── */
+  --ink:            #111111;
+  --ink-2:          #1A1A1A;
+  --ink-3:          #2D2D2D;
+  --paper:          #FAFAFA;
+  --paper-2:        #F3F3F3;
+  --ember:          #FF6B00;
+  --ember-warm:     #E85D3A;
+  --cream:          #F5F3EE;
+  --warm-grey:      #A8A29E;
+  --on-light:       #1A1A1A;
+  --on-light-muted: #57534E;
+  --charcoal:       #111111;
+  --charcoal-soft:  #1A1A1A;
+  --hairline:       #E4E2DE;
+  --surface-2:      #F3F3F3;
+  --dim:            #888888;
+  --danger:         #EF4444;
+  --warn:           #F59E0B;
+  --orange:         #FF6B00;
+  --orange-light:   rgba(255,107,0,0.08);
+  --orange-glow:    rgba(255,107,0,0.18);
+
+  --panel-shadow:
+    0 1px 0 0 rgba(255,255,255,0.6) inset,
+    0 10px 30px -12px rgba(0,0,0,0.22),
+    0 2px 6px -2px rgba(0,0,0,0.1);
+  --glow-shadow: 0 0 34px -6px rgba(255,107,0,0.45);
 }
 
 .dark {
@@ -728,3 +764,106 @@
   50% { opacity: 0; }
 }
 .pixel-blink { animation: pixelBlink 1.2s step-end infinite; }
+
+/* ─── Landing Page Pixel Canvas Design System ───────────────────────────── */
+
+/* Dark mode token overrides on landing page */
+.dark {
+  --hairline: #4A4A4A;
+  --surface-2: #1A1A1A;
+  --charcoal: #111111;
+  --charcoal-soft: #1A1A1A;
+  --panel-shadow:
+    0 1px 0 0 rgba(255,255,255,0.08) inset,
+    0 10px 30px -12px rgba(0,0,0,0.5),
+    0 2px 6px -2px rgba(0,0,0,0.3);
+}
+
+/* Font face utilities for landing page */
+.font-pixel  { font-family: "Silkscreen", ui-monospace, monospace !important; }
+.font-display { font-family: "Space Grotesk", "Plus Jakarta Sans", ui-sans-serif !important; }
+.font-serif  { font-family: "Libre Baskerville", ui-serif, Georgia !important; }
+
+@utility pixelated {
+  image-rendering: pixelated;
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+@utility scanline-overlay {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.18) 0px,
+    rgba(0,0,0,0.18) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+@utility vignette {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 45%,
+    rgba(0,0,0,0.50) 100%
+  );
+}
+
+@utility panel {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-hairline);
+  box-shadow: var(--panel-shadow);
+  border-radius: var(--radius-2xl);
+}
+
+@keyframes marquee-left {
+  from { transform: translate3d(0,0,0); }
+  to   { transform: translate3d(-50%,0,0); }
+}
+@keyframes marquee-right {
+  from { transform: translate3d(-50%,0,0); }
+  to   { transform: translate3d(0,0,0); }
+}
+@keyframes ember-pulse {
+  0%,100% { opacity: 0.7; transform: scale(1); }
+  50%     { opacity: 1;   transform: scale(1.22); }
+}
+@keyframes bob {
+  0%,100% { transform: translate3d(0,0,0); }
+  50%     { transform: translate3d(0,-12px,0); }
+}
+@keyframes breathe {
+  0%,100% { opacity: 0.35; transform: scale(0.92); }
+  50%     { opacity: 0.72; transform: scale(1.06); }
+}
+@keyframes flicker {
+  0%,100% { opacity: 0.9; }
+  33%     { opacity: 0.7; }
+  66%     { opacity: 1;   }
+}
+
+.animate-marquee-left  { animation: marquee-left  30s linear infinite; }
+.animate-marquee-right { animation: marquee-right 38s linear infinite; }
+.animate-ember   { animation: ember-pulse 2s ease-in-out infinite; }
+.animate-bob     { animation: bob 5s ease-in-out infinite; }
+.animate-breathe { animation: breathe 5s ease-in-out infinite; }
+.animate-flicker { animation: flicker 3s ease-in-out infinite; }
+
+.marquee-group:hover .animate-marquee-left,
+.marquee-group:hover .animate-marquee-right {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee-left,
+  .animate-marquee-right,
+  .animate-ember,
+  .animate-bob,
+  .animate-breathe,
+  .animate-flicker {
+    animation: none !important;
+  }
+}
+
