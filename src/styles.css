@@ -449,7 +449,9 @@
 /* Crisp Dark Mode Inputs & Controls */
 .dark input,
 .dark select,
-.dark textarea {
+.dark textarea,
+.dark button[role="combobox"],
+.dark [data-radix-select-trigger] {
   background-color: #1A1A1A !important;
   color: #FFFFFF !important;
   border-color: rgba(255, 255, 255, 0.18) !important;
@@ -477,32 +479,83 @@
   color: #FFFFFF !important;
 }
 
-.dark .bg-muted {
+.dark .bg-muted,
+.dark .bg-muted\/50,
+.dark .bg-muted\/40,
+.dark .bg-muted\/20,
+.dark .bg-muted\/10 {
   background-color: #222222 !important;
 }
 
-/* ── Dark Mode Tables (Payments, Customers, Sales, Cashbook) ── */
+/* ── Dark Mode Master Table System (Expenses, Payments, Sales, Customers, Cashbook) ── */
+.dark table {
+  color: #F1F5F9 !important;
+  background-color: transparent !important;
+}
+
 .dark table thead,
 .dark table thead tr,
-.dark table th {
-  background-color: #1E1E1E !important;
+.dark table th,
+.dark table tr.bg-muted\/50,
+.dark table tr.bg-muted\/40 {
+  background-color: #1F1F1F !important;
   color: #FFFFFF !important;
-  border-color: rgba(255, 255, 255, 0.15) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.dark table th {
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
 }
 
 .dark table tbody tr {
-  background-color: #141414 !important;
-  color: #E2E8F0 !important;
+  background-color: #121212 !important;
+  color: #F1F5F9 !important;
   border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
-.dark table tbody tr:hover {
-  background-color: #1F1F1F !important;
+.dark table tbody tr:hover,
+.dark table tbody tr.hover\:bg-muted\/15:hover,
+.dark table tbody tr.hover\:bg-muted\/30:hover {
+  background-color: #262626 !important;
+  color: #FFFFFF !important;
 }
 
-.dark table td {
-  color: #E2E8F0 !important;
+.dark table td,
+.dark table td span,
+.dark table td div,
+.dark table td a,
+.dark table td p {
+  color: #F1F5F9 !important;
   border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Category pills & badges inside dark table cells */
+.dark table td .bg-muted,
+.dark table td span.bg-muted {
+  background-color: #2A2A2A !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Notes & secondary text inside dark table cells */
+.dark table td.text-muted-foreground,
+.dark table td .text-muted-foreground {
+  color: #CBD5E1 !important;
+}
+
+/* Outflow / Debit amounts (Red) */
+.dark table td.text-destructive,
+.dark table td .text-destructive {
+  color: #FF6B6B !important;
+}
+
+/* Inflow / Credit amounts (Green) */
+.dark table td.text-success,
+.dark table td .text-success,
+.dark table td.text-success-dark,
+.dark table td .text-success-dark {
+  color: #34D399 !important;
 }
 
 /* ── Dark Mode Sidebar Navigation ── */
