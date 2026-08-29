@@ -73,7 +73,6 @@ export function CinematicOpen() {
           >
             <source src={videoAsset.url} type="video/mp4" />
             <source src="/lpg-ledger-digital-transformation.mp4" type="video/mp4" />
-            <source src="/promo-video.mp4" type="video/mp4" />
           </video>
         </motion.div>
 
