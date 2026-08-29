@@ -56,7 +56,7 @@ export function CinematicOpen() {
           className="absolute inset-0 z-0"
           animate={{
             background:
-              phase === "night" || phase === "night"
+              phase === "night"
                 ? "linear-gradient(to bottom, #050514 0%, #0D0A2E 35%, #1A0E2E 60%, #2D1810 100%)"
                 : phase === "dawn"
                 ? "linear-gradient(to bottom, #FF8C00 0%, #FF4500 25%, #FF6B00 45%, #8B2500 70%, #1A0A00 100%)"
