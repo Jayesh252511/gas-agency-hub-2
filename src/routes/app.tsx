@@ -167,9 +167,9 @@ function AppLayout() {
             {to:"/app/customers",label:"Customers",icon:Users},
           ].map(n=>(
             <Link key={n.to} to={n.to}
-              className={cn("flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 hover:translate-x-[2px]")}
-              style={{fontFamily:"'Inter',sans-serif",fontWeight:500,fontSize:13,color:'var(--sidebar-foreground)',textDecoration:'none'}}
-              activeProps={{className:"nav-item-active",style:{fontFamily:"'Inter',sans-serif",fontWeight:600,fontSize:13,color:'var(--foreground)',textDecoration:'none',background:'var(--muted)',borderLeft:'3px solid var(--foreground)',paddingLeft:9}}}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 text-gray-300 hover:text-white hover:bg-white/10"
+              style={{fontFamily:"'Inter',sans-serif",fontSize:13,textDecoration:'none'}}
+              activeProps={{className:"nav-item-active font-semibold text-white bg-white/15 border-l-4 border-primary pl-2.5", style:{fontFamily:"'Inter',sans-serif",fontSize:13,textDecoration:'none'}}}
               activeOptions={{exact:(n as any).exact}}
             >
               <n.icon className="w-4 h-4 shrink-0"/>

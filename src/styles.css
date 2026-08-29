@@ -513,16 +513,23 @@
 }
 
 .dark aside nav a:hover {
-  background-color: #222222 !important;
+  background-color: rgba(255, 255, 255, 0.10) !important;
   color: #FFFFFF !important;
 }
 
+.nav-item-active,
+a.nav-item-active,
 .dark aside nav a.nav-item-active,
 .dark aside nav a[aria-current="page"] {
-  background-color: #282828 !important;
+  background-color: rgba(255, 255, 255, 0.15) !important;
   color: #FFFFFF !important;
-  border-left-color: #FF6B00 !important;
+  border-left: 4px solid #FF6B00 !important;
 }
+
+.nav-item-active span,
+.nav-item-active svg,
+a.nav-item-active span,
+a.nav-item-active svg,
 .dark aside nav a.nav-item-active span,
 .dark aside nav a.nav-item-active svg {
   color: #FFFFFF !important;
