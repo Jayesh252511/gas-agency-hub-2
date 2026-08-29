@@ -463,27 +463,102 @@
   color-scheme: dark;
 }
 
-/* High Contrast Dark Mode Color Overrides for App Tables & Cards */
-.dark .text-slate-500,
-.dark .text-slate-600,
-.dark .text-slate-700,
-.dark .text-slate-800 {
-  color: #D4D4D4 !important;
+/* ── Dark Mode Cards, Headers & Containers ── */
+.dark .bg-white,
+.dark .bg-slate-50,
+.dark .bg-slate-100 {
+  background-color: #161616 !important;
+  color: #F3F4F6 !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
 }
+
+.dark .bg-slate-900 {
+  background-color: #121212 !important;
+  color: #FFFFFF !important;
+}
+
+.dark .bg-muted {
+  background-color: #222222 !important;
+}
+
+/* ── Dark Mode Tables (Payments, Customers, Sales, Cashbook) ── */
+.dark table thead,
+.dark table thead tr,
+.dark table th {
+  background-color: #1E1E1E !important;
+  color: #FFFFFF !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.dark table tbody tr {
+  background-color: #141414 !important;
+  color: #E2E8F0 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.dark table tbody tr:hover {
+  background-color: #1F1F1F !important;
+}
+
+.dark table td {
+  color: #E2E8F0 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* ── Dark Mode Sidebar Navigation ── */
+.dark aside nav a,
+.dark aside nav a span,
+.dark aside nav a svg {
+  color: #D1D5DB !important;
+}
+
+.dark aside nav a:hover {
+  background-color: #222222 !important;
+  color: #FFFFFF !important;
+}
+
+.dark aside nav a.nav-item-active,
+.dark aside nav a[aria-current="page"] {
+  background-color: #282828 !important;
+  color: #FFFFFF !important;
+  border-left-color: #FF6B00 !important;
+}
+.dark aside nav a.nav-item-active span,
+.dark aside nav a.nav-item-active svg {
+  color: #FFFFFF !important;
+}
+
+/* ── High Contrast Dark Mode Typography Overrides ── */
+.dark .text-slate-900,
+.dark .text-slate-800,
+.dark .text-slate-700,
+.dark .text-slate-600 {
+  color: #E2E8F0 !important;
+}
+
+.dark .text-slate-500,
 .dark .text-slate-400,
 .dark .text-slate-300 {
-  color: #A3A3A3 !important;
+  color: #94A3B8 !important;
 }
+
+.dark .text-slate-200,
+.dark .text-slate-100 {
+  color: #F8FAFC !important;
+}
+
 .dark .text-red-600,
 .dark .text-red-700,
 .dark .text-red-800,
 .dark .text-red-900 {
   color: #FF6B6B !important;
 }
+
 .dark .text-emerald-600,
 .dark .text-emerald-700 {
   color: #34D399 !important;
 }
+
 .dark .text-amber-600,
 .dark .text-amber-700 {
   color: #FBBF24 !important;
