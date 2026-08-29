@@ -5,7 +5,6 @@ import { Marquee } from "@/components/site/Marquee";
 import { OldWay } from "@/components/site/OldWay";
 import { AssemblyLine } from "@/components/site/AssemblyLine";
 import { Workbench } from "@/components/site/Workbench";
-import { Showcase } from "@/components/site/Showcase";
 import { VideoDemo } from "@/components/site/VideoDemo";
 import { Pipeline } from "@/components/site/Pipeline";
 import { HowItWorksStacked } from "@/components/site/HowItWorksStacked";
@@ -56,9 +55,6 @@ export default function LandingPage() {
 
         {/* ACT 5 — Interactive App Workbench */}
         <Workbench />
-
-        {/* ACT 6 — Pixel Dark Showcase */}
-        <Showcase />
 
         {/* ACT 7 — Scroll-Driven Video Demo */}
         <VideoDemo />

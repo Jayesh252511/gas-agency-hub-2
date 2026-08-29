@@ -7,7 +7,6 @@ const SECTIONS = [
   { id: "oldway",   label: "THE OLD WAY" },
   { id: "assembly", label: "ASSEMBLY LINE" },
   { id: "workbench",label: "WORKBENCH" },
-  { id: "showcase", label: "FEATURES" },
   { id: "demo",     label: "PRODUCT DEMO" },
   { id: "how",      label: "HOW IT WORKS" },
   { id: "start",    label: "IGNITE" },

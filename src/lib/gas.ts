@@ -26,7 +26,6 @@ export const ACTS = [
   { id: "oldway", label: "THE OLD WAY" },
   { id: "assembly", label: "ASSEMBLY" },
   { id: "workbench", label: "WORKBENCH" },
-  { id: "showcase", label: "FEATURES" },
   { id: "demo", label: "DEMO" },
   { id: "how", label: "PROCESS" },
   { id: "start", label: "IGNITE" },
