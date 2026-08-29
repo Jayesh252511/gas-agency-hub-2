@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Nav } from "@/components/site/Nav";
-import { Hero } from "@/components/site/Hero";
 import { Marquee } from "@/components/site/Marquee";
 import { OldWay } from "@/components/site/OldWay";
 import { AssemblyLine } from "@/components/site/AssemblyLine";
@@ -40,9 +39,6 @@ export default function LandingPage() {
 
         {/* ACT 0 — Nav with dark/light toggle */}
         <Nav />
-
-        {/* ACT 1 — Hero: Glitch ignition, 3D tilt cards, live numbers */}
-        <Hero />
 
         {/* ACT 2 — Infinite Marquee Ticker */}
         <Marquee />
