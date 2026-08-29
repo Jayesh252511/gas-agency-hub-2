@@ -3,6 +3,7 @@ import { useRef } from "react";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { scrollToId, WHATSAPP } from "@/lib/gas";
 import { ArrowRight, Play } from "lucide-react";
+import videoAsset from "../../../public/lpg-ledger-digital-transformation.mp4.asset.json";
 
 // Deterministic star positions
 const STARS = Array.from({ length: 90 }, (_, i) => ({
@@ -70,7 +71,7 @@ export function CinematicOpen() {
             className="h-full w-full object-cover opacity-65"
             poster="/pixel-city-night.png"
           >
-            <source src="/__l5e/assets-v1/7e543f9f-f073-4368-b5d7-8ea049310ebb/lpg-ledger-digital-transformation.mp4" type="video/mp4" />
+            <source src={videoAsset.url} type="video/mp4" />
             <source src="/lpg-ledger-digital-transformation.mp4" type="video/mp4" />
             <source src="/promo-video.mp4" type="video/mp4" />
           </video>
