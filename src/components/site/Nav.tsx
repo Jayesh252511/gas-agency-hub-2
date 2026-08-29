@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { AnimatePresence, motion, useScroll } from "framer-motion";
-import { Flame, Menu, X } from "lucide-react";
+import { Flame, Menu, Moon, Sun, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { WHATSAPP, scrollToId } from "@/lib/gas";
 
@@ -14,8 +14,18 @@ export function Nav() {
   const { scrollY } = useScroll();
   const [solid, setSolid] = useState(false);
   const [open, setOpen] = useState(false);
+  const [dark, setDark] = useState(false);
 
   useEffect(() => scrollY.on("change", (v) => setSolid(v > 40)), [scrollY]);
+
+  // Dark/light toggle
+  useEffect(() => {
+    if (dark) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [dark]);
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => {
@@ -84,6 +94,25 @@ export function Nav() {
           >
             Start Free Trial
           </a>
+          {/* Dark/Light Toggle */}
+          <button
+            type="button"
+            aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
+            onClick={() => setDark((d) => !d)}
+            className="grid h-9 w-9 place-items-center rounded-md border border-hairline text-muted-foreground transition-colors hover:bg-secondary"
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              {dark ? (
+                <motion.span key="sun" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
+                  <Sun className="h-4 w-4" />
+                </motion.span>
+              ) : (
+                <motion.span key="moon" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
+                  <Moon className="h-4 w-4" />
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </button>
           <button
             type="button"
             aria-label="Open menu"

@@ -75,10 +75,10 @@ export function CtaFooter() {
             className="absolute bottom-2 z-10 h-12 w-auto pixelated"
             animate={{ x: ["-10%", "110%"] }}
             transition={{
-              duration: 18,
+              duration: 8,
               repeat: Infinity,
               ease: "linear",
-              repeatDelay: 4,
+              repeatDelay: 2,
             }}
           />
         </div>
