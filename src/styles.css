@@ -439,18 +439,54 @@
 /* Dot-matrix engineering grid on main content background */
 .app-editorial-bg {
   position: relative;
+  background-color: var(--color-background);
 }
-.app-editorial-bg::before {
-  content: '';
-  position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  background-image:
-    radial-gradient(#DCDCDC 1px, transparent 1px);
-  background-size: 24px 24px;
-  opacity: 0.5;
-}
+.app-editorial-bg::before,
 .dark .app-editorial-bg::before {
-  background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
-  opacity: 0.6;
+  display: none !important;
+}
+
+/* Crisp Dark Mode Inputs & Controls */
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: #1A1A1A !important;
+  color: #FFFFFF !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+}
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #888888 !important;
+}
+.dark input[type="date"],
+.dark input[type="datetime-local"] {
+  color-scheme: dark;
+}
+
+/* High Contrast Dark Mode Color Overrides for App Tables & Cards */
+.dark .text-slate-500,
+.dark .text-slate-600,
+.dark .text-slate-700,
+.dark .text-slate-800 {
+  color: #D4D4D4 !important;
+}
+.dark .text-slate-400,
+.dark .text-slate-300 {
+  color: #A3A3A3 !important;
+}
+.dark .text-red-600,
+.dark .text-red-700,
+.dark .text-red-800,
+.dark .text-red-900 {
+  color: #FF6B6B !important;
+}
+.dark .text-emerald-600,
+.dark .text-emerald-700 {
+  color: #34D399 !important;
+}
+.dark .text-amber-600,
+.dark .text-amber-700 {
+  color: #FBBF24 !important;
 }
 
 /* ── PIXEL LABEL UTILITY ── */
